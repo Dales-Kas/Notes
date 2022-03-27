@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Notes.Views.NotePage"
+             Title="Notes">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical">
+        
+        <!--<Grid ColumnSpacing="10" RowSpacing="10">
+            <Button Text="Alert1" Clicked="Alert1_Clicked" FontSize="Small" HeightRequest="100"></Button>
+             <Button Grid.Column="1" Text="Alert2" Clicked="Alert2_Clicked" FontSize="Small" HeightRequest="100"></Button>
+             <Button Grid.Column="2" Text="Alert3" Clicked="Alert3_Clicked" FontSize="Small" HeightRequest="100"></Button>
+             <Button Grid.Column="3" Text="Alert4" Clicked="Alert4_Clicked" FontSize="Small" HeightRequest="100"></Button>
+        </Grid>-->
+
+        <Label Text="Нотатки:" FontSize="Medium" TextColor="Blue"></Label>
+    
+        <CollectionView x:Name="collectionView" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout>
+                        <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                        <Label Text="{Binding Date}" FontSize="Small" TextColor="Silver"></Label>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

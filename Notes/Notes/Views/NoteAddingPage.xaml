@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Notes.Views.NoteAddingPage">
+  
+    <ContentPage.Content>
+        <StackLayout>
+            <ScrollView Margin="10" VerticalOptions="FillAndExpand">
+                <Editor x:Name="TextEditor1" Placeholder="Note text" Text="{Binding Text}" VerticalOptions="FillAndExpand" AutoSize="TextChanges" FontSize="14"/>
+            </ScrollView>
+            <Grid VerticalOptions="End" MinimumHeightRequest="250">
+                <StackLayout Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                    <Label x:Name="CurFontSize" Text="14" VerticalOptions="Center" FontSize="14"></Label>
+                    <Slider x:Name="Slider1" Minimum="0" Maximum="100" Value="14" ValueChanged="Slider1_ValueChanged" HorizontalOptions="FillAndExpand" MaximumTrackColor="Blue" MinimumTrackColor="Red" InputTransparent="False"></Slider>
+                    <Stepper x:Name="Stepper1" Minimum="0" Maximum="100" StepperPosition="14" Value="14" Increment="2" ValueChanged="Stepper1_ValueChanged" HorizontalOptions="End"></Stepper>
+                </StackLayout>
+                <Button Grid.Row="1" Text="Save" Clicked="OnSaveButton_Clicked" BackgroundColor="Green"/>
+                <Button Grid.Row="1" Grid.Column="1" Text="Delete" Clicked="OnDeleteButton_Clicked" BackgroundColor="LightCoral"/>
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

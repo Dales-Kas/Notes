@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Notes.AppShell"
+             xmlns:views="clr-namespace:Notes.Views">
+    <Shell.FlyoutHeader>
+        <views:HeaderContentView/>
+    </Shell.FlyoutHeader>
+    
+    <FlyoutItem Shell.TabBarIsVisible="False"
+                FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent Title="Notes" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
+        <ShellContent Title="About" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>
+            
+            <!--<ShellContent Orientation="Vertical" VerticalOptions="FillAndExpand">
+                <ImageButton WidthRequest="65" HeightRequest="65" Aspect="AspectFit" Source="pic4.png" VerticalOptions="Center" BackgroundColor="White"></ImageButton>
+                <Label Text="Dales Kas ©" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"></Label>
+                <BoxView HorizontalOptions="FillAndExpand" Color="Black" HeightRequest="3"></BoxView>
+                <FlexLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                    <Image WidthRequest="24" HeightRequest="24" Aspect="AspectFit" Source="pic1" HorizontalOptions="Start"/>
+                    <Button x:Name="btnNotes" Text="Notes" BackgroundColor="White" Clicked="btnNotes_Clicked" HorizontalOptions="FillAndExpand"></Button>
+                </FlexLayout>
+                <FlexLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                    <Image WidthRequest="24" HeightRequest="24" Aspect="AspectFit" Source="pic2" HorizontalOptions="Start"/>
+                    <Button x:Name="btnAbout" Text="About" BackgroundColor="White" Clicked="btnAbout_Clicked" HorizontalOptions="FillAndExpand"></Button>
+                </FlexLayout>
+            </ShellContent>-->
+        
+    </FlyoutItem>
+
+    <!--<MasterDetailPage.Detail>
+        <ContentPage>
+        </ContentPage>
+    </MasterDetailPage.Detail>-->
+</Shell>
