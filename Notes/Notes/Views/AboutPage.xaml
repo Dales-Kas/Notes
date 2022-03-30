@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="Notes.Views.AboutPage"
-             Title="About">
+             Title="Про програму">
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Dales Budget (on xamarin.forms) version 1.0.0"

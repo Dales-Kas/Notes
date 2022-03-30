@@ -57,10 +57,15 @@ namespace Notes.Views
 
         private async void OnDeleteButton_Clicked(object sender, EventArgs e)
         {
-            Note note = (Note)BindingContext;
-            await App.NotesDB.DeleteNoteAsync(note);
-            //await Shell.Current.GoToAsync(nameof(NotePage));
-            await Navigation.PopAsync();
+            bool resault = await DisplayAlert("Нотатку буде видалено","Бажаєте продовжити?","Так","Ні, не видаляти");
+
+            if (resault)
+            {
+                Note note = (Note)BindingContext;
+                await App.NotesDB.DeleteNoteAsync(note);
+                //await Shell.Current.GoToAsync(nameof(NotePage));
+                await Navigation.PopAsync();
+            }            
         }
 
         private void Stepper1_ValueChanged(object sender, ValueChangedEventArgs e)
