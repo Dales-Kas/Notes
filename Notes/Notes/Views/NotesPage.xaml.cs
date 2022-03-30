@@ -13,6 +13,8 @@ namespace Notes.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class NotePage : ContentPage
     {
+        public List<Note> allNotes = null;
+
         public NotePage()
         {
             InitializeComponent();
@@ -20,7 +22,8 @@ namespace Notes.Views
 
         protected override async void OnAppearing()
         {
-            collectionView.ItemsSource = await App.NotesDB.GetNotesAsync();
+            allNotes = await App.NotesDB.GetNotesAsync();
+            collectionView.ItemsSource = allNotes;
             base.OnAppearing();
         }
 
@@ -78,6 +81,29 @@ namespace Notes.Views
             ((Label)sender).Text = curText;
 
 
+        }
+
+        private void srchEntry_BindingContextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        public class FilterData : BindableObject
+        {
+            public static readonly BindableProperty FilterProperty = BindableProperty.Create(nameof(Filter), typeof(string), typeof(FilterData), null);
+
+            public string Filter
+            {
+                get { return (string)GetValue(FilterProperty); }
+                set { SetValue(FilterProperty, value); }
+            }
+        }
+
+        private void searchBar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+           var filterList = allNotes.Where(x=>x.Text.Contains(searchBar.Text)).ToList();
+            
+           collectionView.ItemsSource = filterList;
         }
     }
 }
