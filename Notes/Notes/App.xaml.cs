@@ -41,6 +41,6 @@ namespace Notes
 
         protected override void OnResume()
         {
-        }
+        } 
     }
 }

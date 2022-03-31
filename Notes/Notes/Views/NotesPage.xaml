@@ -7,7 +7,7 @@
              x:Class="Notes.Views.NotePage"
              Title="Нотатки">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>
+        <!--<ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>-->
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
@@ -52,12 +52,29 @@
                     </DataTemplate>
                 </CollectionView.EmptyViewTemplate>
 
+                <CollectionView.Footer>
+                    
+                </CollectionView.Footer>
+                
             </CollectionView>
-            <Button x:Name="AddItemButton" Text="Добавити нотатку"
+
+            <!--AbsoluteLayout.LayoutFlags="PositionProportional"
+                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"-->
+            <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
                 Clicked="AddButton_Clicked" IsVisible="True"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
-                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    HorizontalOptions="End"/>
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    Margin="20"
+                    />
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

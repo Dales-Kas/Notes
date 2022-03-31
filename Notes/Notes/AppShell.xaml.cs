@@ -21,7 +21,7 @@ namespace Notes
             Routing.RegisterRoute(nameof(NoteAddingPage),typeof(NoteAddingPage));
             
         }
-        private async void btnAbout_Clicked(object sender, EventArgs e)
+        private void btnAbout_Clicked(object sender, EventArgs e)
         {
             //Detail = new NavigationPage(new AboutPage())
             //{
@@ -31,13 +31,20 @@ namespace Notes
             FlyoutIsPresented = false;
         }
 
-        private async void btnNotes_Clicked(object sender, EventArgs e)
+        private void btnNotes_Clicked(object sender, EventArgs e)
         {
             //Detail = new NavigationPage(new NotePage())
             //{
             //    BackgroundColor = Color.White
             //};
             FlyoutIsPresented = false;
+        }
+
+        protected override bool OnBackButtonPressed()
+        {
+
+
+            return base.OnBackButtonPressed();
         }
     }
 }

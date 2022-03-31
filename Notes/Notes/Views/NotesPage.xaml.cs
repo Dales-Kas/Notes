@@ -88,17 +88,6 @@ namespace Notes.Views
 
         }
 
-        public class FilterData : BindableObject
-        {
-            public static readonly BindableProperty FilterProperty = BindableProperty.Create(nameof(Filter), typeof(string), typeof(FilterData), null);
-
-            public string Filter
-            {
-                get { return (string)GetValue(FilterProperty); }
-                set { SetValue(FilterProperty, value); }
-            }
-        }
-
         private void searchBar_TextChanged(object sender, TextChangedEventArgs e)
         {
            var filterList = allNotes.Where(x=>x.Text.Contains(searchBar.Text)).ToList();

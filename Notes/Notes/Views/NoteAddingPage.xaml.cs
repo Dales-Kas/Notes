@@ -14,12 +14,15 @@ namespace Notes.Views
     public partial class NoteAddingPage : ContentPage
     {
         public string ItemId
+
         {
             set
             {
                 LoadNote(value);
             }
         }
+
+        private string NoteText = "";
 
         public NoteAddingPage()
         {
@@ -37,11 +40,17 @@ namespace Notes.Views
                 Note note = await App.NotesDB.GetNoteAsync(id);
 
                 BindingContext = note;
+
+                NoteText = note.Text;
             }
             catch { }
         }
 
         private async void OnSaveButton_Clicked(object sender, EventArgs e)
+        {
+            SaveNote();
+        }
+        private async void SaveNote()
         {
             Note note = (Note)BindingContext;
             note.Date = DateTime.UtcNow;
@@ -87,5 +96,62 @@ namespace Notes.Views
             Stepper1.Value = e.NewValue;
             CurFontSize.Text = e.NewValue.ToString();
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+            return base.OnBackButtonPressed();
+        }
+
+        protected override void OnDisappearing()
+        {
+            Note note = (Note)BindingContext;
+
+            if (NoteText != note.Text && (note.ID == 0 ? !string.IsNullOrEmpty(note.Text) : true))
+            {
+                //const string text_Ok = "Так, вийти";
+                const string text_Save = "Так";
+                const string text_NOK = "Ні";
+
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    //your logic             
+                    bool resault = await DisplayAlert("Зберегти нотатку?","",text_Save,text_NOK);
+
+                    if (resault)
+                    {
+                        SaveNote();
+                    }
+
+                    //switch (resault)
+                    //{
+                    //    //case text_Ok:
+
+                    //    //    break;
+
+                    //    case text_Save:
+
+                    //        SaveNote();
+
+                    //        break;
+
+                    //    case text_NOK:
+
+                    //        break;
+                    //}
+                });
+
+                //return true; //you handled the back button press
+
+            }
+
+            else
+            {
+                //return true;//base.OnBackButtonPressed();
+            }
+            //return true;
+
+            //base.OnDisappearing();
+        } 
+
     }
 }
