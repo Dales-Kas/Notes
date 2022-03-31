@@ -27,7 +27,7 @@ namespace Notes.Views
         public NoteAddingPage()
         {
             InitializeComponent();
-            
+
             BindingContext = new Note();
         }
 
@@ -46,7 +46,7 @@ namespace Notes.Views
             catch { }
         }
 
-        private async void OnSaveButton_Clicked(object sender, EventArgs e)
+        private void OnSaveButton_Clicked(object sender, EventArgs e)
         {
             SaveNote();
         }
@@ -66,7 +66,7 @@ namespace Notes.Views
 
         private async void OnDeleteButton_Clicked(object sender, EventArgs e)
         {
-            bool resault = await DisplayAlert("Нотатку буде видалено","Бажаєте продовжити?","Так","Ні, не видаляти");
+            bool resault = await DisplayAlert("Нотатку буде видалено", "Бажаєте продовжити?", "Так", "Ні, не видаляти");
 
             if (resault)
             {
@@ -74,7 +74,7 @@ namespace Notes.Views
                 await App.NotesDB.DeleteNoteAsync(note);
                 //await Shell.Current.GoToAsync(nameof(NotePage));
                 await Navigation.PopAsync();
-            }            
+            }
         }
 
         private void Stepper1_ValueChanged(object sender, ValueChangedEventArgs e)
@@ -115,29 +115,13 @@ namespace Notes.Views
                 Device.BeginInvokeOnMainThread(async () =>
                 {
                     //your logic             
-                    bool resault = await DisplayAlert("Зберегти нотатку?","",text_Save,text_NOK);
+                    bool resault = await DisplayAlert("Зберегти нотатку?", "", text_Save, text_NOK);
 
                     if (resault)
                     {
                         SaveNote();
                     }
 
-                    //switch (resault)
-                    //{
-                    //    //case text_Ok:
-
-                    //    //    break;
-
-                    //    case text_Save:
-
-                    //        SaveNote();
-
-                    //        break;
-
-                    //    case text_NOK:
-
-                    //        break;
-                    //}
                 });
 
                 //return true; //you handled the back button press
@@ -151,7 +135,45 @@ namespace Notes.Views
             //return true;
 
             //base.OnDisappearing();
-        } 
+        }
 
+        private void IsList_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+
+
+        }
+
+        private void IsList_Toggled(object sender, ToggledEventArgs e)
+        {
+            Note note = (Note)BindingContext;
+
+            if (note != null)
+            {
+
+                if (note.IsList == true)
+                {
+                    TextEditor1.IsVisible = false;
+                }
+
+                else
+                {
+                    TextEditor1.IsVisible = true;
+                }
+
+                if (!string.IsNullOrEmpty(note.Text))
+                {
+                    foreach (var item in note.Text.Split('\n'))
+                    {
+                        TextCell cell = new TextCell();
+                        cell.Text = item;
+
+                        //scrollView1.
+                            //Children.Add(cell);
+                    }
+                }
+
+            }
+
+        }
     }
 }

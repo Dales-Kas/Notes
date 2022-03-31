@@ -5,10 +5,16 @@
   
     <ContentPage.Content>
         <StackLayout>
-            <ScrollView Margin="10" VerticalOptions="FillAndExpand">
+            <ScrollView x:Name="scrollView1" Margin="10" VerticalOptions="FillAndExpand">
                 <Editor x:Name="TextEditor1" Placeholder="Note text" Text="{Binding Text}" VerticalOptions="FillAndExpand" AutoSize="TextChanges" FontSize="18"/>
             </ScrollView>
-            <Grid VerticalOptions="End" MinimumHeightRequest="250">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                <Label Text="Списком"/>
+                <Switch x:Name="IsList" IsToggled="{Binding IsList}" Toggled="IsList_Toggled"/>
+                <Label Text="В архів"/>
+                <Switch x:Name="IsArchived" IsToggled="{Binding IsArchived}"/>
+            </StackLayout>
+        <Grid VerticalOptions="End" MinimumHeightRequest="250">
                 <StackLayout Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                     <Label Margin="2" x:Name="CurFontSize" Text="18" VerticalOptions="Center" FontSize="18"></Label>
                     <Slider x:Name="Slider1" Minimum="0" Maximum="100" Value="18" ValueChanged="Slider1_ValueChanged" HorizontalOptions="FillAndExpand" MaximumTrackColor="Blue" MinimumTrackColor="Blue" InputTransparent="False"></Slider>

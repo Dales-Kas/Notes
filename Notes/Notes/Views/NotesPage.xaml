@@ -10,22 +10,17 @@
         <!--<ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>-->
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
+
         <StackLayout Orientation="Vertical">
 
-            <!--<Grid ColumnSpacing="10" RowSpacing="10">
-            <Button Text="Alert1" Clicked="Alert1_Clicked" FontSize="Small" HeightRequest="100"></Button>
-             <Button Grid.Column="1" Text="Alert2" Clicked="Alert2_Clicked" FontSize="Small" HeightRequest="100"></Button>
-             <Button Grid.Column="2" Text="Alert3" Clicked="Alert3_Clicked" FontSize="Small" HeightRequest="100"></Button>
-             <Button Grid.Column="3" Text="Alert4" Clicked="Alert4_Clicked" FontSize="Small" HeightRequest="100"></Button>
-        </Grid>-->
-            <StackLayout Orientation="Horizontal">
+           <StackLayout Orientation="Horizontal">
                 <!--<Label Text="Нотатки:" FontSize="Medium" TextColor="Blue" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>-->
                 <SearchBar x:Name="searchBar"
                        TextChanged="searchBar_TextChanged"
                        Placeholder="Пошук"
                        HorizontalOptions="StartAndExpand"/>
             </StackLayout>
-            <CollectionView x:Name="collectionView" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged">
+            <CollectionView x:Name="collectionView" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
                 </CollectionView.ItemsLayout>
@@ -53,9 +48,9 @@
                 </CollectionView.EmptyViewTemplate>
 
                 <CollectionView.Footer>
-                    
+
                 </CollectionView.Footer>
-                
+
             </CollectionView>
 
             <!--AbsoluteLayout.LayoutFlags="PositionProportional"
