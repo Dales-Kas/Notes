@@ -8,6 +8,8 @@ namespace Notes
 {
     public partial class App : Application
     {
+        
+
         static NotesDB notesDB;
 
         public static NotesDB NotesDB
@@ -25,6 +27,8 @@ namespace Notes
 
         public App()
         {
+            Device.SetFlags(new string[] { "SwipeView_Experimental", "AppTheme_Experimental" });
+
             InitializeComponent();
 
             MainPage = new AppShell();

@@ -14,6 +14,7 @@
                 FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
         <ShellContent Title="Про програму" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>
+        <!--<ShellContent Title="Тест" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ListViewPage1}"></ShellContent>-->
             
             <!--<ShellContent Orientation="Vertical" VerticalOptions="FillAndExpand">
                 <ImageButton WidthRequest="65" HeightRequest="65" Aspect="AspectFit" Source="pic4.png" VerticalOptions="Center" BackgroundColor="White"></ImageButton>

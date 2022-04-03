@@ -24,11 +24,15 @@ namespace Notes.Views
 
         private string NoteText = "";
 
+        private bool addToolsView = false;
         public NoteAddingPage()
         {
             InitializeComponent();
 
             BindingContext = new Note();
+
+            stackLayoutAddtools.IsVisible = false;
+            gridAddtools.IsVisible = false;
         }
 
         private async void LoadNote(string value)
@@ -137,12 +141,6 @@ namespace Notes.Views
             //base.OnDisappearing();
         }
 
-        private void IsList_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-
-
-        }
-
         private void IsList_Toggled(object sender, ToggledEventArgs e)
         {
             Note note = (Note)BindingContext;
@@ -174,6 +172,23 @@ namespace Notes.Views
 
             }
 
+        }
+
+        private void toolbarItem1_Clicked(object sender, EventArgs e)
+        {
+            addToolsView = !addToolsView;
+
+            if (addToolsView)
+            {
+                stackLayoutAddtools.IsVisible = true;
+                gridAddtools.IsVisible = true;
+            }
+
+            else
+            {
+                stackLayoutAddtools.IsVisible = false;
+                gridAddtools.IsVisible = false;
+            }            
         }
     }
 }

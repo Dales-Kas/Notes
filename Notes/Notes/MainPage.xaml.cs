@@ -24,7 +24,7 @@ namespace Notes
             IsPresented = false;
         }
 
-    private async void btnAbout_Clicked(object sender, EventArgs e)
+    private void BtnAbout_Clicked(object sender, EventArgs e)
     {
         Detail = new NavigationPage(new AboutPage())
         {
@@ -34,7 +34,7 @@ namespace Notes
             IsPresented = false;
         }
 
-        private async void btnNotes_Clicked(object sender, EventArgs e)
+        private void BtnNotes_Clicked(object sender, EventArgs e)
         {
             Detail = new NavigationPage(new NotePage())
             {

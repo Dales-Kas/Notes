@@ -2,20 +2,28 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Notes.Views.NoteAddingPage">
-  
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="toolbarItem1" Text="" Clicked="toolbarItem1_Clicked" IconImageSource="ic_action_assignment.png"></ToolbarItem>
+    </ContentPage.ToolbarItems>
+    
     <ContentPage.Content>
         <StackLayout>
+            
             <ScrollView x:Name="scrollView1" Margin="10" VerticalOptions="FillAndExpand">
-                <Editor x:Name="TextEditor1" Placeholder="Note text" Text="{Binding Text}" VerticalOptions="FillAndExpand" AutoSize="TextChanges" FontSize="18"/>
+                <Editor x:Name="TextEditor1" Placeholder="Текст нотатки..." Text="{Binding Text}" VerticalOptions="FillAndExpand" AutoSize="TextChanges" FontSize="18"/>
             </ScrollView>
-            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+
+            
+            
+            <StackLayout x:Name="stackLayoutAddtools" Orientation="Horizontal" HorizontalOptions="End">
                 <Label Text="Списком"/>
                 <Switch x:Name="IsList" IsToggled="{Binding IsList}" Toggled="IsList_Toggled"/>
                 <Label Text="В архів"/>
                 <Switch x:Name="IsArchived" IsToggled="{Binding IsArchived}"/>
             </StackLayout>
-        <Grid VerticalOptions="End" MinimumHeightRequest="250">
-                <StackLayout Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+            <Grid VerticalOptions="End" MinimumHeightRequest="250">
+                <StackLayout x:Name="gridAddtools" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                     <Label Margin="2" x:Name="CurFontSize" Text="18" VerticalOptions="Center" FontSize="18"></Label>
                     <Slider x:Name="Slider1" Minimum="0" Maximum="100" Value="18" ValueChanged="Slider1_ValueChanged" HorizontalOptions="FillAndExpand" MaximumTrackColor="Blue" MinimumTrackColor="Blue" InputTransparent="False"></Slider>
                     <Stepper x:Name="Stepper1"
@@ -27,11 +35,13 @@
                              ValueChanged="Stepper1_ValueChanged"
                              HorizontalOptions="End"
                              Margin="15" 
-                             HeightRequest="20">
+                             MinimumHeightRequest="50">
                     </Stepper>
                 </StackLayout>
-                <Button Margin="15" Grid.Row="1" Text="Save" Clicked="OnSaveButton_Clicked" BackgroundColor="#2196F3" CornerRadius="15"/>
-                <Button Margin="15" Grid.Row="1" Grid.Column="1" Text="Delete" Clicked="OnDeleteButton_Clicked" BackgroundColor="LightBlue" CornerRadius="15"/>
+            </Grid>
+            <Grid VerticalOptions="End" MinimumHeightRequest="250">
+                <Button Margin="15" Grid.Row="0" Text="Save" Clicked="OnSaveButton_Clicked" BackgroundColor="#2196F3" CornerRadius="15"/>
+                <Button Margin="15" Grid.Row="0" Grid.Column="1" Text="Delete" Clicked="OnDeleteButton_Clicked" BackgroundColor="LightBlue" CornerRadius="15"/>
             </Grid>
         </StackLayout>
     </ContentPage.Content>
