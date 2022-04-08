@@ -30,7 +30,7 @@ namespace Notes.Views
 
         public async void UpdateNotesList()
         {
-            allNotes = await App.NotesDB.GetNotesAsync();
+            List<Note> allNotes = await App.NotesDB.GetNotesAsync();
             collectionView.ItemsSource = allNotes.Where(x => x.IsArchived == false);
             collectionView1.ItemsSource = allNotes.Where(x => x.IsArchived == true);
         }
@@ -114,7 +114,7 @@ namespace Notes.Views
                 searchBar1.Text = searchText;
             }
 
-            if (nameOfList == "searchBar1")
+            else if (nameOfList == "searchBar1")
             {
                 searchBar.Text = searchText;
             }
@@ -155,7 +155,13 @@ namespace Notes.Views
             if (curEventArg.Parameter != null)
             {
                 string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={curEventArg.Parameter.ToString()}";
-                await Shell.Current.GoToAsync(notePath);
+
+                //Device.BeginInvokeOnMainThread(async () =>
+                //{
+                await Shell.Current.GoToAsync(notePath,true);
+                //});
+                //                
+                //UpdateNotesList();
             }
         }
 
@@ -180,6 +186,27 @@ namespace Notes.Views
         private void toArchiv1_Invoked(object sender, EventArgs e)
         {
 
+        }
+
+        protected override void OnBindingContextChanged()
+        {
+            UpdateNotesList();
+
+            base.OnBindingContextChanged();
+        }
+
+        protected override bool OnBackButtonPressed()
+        {
+
+            UpdateNotesList();
+
+            return base.OnBackButtonPressed();
+        }
+
+        private void RefreshView_Refreshing(object sender, EventArgs e)
+        {
+            UpdateNotesList();
+            ((RefreshView)sender).IsRefreshing = false;
         }
     }
 }

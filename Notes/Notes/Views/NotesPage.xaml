@@ -30,7 +30,7 @@
                        HorizontalOptions="FillAndExpand"/>
                 </StackLayout>
                 <RefreshView IsRefreshing="{Binding IsRefreshing}" 
-                    Command="{Binding RefreshCommand}">
+                    Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
                     <CollectionView x:Name="collectionView" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
@@ -51,8 +51,8 @@
                                         </SwipeItems>
                                     </SwipeView.RightItems>
 
-                                    <StackLayout BackgroundColor="White">
-                                        <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                                    <StackLayout BackgroundColor="{Binding NoteColorBackGround}">
+                                        <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged"></Label>
                                         <Label Text="{Binding Date}" FontSize="Small" TextColor="Silver" LineBreakMode="TailTruncation"></Label>
                                         <StackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}">
@@ -88,10 +88,12 @@
 
                 <!--AbsoluteLayout.LayoutFlags="PositionProportional"
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"-->
+                <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                    <!--<Label Text="Нотатки" FontSize="Medium" TextColor="Blue" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>-->
+                    
                 <Button x:Name="AddItemButton" Text="+"
                 FontAttributes="Bold"
-                Clicked="AddButton_Clicked" IsVisible="True"
-                    HorizontalOptions="End"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
                     VerticalOptions="End"
                     HeightRequest="50"
                     WidthRequest="50"
@@ -102,6 +104,7 @@
                     TextColor="White"
                     Margin="20"
                     />
+                </StackLayout>
 
             </StackLayout>
         </ContentPage.Content>
@@ -156,7 +159,7 @@
                 <!--<CollectionView.EmptyView>
                     <views:FilterData Filter="{Binding Source={x:Reference searchBar}, Path=Text}" />
                 </CollectionView.EmptyView>-->
-
+                
                 <CollectionView.EmptyViewTemplate>
                     <DataTemplate>
                         <Label Text="{Binding Filter, StringFormat='Your filter term of {0} did not match any records.'}"
@@ -173,6 +176,10 @@
                 </CollectionView.Footer>
 
             </CollectionView>
+
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                <Label Text="Архівні нотатки" FontSize="Medium" TextColor="Brown" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
+            </StackLayout>
 
             <!--AbsoluteLayout.LayoutFlags="PositionProportional"
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"-->

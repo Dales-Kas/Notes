@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Models;
+using Notes.Data;
 
 namespace Notes.Views
 {
     [QueryProperty(nameof(ItemId), nameof(ItemId))]
     public partial class NoteAddingPage : ContentPage
     {
+        public bool formIsCreated = false;
         public string ItemId
 
         {
@@ -25,6 +27,8 @@ namespace Notes.Views
         private string NoteText = "";
 
         private bool addToolsView = false;
+
+        private bool dontSaveNote = false;
         public NoteAddingPage()
         {
             InitializeComponent();
@@ -33,6 +37,9 @@ namespace Notes.Views
 
             stackLayoutAddtools.IsVisible = false;
             gridAddtools.IsVisible = false;
+
+            SetElementsVisability();
+            
         }
 
         private async void LoadNote(string value)
@@ -46,6 +53,8 @@ namespace Notes.Views
                 BindingContext = note;
 
                 NoteText = note.Text;
+                
+                formIsCreated = true;
             }
             catch { }
         }
@@ -54,7 +63,7 @@ namespace Notes.Views
         {
             SaveNote();
         }
-        private async void SaveNote()
+        private async void SaveNote(bool closeForm = true)
         {
             Note note = (Note)BindingContext;
             note.Date = DateTime.UtcNow;
@@ -65,7 +74,10 @@ namespace Notes.Views
                     SaveNoteAsync(note);
             }
             //await Shell.Current.GoToAsync(nameof(NotePage));            
-            await Navigation.PopAsync();
+            if (closeForm)
+            {
+                await Navigation.PopAsync();
+            }            
         }
 
         private async void OnDeleteButton_Clicked(object sender, EventArgs e)
@@ -107,41 +119,16 @@ namespace Notes.Views
         }
 
         protected override void OnDisappearing()
-        {
-            Note note = (Note)BindingContext;
-
-            if (NoteText != note.Text && (note.ID == 0 ? !string.IsNullOrEmpty(note.Text) : true))
+        {            
+            if (!dontSaveNote)
             {
-                //const string text_Ok = "Так, вийти";
-                const string text_Save = "Так";
-                const string text_NOK = "Ні";
-
-                Device.BeginInvokeOnMainThread(async () =>
-                {
-                    //your logic             
-                    bool resault = await DisplayAlert("Зберегти нотатку?", "", text_Save, text_NOK);
-
-                    if (resault)
-                    {
-                        SaveNote();
-                    }
-
-                });
-
-                //return true; //you handled the back button press
-
+                SaveNote(false);
             }
+            base.OnDisappearing();
 
-            else
-            {
-                //return true;//base.OnBackButtonPressed();
-            }
-            //return true;
-
-            //base.OnDisappearing();
         }
 
-        private void IsList_Toggled(object sender, ToggledEventArgs e)
+        private async void IsList_Toggled(object sender, ToggledEventArgs e)
         {
             Note note = (Note)BindingContext;
 
@@ -150,28 +137,65 @@ namespace Notes.Views
 
                 if (note.IsList == true)
                 {
-                    TextEditor1.IsVisible = false;
+
+                    if (formIsCreated)
+                    {
+                        App.NotesDB.DeleteNoteFlagsAsync(note.ID);
+
+                        if (!string.IsNullOrEmpty(note.Text))
+                        {
+                            int i = 0;
+                            //NoteFlags flag = null;
+
+                            foreach (var item in note.Text.Split('\n'))
+                            {
+                                i++;
+                                NoteFlags flag = new NoteFlags();
+                                flag.NoteID = note.ID;
+                                flag.Text = item;
+                                flag.Finished = false;
+                                await App.NotesDB.SaveNoteFlagAsync(flag);
+                            }
+                        }
+                    }
+                    
+                    LoadAllNoteFlags();
                 }
 
                 else
                 {
-                    TextEditor1.IsVisible = true;
+                    //TextEditor1.IsVisible = true;
                 }
 
-                if (!string.IsNullOrEmpty(note.Text))
-                {
-                    foreach (var item in note.Text.Split('\n'))
-                    {
-                        TextCell cell = new TextCell();
-                        cell.Text = item;
-
-                        //scrollView1.
-                            //Children.Add(cell);
-                    }
-                }
+                SetElementsVisability();
 
             }
+        }
 
+        public void SetElementsVisability()
+        {
+            Note note = (Note)BindingContext;
+
+            if (note.IsList==true)
+            {
+                scrollView1.IsVisible = false;
+                collectionViewFlags.IsVisible = true;
+            }
+
+            else
+            {
+                scrollView1.IsVisible = true;
+                collectionViewFlags.IsVisible = false;
+            }
+        }
+
+        private async void LoadAllNoteFlags()
+        {
+            Note note = (Note)BindingContext;
+
+            var allNotesflags = await App.NotesDB.GetNoteFlagsAsync(note.ID);
+
+            collectionView1.ItemsSource = allNotesflags;
         }
 
         private void toolbarItem1_Clicked(object sender, EventArgs e)
@@ -181,14 +205,94 @@ namespace Notes.Views
             if (addToolsView)
             {
                 stackLayoutAddtools.IsVisible = true;
-                gridAddtools.IsVisible = true;
+                gridAddtools.IsVisible = true;             
             }
 
             else
             {
                 stackLayoutAddtools.IsVisible = false;
-                gridAddtools.IsVisible = false;
+                gridAddtools.IsVisible = false;                
             }            
+        }
+
+        private void colorListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+            Color curColor = (e.SelectedItem as NamedColor).Color;
+
+            if (checkBoxText.IsChecked)
+            {
+                TextEditor1.TextColor = curColor;
+                ColorTextEntry.Text = curColor.ToHex().ToString();
+            }
+            else
+            {
+                MainStackLayout.BackgroundColor = curColor;
+                TextEditor1.BackgroundColor = MainStackLayout.BackgroundColor;
+                ColorBackgroundEntry.Text = curColor.ToHex().ToString();
+            }
+
+            
+        }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            colorListView.IsVisible = !colorListView.IsVisible;
+
+            if (colorListView.IsVisible)
+            {
+                if (colorListView.SelectedItem != null)
+                {
+                    colorListView.ScrollTo(colorListView.SelectedItem,
+                                           ScrollToPosition.MakeVisible,
+                                           true);
+                }
+            }
+        }
+
+        private void checkBoxBackground_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            checkBoxText.IsChecked = !checkBoxBackground.IsChecked;            
+        }
+
+        private void checkBoxText_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            checkBoxBackground.IsChecked = !checkBoxText.IsChecked;
+        }
+
+        private void toDelete_Invoked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+        {
+
+        }
+
+        private void deleteBtn_Clicked(object sender, EventArgs e)
+        {
+            Note note = (Note)BindingContext;
+
+            if (note != null)
+            {
+                App.NotesDB.DeleteNoteFlagsAsync(note.ID);
+                LoadAllNoteFlags();
+            }
+        }
+
+        private void cbFinished_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            
+        }
+
+        private void CurItem_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.NewTextValue) && e.NewTextValue.EndsWith("\n"))
+            {
+                (sender as Editor).Text = e.NewTextValue.Replace("\n", "");
+                (sender as Editor).Unfocus();
+                //collectionView1.ScrollTo(1);
+            }
         }
     }
 }

@@ -1,47 +1,132 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Notes.Views.NoteAddingPage">
+             x:Class="Notes.Views.NoteAddingPage"
+             xmlns:local="clr-namespace:Notes">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem x:Name="toolbarItem1" Text="" Clicked="toolbarItem1_Clicked" IconImageSource="ic_action_assignment.png"></ToolbarItem>
+        <!--<ToolbarItem x:Name="toolbarItem1" Text="" Clicked="toolbarItem1_Clicked" IconImageSource="ic_action_assignment.png"></ToolbarItem>-->
     </ContentPage.ToolbarItems>
-    
+
     <ContentPage.Content>
-        <StackLayout>
-            
-            <ScrollView x:Name="scrollView1" Margin="10" VerticalOptions="FillAndExpand">
-                <Editor x:Name="TextEditor1" Placeholder="Текст нотатки..." Text="{Binding Text}" VerticalOptions="FillAndExpand" AutoSize="TextChanges" FontSize="18"/>
+        <StackLayout x:Name="MainStackLayout" BackgroundColor="{Binding NoteColorBackGround}">
+
+            <ScrollView x:Name="scrollView1" Margin="10,10,10,0" VerticalOptions="FillAndExpand">
+                <Editor x:Name="TextEditor1" 
+                        Placeholder="Текст нотатки..."
+                        Text="{Binding Text}"
+                        VerticalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        FontSize="{Binding NoteFontSize}"
+                        BackgroundColor="{Binding NoteColorBackGround}"
+                        TextColor="{Binding NoteColorText}"/>
+                <!--IsVisible="{Binding !IsList, Mode=OneWay}"-->                        
             </ScrollView>
 
-            
-            
+            <StackLayout x:Name="collectionViewFlags" Orientation="Vertical" BackgroundColor="{Binding NoteColorBackGround, Source=BindingContext}">
+                <CollectionView x:Name="collectionView1" Margin="10,10,10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepScrollOffset">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+
+                            <SwipeView>
+
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <StackLayout BackgroundColor="{Binding NoteColorBackGround}" Orientation="Vertical">
+                                    <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand">
+                                        <CheckBox x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black"></CheckBox>
+                                        <Editor x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding BindingContext.NoteColorText}" TextChanged="CurItem_TextChanged" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges"></Editor>
+                                    </StackLayout>
+                                    <!--<StackLayout Orientation="Horizontal">
+                                        <Label Text="ID:" FontSize="Small"></Label>
+                                        <Label Text="{Binding ID}" FontSize="Small" TextColor="SeaGreen"></Label>
+                                        <Label Text="NoteID:" FontSize="Small"></Label>
+                                        <Label Text="{Binding NoteID}" FontSize="Small" TextColor="SeaGreen"></Label>
+                                    </StackLayout>-->
+                                    <StackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}">
+                                        </TapGestureRecognizer>
+                                    </StackLayout.GestureRecognizers>
+                                </StackLayout>
+
+                            </SwipeView>
+
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <!--<Button Text="DELETE ALL" x:Name="deleteBtn" Clicked="deleteBtn_Clicked"></Button>-->
+            </StackLayout>
+
+            <StackLayout Orientation="Horizontal" >
+                <ImageButton Margin="15,0,15,0" x:Name="toolbarItem1" Clicked="toolbarItem1_Clicked" Source="ic_action_assignment.png" HorizontalOptions="StartAndExpand"></ImageButton>
+                <Label Text="Прапорці" VerticalOptions="Center" HorizontalOptions="End"/>
+                <Switch x:Name="IsList" VerticalOptions="Center" HorizontalOptions="End" IsToggled="{Binding IsList}" Toggled="IsList_Toggled" Margin="15,0,15,0"/>
+            </StackLayout>
             <StackLayout x:Name="stackLayoutAddtools" Orientation="Horizontal" HorizontalOptions="End">
-                <Label Text="Списком"/>
-                <Switch x:Name="IsList" IsToggled="{Binding IsList}" Toggled="IsList_Toggled"/>
-                <Label Text="В архів"/>
-                <Switch x:Name="IsArchived" IsToggled="{Binding IsArchived}"/>
+                <!--<Picker Title="Select a color" ItemsSource="{Binding ColorNames}" SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" />
+                <BoxView Color="{Binding SelectedColor}" HeightRequest="100" />-->
+                <StackLayout Orientation="Vertical">
+                    <StackLayout Orientation="Horizontal">
+                        <CheckBox x:Name="checkBoxBackground" CheckedChanged="checkBoxBackground_CheckedChanged" IsChecked="True" Color="Black"/>
+                        <Label Text="Фон" VerticalOptions="Center"></Label>
+                        <CheckBox x:Name="checkBoxText" CheckedChanged="checkBoxText_CheckedChanged" Color="Black"/>
+                        <Label Text="Текст" VerticalOptions="Center"></Label>
+                        <Entry x:Name="ColorTextEntry" Text="{Binding NoteColorText}" Placeholder="Колір нотатки в hex" IsVisible="false"></Entry>
+                        <Entry x:Name="ColorBackgroundEntry" Text="{Binding NoteColorBackGround}" Placeholder="Колір нотатки в hex" IsVisible="false"></Entry>
+                        <Button Text="..." Clicked="Button_Clicked" Margin="0,0,15,0"></Button>
+                    </StackLayout>
+                    <ListView x:Name="colorListView"
+                  ItemsSource="{x:Static local:NamedColor.All}"
+                  SelectedItem="{Binding BackgroundNamedColor, Mode=TwoWay}"
+                  VerticalOptions="FillAndExpand"
+                              ItemSelected="colorListView_ItemSelected"
+                              IsVisible="false"
+                  RowHeight="40">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <StackLayout Orientation="Horizontal">
+                                        <BoxView Color="{Binding Color}"
+                                     HeightRequest="32"
+                                     WidthRequest="32"
+                                     VerticalOptions="Center" />
+
+                                        <Label Text="{Binding FriendlyName}"
+                                   FontSize="24"
+                                   VerticalOptions="Center" />
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackLayout>
+                <!--<Label Text="В архів"/>
+                <Switch x:Name="IsArchived" IsToggled="{Binding IsArchived}"/>-->
             </StackLayout>
             <Grid VerticalOptions="End" MinimumHeightRequest="250">
                 <StackLayout x:Name="gridAddtools" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                    <Label Margin="2" x:Name="CurFontSize" Text="18" VerticalOptions="Center" FontSize="18"></Label>
-                    <Slider x:Name="Slider1" Minimum="0" Maximum="100" Value="18" ValueChanged="Slider1_ValueChanged" HorizontalOptions="FillAndExpand" MaximumTrackColor="Blue" MinimumTrackColor="Blue" InputTransparent="False"></Slider>
+                    <Label Margin="15,0,5,0" x:Name="CurFontSize" Text="{Binding NoteFontSize}" VerticalOptions="Center" FontSize="18"></Label>
+                    <Slider x:Name="Slider1" Minimum="0" Maximum="100" Value="{Binding NoteFontSize}" ValueChanged="Slider1_ValueChanged" HorizontalOptions="FillAndExpand" MaximumTrackColor="Black" MinimumTrackColor="Black" ThumbColor="Black" InputTransparent="False"></Slider>
                     <Stepper x:Name="Stepper1"
                              Minimum="0"
                              Maximum="100"
                              StepperPosition="18"
-                             Value="14"
-                             Increment="2"
+                             Value="{Binding NoteFontSize}"
+                             Increment="1"
                              ValueChanged="Stepper1_ValueChanged"
                              HorizontalOptions="End"
-                             Margin="15" 
+                             Margin="5,0,15,0" 
                              MinimumHeightRequest="50">
                     </Stepper>
                 </StackLayout>
-            </Grid>
-            <Grid VerticalOptions="End" MinimumHeightRequest="250">
-                <Button Margin="15" Grid.Row="0" Text="Save" Clicked="OnSaveButton_Clicked" BackgroundColor="#2196F3" CornerRadius="15"/>
-                <Button Margin="15" Grid.Row="0" Grid.Column="1" Text="Delete" Clicked="OnDeleteButton_Clicked" BackgroundColor="LightBlue" CornerRadius="15"/>
+                <!--<Label Grid.Row="1" Grid.ColumnSpan="2" Text="Background Color:" />-->
             </Grid>
         </StackLayout>
     </ContentPage.Content>

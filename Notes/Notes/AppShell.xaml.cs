@@ -41,10 +41,14 @@ namespace Notes
         }
 
         protected override bool OnBackButtonPressed()
-        {
-
-
+        {           
             return base.OnBackButtonPressed();
         }
+
+        private void Shell_Navigated(object sender, ShellNavigatedEventArgs e)
+        {
+            //NotePage.UpdateNotesList();
+        }
+
     }
 }

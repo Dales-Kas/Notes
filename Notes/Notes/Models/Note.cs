@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using SQLite;
 
@@ -18,14 +19,11 @@ namespace Notes.Models
 
         public double Rate { get; set; }
 
-        //public NoteFlags[] Flags { get; set; } 
+        public int NoteFontSize { get; set; } = 18;
 
-    }
+        //public Color NoteColor { get; set; }
+        public string NoteColorText { get; set; } = "#000000";
+        public string NoteColorBackGround { get; set; } = "#ffffff";
 
-    public class NoteFlags
-    {
-        public bool Finished { get; set; }
-
-        public string Text { get; set; }
     }
 }

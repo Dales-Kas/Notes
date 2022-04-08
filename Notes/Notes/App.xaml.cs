@@ -9,13 +9,12 @@ namespace Notes
     public partial class App : Application
     {
         
-
         static NotesDB notesDB;
 
         public static NotesDB NotesDB
         {
             get
-            {
+             {
                 if (notesDB == null)
                 {
                     string connString = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NotesDataBase.db3");
