@@ -8,6 +8,9 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Models;
 using Notes.Data;
+using Xamarin.CommunityToolkit.Extensions;
+using Xamarin.CommunityToolkit.UI.Views.Options;
+using System.Threading;
 
 namespace Notes.Views
 {
@@ -21,8 +24,9 @@ namespace Notes.Views
             InitializeComponent();
         }
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
+            Thread.Sleep(500);
             UpdateNotesList();
 
             base.OnAppearing();
@@ -30,16 +34,16 @@ namespace Notes.Views
 
         public async void UpdateNotesList()
         {
-            List<Note> allNotes = await App.NotesDB.GetNotesAsync();
-            collectionView.ItemsSource = allNotes.Where(x => x.IsArchived == false);
-            collectionView1.ItemsSource = allNotes.Where(x => x.IsArchived == true);
+            //List<Note> 
+            allNotes = await App.NotesDB.GetNotesAsync();
+            collectionView.ItemsSource = allNotes.Where(x => x.IsArchived == false).OrderByDescending(x => x.Date);
+            collectionView1.ItemsSource = allNotes.Where(x => x.IsArchived == true).OrderByDescending(x => x.Date);
         }
 
 
         private async void AddButton_Clicked(object sender, EventArgs e)
         {
-            //await Shell.Current.GoToAsync(nameof(NoteAddingPage));
-            await Navigation.PushAsync(new NoteAddingPage());
+            await Shell.Current.GoToAsync(nameof(NoteAddingPage));
         }
 
         private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -49,8 +53,6 @@ namespace Notes.Views
                 Note note = (Note)e.CurrentSelection.FirstOrDefault();
                 string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={note.ID.ToString()}";
                 await Shell.Current.GoToAsync(notePath);
-                //NoteAddingPage myPage = new NoteAddingPage();
-                //await Navigation.PushAsync(myPage);
             }
         }
 
@@ -86,14 +88,15 @@ namespace Notes.Views
         {
             string curText = ((Label)sender).Text;
 
-            if (curText.Length >= 200)
+            if (!String.IsNullOrEmpty(curText))
             {
-                curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
-            }
+                if (curText.Length >= 200)
+                {
+                    curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
+                }
 
             ((Label)sender).Text = curText;
-
-
+            }
         }
 
         private void srchEntry_BindingContextChanged(object sender, EventArgs e)
@@ -119,8 +122,8 @@ namespace Notes.Views
                 searchBar.Text = searchText;
             }
 
-            var filterList = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == false).ToList();
-            var filterList1 = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == true).ToList();
+            var filterList = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == false).OrderByDescending(x => x.Date).ToList();
+            var filterList1 = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == true).OrderByDescending(x => x.Date).ToList();
 
             collectionView.ItemsSource = filterList;
             collectionView1.ItemsSource = filterList1;
@@ -138,13 +141,12 @@ namespace Notes.Views
             int id = Convert.ToInt32((sender as MenuItem).CommandParameter);
 
             if (id != 0)
-            {               
+            {
                 Note note = await App.NotesDB.GetNoteAsync(id);
                 note.IsArchived = !note.IsArchived;
                 await App.NotesDB.SaveNoteAsync(note);
 
                 UpdateNotesList();
-                //DisplayAlert("Відправлено в архів...", "", "ОК");
             }
         }
 
@@ -158,7 +160,7 @@ namespace Notes.Views
 
                 //Device.BeginInvokeOnMainThread(async () =>
                 //{
-                await Shell.Current.GoToAsync(notePath,true);
+                await Shell.Current.GoToAsync(notePath, true);
                 //});
                 //                
                 //UpdateNotesList();
@@ -203,10 +205,38 @@ namespace Notes.Views
             return base.OnBackButtonPressed();
         }
 
-        private void RefreshView_Refreshing(object sender, EventArgs e)
+        private async void RefreshView_Refreshing(object sender, EventArgs e)
         {
             UpdateNotesList();
             ((RefreshView)sender).IsRefreshing = false;
+
+            var toastOptions = new ToastOptions()
+            {
+                BackgroundColor = Color.Transparent.ToGrayScale(),
+                CornerRadius = 25,
+                Duration = TimeSpan.FromSeconds(1),
+                MessageOptions = new MessageOptions()
+                {
+                    Message = "Список оновлено...",
+                    Foreground = Color.Blue,
+                    Padding = 25
+                }
+
+            };
+
+            await this.DisplayToastAsync(toastOptions);
+
         }
+
+        private void SwipeItems_DescendantAdded(object sender, ElementEventArgs e)
+        {
+
+        }
+
+        private void CurDescripton_BindingContextChanged(object sender, EventArgs e)
+        {
+            ((Label)sender).IsVisible = !String.IsNullOrEmpty(((Label)sender).Text);
+        }
+
     }
 }

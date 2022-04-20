@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Xamarin.Essentials;
 
 namespace Notes.Views
 {
@@ -13,7 +13,7 @@ namespace Notes.Views
     public partial class AboutPage : ContentPage
     {
         public AboutPage()
-        {           
+        {
             InitializeComponent();
         }
 
@@ -81,6 +81,62 @@ namespace Notes.Views
         private void SwipeItem_Invoked_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void ImportJSON_Clicked(object sender, EventArgs e)
+        {
+            var res = PickAndShow();
+        }
+
+        private async Task<FileResult> PickAndShow()
+        {
+            var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+    {
+        { DevicePlatform.Android, new[] { "application/json" } }
+        
+    });
+            var options = new PickOptions
+            {
+                PickerTitle = "Please select a json file",
+                FileTypes = customFileType,
+            };
+
+            try
+            {
+                var result = await FilePicker.PickAsync(options);
+                if (result != null)
+                {
+                    string Text = $"File Name: {result.FileName}";
+                    //if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
+                    //    result.FileName.EndsWith("png", StringComparison.OrdinalIgnoreCase))
+                    //{
+                    var stream = await result.OpenReadAsync();
+                    //    Image = ImageSource.FromStream(() => stream);
+                    //}
+
+                    var reader = new System.IO.StreamReader(stream);
+
+                    var jsonString = reader.ReadToEnd();
+
+                    //Dictionary<string, JsonContent> jsonData = JsonConvert.DeserializeObject<Dictionary<string, JsonContent>>(jsonString);
+                    //foreach (var item in jsonData)
+                    //{
+                    //    Debug.WriteLine("Date:>>" + item.Key);
+                    //    Debug.WriteLine("color:>>" + item.Value.color);
+                    //    Debug.WriteLine("message:>>" + item.Value.message);
+                    //}
+
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                DisplayAlert("УВАГА!",ex.Message,"ОК");
+                // The user canceled or something went wrong
+            }
+
+            return null;
         }
     }
 }

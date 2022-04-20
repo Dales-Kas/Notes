@@ -16,28 +16,19 @@ namespace Notes
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(NotePage), typeof(NotePage));
             Routing.RegisterRoute(nameof(NoteAddingPage),typeof(NoteAddingPage));
+            Routing.RegisterRoute(nameof(AboutPage), typeof(AboutPage));
             
         }
         private void btnAbout_Clicked(object sender, EventArgs e)
         {
-            //Detail = new NavigationPage(new AboutPage())
-            //{
-            //    BackgroundColor = Color.White
-            //};
-
-            FlyoutIsPresented = false;
+           FlyoutIsPresented = false;
         }
 
         private void btnNotes_Clicked(object sender, EventArgs e)
         {
-            //Detail = new NavigationPage(new NotePage())
-            //{
-            //    BackgroundColor = Color.White
-            //};
-            FlyoutIsPresented = false;
+           FlyoutIsPresented = false;
         }
 
         protected override bool OnBackButtonPressed()

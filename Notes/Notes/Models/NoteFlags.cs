@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using SQLite;
 
 namespace Notes.Models
 {
     public class NoteFlags
-    {        
+    {
         //public NoteFlags()
         //{
 
@@ -18,7 +19,7 @@ namespace Notes.Models
         //    Text = text;
         //    Finished = finished;
         //}
-        
+
         [PrimaryKey, AutoIncrement]
         public Guid ID { get; set; }
 
@@ -26,5 +27,6 @@ namespace Notes.Models
         public bool Finished { get; set; }
 
         public string Text { get; set; }
+
     }
 }

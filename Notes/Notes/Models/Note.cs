@@ -11,7 +11,11 @@ namespace Notes.Models
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public string Text { get; set; }
+        
+        public string Descripton { get; set; }
         public DateTime Date { get; set; }
+
+        public TimeSpan NoteTime { get; set; }
 
         public bool IsArchived { get; set; }
 

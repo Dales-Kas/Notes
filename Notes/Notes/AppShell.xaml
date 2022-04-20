@@ -9,14 +9,21 @@
     <Shell.FlyoutHeader>
         <views:HeaderContentView/>
     </Shell.FlyoutHeader>
-    
-    <FlyoutItem Shell.TabBarIsVisible="False"
-                FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
+
+    <FlyoutItem Title="Нотатки" Icon="ic_action_assignment.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <Tab Title="Нотатки" FlyoutDisplayOptions="AsSingleItem">
+            <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
+        </Tab>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
+                FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Про програму" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>
-        <!--<ShellContent Title="Тест" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ListViewPage1}"></ShellContent>-->
-            
-            <!--<ShellContent Orientation="Vertical" VerticalOptions="FillAndExpand">
+    </FlyoutItem>
+    <!--<ShellContent Title="Тест" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ListViewPage1}"></ShellContent>-->
+
+    <!--<ShellContent Orientation="Vertical" VerticalOptions="FillAndExpand">
                 <ImageButton WidthRequest="65" HeightRequest="65" Aspect="AspectFit" Source="pic4.png" VerticalOptions="Center" BackgroundColor="White"></ImageButton>
                 <Label Text="Dales Kas ©" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"></Label>
                 <BoxView HorizontalOptions="FillAndExpand" Color="Black" HeightRequest="3"></BoxView>
@@ -29,8 +36,8 @@
                     <Button x:Name="btnAbout" Text="About" BackgroundColor="White" Clicked="btnAbout_Clicked" HorizontalOptions="FillAndExpand"></Button>
                 </FlexLayout>
             </ShellContent>-->
-        
-    </FlyoutItem>
+
+
 
     <!--<MasterDetailPage.Detail>
         <ContentPage>

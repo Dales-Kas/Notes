@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Notes.Views.NoteAddingPage"
-             xmlns:local="clr-namespace:Notes">
+             xmlns:local="clr-namespace:Notes"             
+             Disappearing="ContentPage_Disappearing" Appearing="ContentPage_Appearing">
 
     <ContentPage.ToolbarItems>
         <!--<ToolbarItem x:Name="toolbarItem1" Text="" Clicked="toolbarItem1_Clicked" IconImageSource="ic_action_assignment.png"></ToolbarItem>-->
@@ -10,8 +11,11 @@
 
     <ContentPage.Content>
         <StackLayout x:Name="MainStackLayout" BackgroundColor="{Binding NoteColorBackGround}">
-
-            <ScrollView x:Name="scrollView1" Margin="10,10,10,0" VerticalOptions="FillAndExpand">
+            <StackLayout Orientation="Horizontal" Margin="0">
+                <Entry x:Name="NoteDescripton" Margin="10,0" HorizontalOptions="FillAndExpand" Placeholder="Назва нотатки..." Text="{Binding Descripton}" FontSize="{Binding NoteFontSize}" FontAttributes="Bold"></Entry>
+                <Label x:Name="TotalFinished" Margin="5,0,10,0" Text="" HorizontalOptions="End" VerticalOptions="Center"></Label>
+            </StackLayout>
+            <ScrollView x:Name="scrollView1" Margin="10,0" VerticalOptions="FillAndExpand">
                 <Editor x:Name="TextEditor1" 
                         Placeholder="Текст нотатки..."
                         Text="{Binding Text}"
@@ -20,11 +24,10 @@
                         FontSize="{Binding NoteFontSize}"
                         BackgroundColor="{Binding NoteColorBackGround}"
                         TextColor="{Binding NoteColorText}"/>
-                <!--IsVisible="{Binding !IsList, Mode=OneWay}"-->                        
             </ScrollView>
 
-            <StackLayout x:Name="collectionViewFlags" Orientation="Vertical" BackgroundColor="{Binding NoteColorBackGround, Source=BindingContext}">
-                <CollectionView x:Name="collectionView1" Margin="10,10,10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepScrollOffset">
+            <StackLayout x:Name="collectionViewFlags" Orientation="Vertical" Margin="10,0">
+                <CollectionView x:Name="collectionView1" Margin="10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepLastItemInView" SelectionChanged="collectionView1_SelectionChanged">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
                     </CollectionView.ItemsLayout>
@@ -39,10 +42,10 @@
                                     </SwipeItems>
                                 </SwipeView.RightItems>
 
-                                <StackLayout BackgroundColor="{Binding NoteColorBackGround}" Orientation="Vertical">
+                                <StackLayout BackgroundColor="{Binding Source={x:Reference Name=MainStackLayout},Path=BackgroundColor}" Orientation="Vertical">
                                     <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand">
-                                        <CheckBox x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black"></CheckBox>
-                                        <Editor x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding BindingContext.NoteColorText}" TextChanged="CurItem_TextChanged" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges"></Editor>
+                                        <CheckBox x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black" PropertyChanged="cbFinished_PropertyChanged"></CheckBox>
+                                        <Editor  x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding Source={x:Reference Name=TextEditor1},Path=TextColor}" TextChanged="CurItem_TextChanged" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges"></Editor>
                                     </StackLayout>
                                     <!--<StackLayout Orientation="Horizontal">
                                         <Label Text="ID:" FontSize="Small"></Label>
@@ -61,14 +64,33 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <!--<Button Text="DELETE ALL" x:Name="deleteBtn" Clicked="deleteBtn_Clicked"></Button>-->
+                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                    <Button Text="DELETE ALL" x:Name="deleteBtn" Clicked="deleteBtn_Clicked" HorizontalOptions="StartAndExpand"></Button>
+                    <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="Black"                        
+                    HorizontalOptions="End"/>
+                </StackLayout>
             </StackLayout>
 
             <StackLayout Orientation="Horizontal" >
                 <ImageButton Margin="15,0,15,0" x:Name="toolbarItem1" Clicked="toolbarItem1_Clicked" Source="ic_action_assignment.png" HorizontalOptions="StartAndExpand"></ImageButton>
+                <DatePicker x:Name="noteDate" Date="{Binding Date}" PropertyChanged="noteDate_PropertyChanged"></DatePicker>
+                <TimePicker x:Name="noteTime" Time="{Binding NoteTime}" PropertyChanged="noteTime_PropertyChanged"></TimePicker>
                 <Label Text="Прапорці" VerticalOptions="Center" HorizontalOptions="End"/>
                 <Switch x:Name="IsList" VerticalOptions="Center" HorizontalOptions="End" IsToggled="{Binding IsList}" Toggled="IsList_Toggled" Margin="15,0,15,0"/>
             </StackLayout>
+                       
             <StackLayout x:Name="stackLayoutAddtools" Orientation="Horizontal" HorizontalOptions="End">
                 <!--<Picker Title="Select a color" ItemsSource="{Binding ColorNames}" SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" />
                 <BoxView Color="{Binding SelectedColor}" HeightRequest="100" />-->
@@ -80,13 +102,13 @@
                         <Label Text="Текст" VerticalOptions="Center"></Label>
                         <Entry x:Name="ColorTextEntry" Text="{Binding NoteColorText}" Placeholder="Колір нотатки в hex" IsVisible="false"></Entry>
                         <Entry x:Name="ColorBackgroundEntry" Text="{Binding NoteColorBackGround}" Placeholder="Колір нотатки в hex" IsVisible="false"></Entry>
-                        <Button Text="..." Clicked="Button_Clicked" Margin="0,0,15,0"></Button>
+                        <Button Text="..." Clicked="Button_Clicked" Margin="0,0,15,0" Style="{StaticResource Key=ButtonStyle}"></Button>
                     </StackLayout>
                     <ListView x:Name="colorListView"
                   ItemsSource="{x:Static local:NamedColor.All}"
                   SelectedItem="{Binding BackgroundNamedColor, Mode=TwoWay}"
                   VerticalOptions="FillAndExpand"
-                              ItemSelected="colorListView_ItemSelected"
+                              ItemSelected="СolorListView_ItemSelected"
                               IsVisible="false"
                   RowHeight="40">
                         <ListView.ItemTemplate>
@@ -128,6 +150,14 @@
                 </StackLayout>
                 <!--<Label Grid.Row="1" Grid.ColumnSpan="2" Text="Background Color:" />-->
             </Grid>
+            <StackLayout.Resources>
+                <ResourceDictionary>
+                    <Style x:Key="ButtonStyle" TargetType="Button">
+                        <Setter Property="BackgroundColor" Value="CornflowerBlue"></Setter>
+                    </Style>
+                </ResourceDictionary>
+            </StackLayout.Resources>
+            
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

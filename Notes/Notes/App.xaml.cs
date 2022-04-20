@@ -26,7 +26,7 @@ namespace Notes
 
         public App()
         {
-            Device.SetFlags(new string[] { "SwipeView_Experimental", "AppTheme_Experimental" });
+            //Device.SetFlags(new string[] { "SwipeView_Experimental", "AppTheme_Experimental" });
 
             InitializeComponent();
 

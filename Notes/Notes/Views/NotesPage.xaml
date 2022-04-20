@@ -6,92 +6,85 @@
              mc:Ignorable="d"
              x:Class="Notes.Views.NotePage"
              Title="Нотатки">
-    <ContentPage BackgroundColor="White" Title="Нотатки">
+    <ContentPage BackgroundColor="WhiteSmoke" Title="Нотатки">
         <ContentPage.ToolbarItems>
             <!--<ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>-->
         </ContentPage.ToolbarItems>
         <ContentPage.Content>
-
-
-            <!--<ScrollView Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-            <FlexLayout>
-
-                <Frame >
-
-                    <FlexLayout Direction="Column">-->
-
-            <StackLayout Orientation="Vertical" Margin="10">
-
-                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                    <!--<Label Text="Нотатки:" FontSize="Medium" TextColor="Blue" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>-->
-                    <SearchBar x:Name="searchBar"
+            <StackLayout>
+                <SearchBar x:Name="searchBar"
                        TextChanged="searchBar_TextChanged"
                        Placeholder="Пошук"
-                       HorizontalOptions="FillAndExpand"/>
-                </StackLayout>
-                <RefreshView IsRefreshing="{Binding IsRefreshing}" 
-                    Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
-                    <CollectionView x:Name="collectionView" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
-                        <CollectionView.ItemsLayout>
-                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
+                       HorizontalOptions="FillAndExpand"
+                       AnchorX="10"                               
+                       AnchorY="50"/>
 
-                                <SwipeView>
-                                    <SwipeView.LeftItems>
-                                        <SwipeItems SwipeBehaviorOnInvoked="Close" Mode="Reveal">
-                                            <SwipeItem x:Name="toArchiv1" Text="В архів" BackgroundColor="RosyBrown" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
-                                        </SwipeItems>
-                                    </SwipeView.LeftItems>
+                <StackLayout Margin="10,0">
+                    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
+                        <CollectionView x:Name="collectionView" Margin="0,0" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
 
-                                    <SwipeView.RightItems>
-                                        <SwipeItems>
-                                            <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
-                                        </SwipeItems>
-                                    </SwipeView.RightItems>
+                                    <SwipeView>
+                                        <SwipeView.LeftItems>
+                                            <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded">
+                                                <SwipeItem x:Name="toArchiv1" Text="В архів" IconImageSource="arhive1.png" BackgroundColor="WhiteSmoke" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}" ></SwipeItem>
+                                                <SwipeItem x:Name="toDelete" Text="Видалити" IconImageSource="delete.png" BackgroundColor="WhiteSmoke" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                            </SwipeItems>
+                                        </SwipeView.LeftItems>
 
-                                    <StackLayout BackgroundColor="{Binding NoteColorBackGround}">
-                                        <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged"></Label>
-                                        <Label Text="{Binding Date}" FontSize="Small" TextColor="Silver" LineBreakMode="TailTruncation"></Label>
-                                        <StackLayout.GestureRecognizers>
+                                        <StackLayout BackgroundColor="WhiteSmoke" Orientation="Vertical">
+                                            <Frame BackgroundColor="{Binding NoteColorBackGround}" BorderColor="{Binding NoteColorText}" HasShadow="True" CornerRadius="15">
+                                                <StackLayout>
+                                                    <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="{Binding NoteColorText}" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
+                                                    <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                                                    <Label Text="{Binding Date}" FontSize="Small" TextColor="Brown" LineBreakMode="TailTruncation"></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <!--<Ellipse HorizontalOptions="FillAndExpand" BackgroundColor="#2196F3"></Ellipse>-->
+                                            <!--<StackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}">
                                             </TapGestureRecognizer>
-                                        </StackLayout.GestureRecognizers>
-                                    </StackLayout>
+                                        </StackLayout.GestureRecognizers>-->
+                                        </StackLayout>
 
-                                </SwipeView>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                        <!--<CollectionView.EmptyView>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                            <!--<CollectionView.EmptyView>
                     <views:FilterData Filter="{Binding Source={x:Reference searchBar}, Path=Text}" />
                 </CollectionView.EmptyView>-->
 
-                        <CollectionView.EmptyViewTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding Filter, StringFormat='Your filter term of {0} did not match any records.'}"
+                            <CollectionView.EmptyViewTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding Filter, StringFormat='Your filter term of {0} did not match any records.'}"
                        Margin="10,25,10,10"
                        FontAttributes="Bold"
                        FontSize="18"
                        HorizontalOptions="Fill"
                        HorizontalTextAlignment="Center" />
-                            </DataTemplate>
-                        </CollectionView.EmptyViewTemplate>
+                                </DataTemplate>
+                            </CollectionView.EmptyViewTemplate>
 
-                        <CollectionView.Footer>
+                            <!--<CollectionView.Footer>
 
-                        </CollectionView.Footer>
+                            </CollectionView.Footer>-->
 
-                    </CollectionView>
+                        </CollectionView>
 
-                </RefreshView>
+                    </RefreshView>
 
-                <!--AbsoluteLayout.LayoutFlags="PositionProportional"
+                    <!--AbsoluteLayout.LayoutFlags="PositionProportional"
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"-->
-                <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                    <!--<StackLayout Orientation="Horizontal" HorizontalOptions="End">-->
                     <!--<Label Text="Нотатки" FontSize="Medium" TextColor="Blue" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>-->
-                    
-                <Button x:Name="AddItemButton" Text="+"
+
+                    <!--</StackLayout>-->
+
+                    <Button x:Name="AddItemButton" Text="+"
                 FontAttributes="Bold"
                 Clicked="AddButton_Clicked" IsVisible="True"                    
                     VerticalOptions="End"
@@ -102,88 +95,66 @@
                     FontSize="Large"
                     BackgroundColor="#2196F3"
                     TextColor="White"
-                    Margin="20"
-                    />
+                    Margin="10,0,10,10"
+                    BorderColor="Black"                        
+                    HorizontalOptions="End"/>
                 </StackLayout>
-
             </StackLayout>
         </ContentPage.Content>
     </ContentPage>
-    <ContentPage BackgroundColor="Wheat" Title="Архів">
+    <ContentPage Title="Архів" BackgroundColor="WhiteSmoke">
         <ContentPage.ToolbarItems>
             <ToolbarItem Text="Архів" Order="Primary"></ToolbarItem>
         </ContentPage.ToolbarItems>
         <StackLayout Orientation="Vertical">
 
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                <!--<Label Text="Нотатки:" FontSize="Medium" TextColor="Blue" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>-->
                 <SearchBar x:Name="searchBar1"
                        TextChanged="searchBar1_TextChanged"
                        Placeholder="Пошук"
                        HorizontalOptions="FillAndExpand"/>
             </StackLayout>
-            <CollectionView x:Name="collectionView1" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
+            <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
+                <CollectionView x:Name="collectionView1" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
 
-                        <SwipeView>
+                            <SwipeView>
 
-                            <SwipeView.LeftItems>
-                                <SwipeItems SwipeBehaviorOnInvoked="Close" Mode="Reveal">
-                                    <SwipeItem x:Name="toArchiv1" Text="Не архів" BackgroundColor="RosyBrown" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
-                                </SwipeItems>
-                            </SwipeView.LeftItems>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem x:Name="toArchiv1" Text="Не архів" IconImageSource="arhive2.png" BackgroundColor="WhiteSmoke" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                        <SwipeItem x:Name="toDelete" Text="Видалити" IconImageSource="delete.png" BackgroundColor="WhiteSmoke" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
 
-                            <SwipeView.RightItems>
-                                <SwipeItems>
-                                    <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
-                                </SwipeItems>
-                            </SwipeView.RightItems>
+                                <StackLayout BackgroundColor="WhiteSmoke">
+                                    <Frame BackgroundColor="Silver" HasShadow="True" CornerRadius="15">
+                                        <StackLayout Orientation="Vertical">
+                                            <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="Black" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
+                                            <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                                            <Label Text="{Binding Date}" FontSize="Small" TextColor="GhostWhite"></Label>
+                                        </StackLayout>
+                                    </Frame>
+                                </StackLayout>
 
-                            <StackLayout BackgroundColor="Wheat">
-                                <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
-                                <Label Text="{Binding Date}" FontSize="Small" TextColor="Silver"></Label>
-                                <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}">
-                                    </TapGestureRecognizer>
-                                </StackLayout.GestureRecognizers>
-                            </StackLayout>
-                        
-                        </SwipeView>
+                            </SwipeView>
 
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-                <!--<CollectionView.EmptyView>
-                    <views:FilterData Filter="{Binding Source={x:Reference searchBar}, Path=Text}" />
-                </CollectionView.EmptyView>-->
-                
-                <CollectionView.EmptyViewTemplate>
-                    <DataTemplate>
-                        <Label Text="{Binding Filter, StringFormat='Your filter term of {0} did not match any records.'}"
-                       Margin="10,25,10,10"
-                       FontAttributes="Bold"
-                       FontSize="18"
-                       HorizontalOptions="Fill"
-                       HorizontalTextAlignment="Center" />
-                    </DataTemplate>
-                </CollectionView.EmptyViewTemplate>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
 
-                <CollectionView.Footer>
+                </CollectionView>
 
-                </CollectionView.Footer>
-
-            </CollectionView>
+            </RefreshView>
 
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
                 <Label Text="Архівні нотатки" FontSize="Medium" TextColor="Brown" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
             </StackLayout>
 
-            <!--AbsoluteLayout.LayoutFlags="PositionProportional"
-                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"-->
-
         </StackLayout>
+
     </ContentPage>
 </CarouselPage>

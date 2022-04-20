@@ -31,18 +31,37 @@ namespace Notes.Data
         }
 
         public Task<int> SaveNoteAsync(Note note)
-        {
+        {            
             if (note.ID != 0)
             {
-                return db.UpdateAsync(note);
+                if (note.IsList)
+                {
+                    db.UpdateAsync(note);
+                }
+                else
+                {
+                    return db.UpdateAsync(note);
+                }
             }
 
             else
             {
-                return db.InsertAsync(note);
+                if (note.IsList)
+                {
+                    db.InsertAsync(note);
+                }
+                else
+                {
+                    return db.InsertAsync(note);
+                }
             }
 
-            //return SaveNoteFlagsAsync(note.ID);
+            if (!note.IsList)
+            {
+                DeleteNoteFlagsAsync(note.ID);                
+            }
+
+            return SaveNoteFlagsAsync(note.ID);            
         }
 
         public Task<int> DeleteNoteAsync(Note note)
