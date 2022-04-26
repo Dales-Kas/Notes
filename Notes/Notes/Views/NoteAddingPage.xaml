@@ -29,7 +29,7 @@
             <StackLayout x:Name="collectionViewFlags" Orientation="Vertical" Margin="10,0">
                 <CollectionView x:Name="collectionView1" Margin="10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepLastItemInView" SelectionChanged="collectionView1_SelectionChanged">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="1"></LinearItemsLayout>
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
@@ -41,29 +41,49 @@
                                         <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
-
-                                <StackLayout BackgroundColor="{Binding Source={x:Reference Name=MainStackLayout},Path=BackgroundColor}" Orientation="Vertical">
-                                    <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand">
-                                        <CheckBox x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black" PropertyChanged="cbFinished_PropertyChanged"></CheckBox>
-                                        <Editor  x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding Source={x:Reference Name=TextEditor1},Path=TextColor}" TextChanged="CurItem_TextChanged" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges"></Editor>
-                                    </StackLayout>
-                                    <!--<StackLayout Orientation="Horizontal">
-                                        <Label Text="ID:" FontSize="Small"></Label>
-                                        <Label Text="{Binding ID}" FontSize="Small" TextColor="SeaGreen"></Label>
-                                        <Label Text="NoteID:" FontSize="Small"></Label>
-                                        <Label Text="{Binding NoteID}" FontSize="Small" TextColor="SeaGreen"></Label>
-                                    </StackLayout>-->
-                                    <StackLayout.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}">
-                                        </TapGestureRecognizer>
-                                    </StackLayout.GestureRecognizers>
-                                </StackLayout>
+                                <Grid BackgroundColor="{Binding Source={x:Reference Name=MainStackLayout},Path=BackgroundColor}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Grid.Column="0" x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black" PropertyChanged="cbFinished_PropertyChanged"></CheckBox>
+                                    <Editor PlaceholderColor="White" Grid.Column="1" x:Name="CurItem" Text="{Binding Text}" Visual="Material" FontSize="Medium" TextColor="{Binding Source={x:Reference Name=TextEditor1},Path=TextColor}" TextChanged="CurItem_TextChanged" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" Unfocused="CurItem_Unfocused"></Editor>
+                                </Grid>
+                                <!--<StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                                </StackLayout>-->
 
                             </SwipeView>
 
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+                <!--<ListView x:Name="collectionView1" Margin="10,0" SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+
+                            <SwipeView>
+
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <StackLayout BackgroundColor="{Binding Source={x:Reference Name=MainStackLayout},Path=BackgroundColor}" Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                                    <CheckBox x:Name="cbFinished" IsChecked="{Binding Finished, Mode=TwoWay}" CheckedChanged="cbFinished_CheckedChanged" Color="Black" PropertyChanged="cbFinished_PropertyChanged"></CheckBox>
+                                    <Editor  x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding Source={x:Reference Name=TextEditor1},Path=TextColor}" TextChanged="CurItem_TextChanged" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" AutoSize="TextChanges" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True"></Editor>
+                                </StackLayout>
+
+                            </SwipeView>
+
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>-->
+
                 <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                     <Button Text="DELETE ALL" x:Name="deleteBtn" Clicked="deleteBtn_Clicked" HorizontalOptions="StartAndExpand"></Button>
                     <Button x:Name="AddItemButton" Text="+"
@@ -95,6 +115,7 @@
                 <!--<Picker Title="Select a color" ItemsSource="{Binding ColorNames}" SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" />
                 <BoxView Color="{Binding SelectedColor}" HeightRequest="100" />-->
                 <StackLayout Orientation="Vertical">
+                    <Label x:Name="noteID" Text="{Binding ID, Mode=TwoWay}"></Label>
                     <StackLayout Orientation="Horizontal">
                         <CheckBox x:Name="checkBoxBackground" CheckedChanged="checkBoxBackground_CheckedChanged" IsChecked="True" Color="Black"/>
                         <Label Text="Фон" VerticalOptions="Center"></Label>

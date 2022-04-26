@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Xamarin.Essentials;
+using Newtonsoft.Json;
+using Notes.Models;
 
 namespace Notes.Views
 {
@@ -90,11 +92,22 @@ namespace Notes.Views
 
         private async Task<FileResult> PickAndShow()
         {
+            string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "Notes", "NotesFlags");
+
+            if (resault1 != null && resault1 != "Відміна")
+            {
+
+            }
+            else
+            {
+                return null;
+            }
+
             var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-    {
-        { DevicePlatform.Android, new[] { "application/json" } }
-        
-    });
+                        {
+                            { DevicePlatform.Android, new[] { "application/json" } 
+                        }
+                    });
             var options = new PickOptions
             {
                 PickerTitle = "Please select a json file",
@@ -107,33 +120,42 @@ namespace Notes.Views
                 if (result != null)
                 {
                     string Text = $"File Name: {result.FileName}";
-                    //if (result.FileName.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) ||
-                    //    result.FileName.EndsWith("png", StringComparison.OrdinalIgnoreCase))
-                    //{
-                    var stream = await result.OpenReadAsync();
-                    //    Image = ImageSource.FromStream(() => stream);
-                    //}
-
+                    var stream = await result.OpenReadAsync();                    
                     var reader = new System.IO.StreamReader(stream);
 
                     var jsonString = reader.ReadToEnd();
 
-                    //Dictionary<string, JsonContent> jsonData = JsonConvert.DeserializeObject<Dictionary<string, JsonContent>>(jsonString);
-                    //foreach (var item in jsonData)
-                    //{
-                    //    Debug.WriteLine("Date:>>" + item.Key);
-                    //    Debug.WriteLine("color:>>" + item.Value.color);
-                    //    Debug.WriteLine("message:>>" + item.Value.message);
-                    //}
+                    switch (resault1)
+                    {
+                        case "Notes":
+                            {
+                                List<Note> jsonData = JsonConvert.DeserializeObject<List<Note>>(jsonString);
 
+                                foreach (Note item in jsonData)
+                                {
+                                    item.Date = DateTime.Now;
+                                    await App.NotesDB.SaveNoteAsync(item, true,true, false);
+                                }
+                                break;
+                            }
+                        case "NotesFlags":
+                            {
+                                List<NoteFlags> jsonData = JsonConvert.DeserializeObject<List<NoteFlags>>(jsonString);
+
+                                foreach (NoteFlags item in jsonData)
+                                {
+                                    await App.NotesDB.SaveNoteFlagAsync(item, true);
+                                }
+                                break;
+                            }
+                    }
                 }
 
                 return result;
             }
             catch (Exception ex)
             {
-                DisplayAlert("УВАГА!",ex.Message,"ОК");
-                // The user canceled or something went wrong
+                await DisplayAlert("УВАГА!", ex.Message, "ОК");                
             }
 
             return null;

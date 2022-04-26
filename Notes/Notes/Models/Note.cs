@@ -9,9 +9,11 @@ namespace Notes.Models
     public class Note
     {
         [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        public Guid ID { get; set; }
         public string Text { get; set; }
-        
+
+        public string ShortText { get; set; }
+
         public string Descripton { get; set; }
         public DateTime Date { get; set; }
 

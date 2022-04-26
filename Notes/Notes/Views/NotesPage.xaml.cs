@@ -42,8 +42,8 @@ namespace Notes.Views
 
 
         private async void AddButton_Clicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync(nameof(NoteAddingPage));
+        {            
+            await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true.ToString()}");
         }
 
         private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -86,17 +86,17 @@ namespace Notes.Views
 
         private void CurItem_BindingContextChanged(object sender, EventArgs e)
         {
-            string curText = ((Label)sender).Text;
+            //string curText = ((Label)sender).Text;
 
-            if (!String.IsNullOrEmpty(curText))
-            {
-                if (curText.Length >= 200)
-                {
-                    curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
-                }
+            //if (!String.IsNullOrEmpty(curText))
+            //{
+            //    if (curText.Length >= 200)
+            //    {
+            //        curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
+            //    }
 
-            ((Label)sender).Text = curText;
-            }
+            //((Label)sender).Text = curText;
+            //}
         }
 
         private void srchEntry_BindingContextChanged(object sender, EventArgs e)
@@ -122,8 +122,8 @@ namespace Notes.Views
                 searchBar.Text = searchText;
             }
 
-            var filterList = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == false).OrderByDescending(x => x.Date).ToList();
-            var filterList1 = allNotes.Where(x => x.Text.Contains(searchText) && x.IsArchived == true).OrderByDescending(x => x.Date).ToList();
+            var filterList = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == false).OrderByDescending(x => x.Date).ToList();
+            var filterList1 = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == true).OrderByDescending(x => x.Date).ToList();
 
             collectionView.ItemsSource = filterList;
             collectionView1.ItemsSource = filterList1;
@@ -138,9 +138,9 @@ namespace Notes.Views
 
         private async void toArchiv1_Invoked(object sender, SwipedEventArgs e)
         {
-            int id = Convert.ToInt32((sender as MenuItem).CommandParameter);
+            Guid id = (Guid)(sender as MenuItem).CommandParameter;
 
-            if (id != 0)
+            if (id != Guid.Empty)
             {
                 Note note = await App.NotesDB.GetNoteAsync(id);
                 note.IsArchived = !note.IsArchived;
@@ -173,9 +173,9 @@ namespace Notes.Views
 
             if (resault)
             {
-                int id = Convert.ToInt32((sender as MenuItem).CommandParameter);
+                Guid id = (Guid)(sender as MenuItem).CommandParameter;
 
-                if (id != 0)
+                if (id != Guid.Empty)
                 {
                     Note note = await App.NotesDB.GetNoteAsync(id);
                     await App.NotesDB.DeleteNoteAsync(note);
@@ -185,9 +185,18 @@ namespace Notes.Views
             }
         }
 
-        private void toArchiv1_Invoked(object sender, EventArgs e)
+        private async void toArchiv1_Invoked(object sender, EventArgs e)
         {
+            Guid id = (Guid)((sender as MenuItem).CommandParameter);
 
+            if (id != Guid.Empty)
+            {
+                Note note = await App.NotesDB.GetNoteAsync(id);
+                note.IsArchived = !note.IsArchived;
+                await App.NotesDB.SaveNoteAsync(note);
+
+                UpdateNotesList();
+            }
         }
 
         protected override void OnBindingContextChanged()
@@ -210,21 +219,7 @@ namespace Notes.Views
             UpdateNotesList();
             ((RefreshView)sender).IsRefreshing = false;
 
-            var toastOptions = new ToastOptions()
-            {
-                BackgroundColor = Color.Transparent.ToGrayScale(),
-                CornerRadius = 25,
-                Duration = TimeSpan.FromSeconds(1),
-                MessageOptions = new MessageOptions()
-                {
-                    Message = "Список оновлено...",
-                    Foreground = Color.Blue,
-                    Padding = 25
-                }
-
-            };
-
-            await this.DisplayToastAsync(toastOptions);
+            await this.DisplayToastAsync(App.GetToastOptions("Список оновлено..."));
 
         }
 
@@ -238,5 +233,24 @@ namespace Notes.Views
             ((Label)sender).IsVisible = !String.IsNullOrEmpty(((Label)sender).Text);
         }
 
+        private void toDelete_DescendantAdded(object sender, ElementEventArgs e)
+        {
+
+        }
+
+        private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
+        {
+            //(e.Parameter as StackLayout).BackgroundColor = Color.FromHex("FFB55A");            
+        }
+
+        private void SwipeGestureRecognizer_Swiped_1(object sender, SwipedEventArgs e)
+        {
+            //(e.Parameter as StackLayout).BackgroundColor = Color.FromHex("FC8989");
+        }
+
+        private void SwipeItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+
+        }
     }
 }

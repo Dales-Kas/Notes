@@ -3,6 +3,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Data;
 using System.IO;
+using Xamarin.CommunityToolkit.UI.Views.Options;
 
 namespace Notes
 {
@@ -44,6 +45,24 @@ namespace Notes
 
         protected override void OnResume()
         {
-        } 
+        }
+        public static ToastOptions GetToastOptions(string messageText)
+        {
+            var toastOptions = new ToastOptions()
+            {
+                BackgroundColor = Color.FromHex("#2196F3").MultiplyAlpha(0.5),
+                CornerRadius = 25,
+                Duration = TimeSpan.FromSeconds(1),
+                MessageOptions = new MessageOptions()
+                {
+                    Message = messageText,
+                    Foreground = Color.Blue,
+                    Padding = 30
+                }
+
+            };
+            
+            return toastOptions;
+        }
     }
 }

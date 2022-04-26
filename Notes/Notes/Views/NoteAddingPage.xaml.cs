@@ -12,6 +12,7 @@ using Notes.Data;
 namespace Notes.Views
 {
     [QueryProperty(nameof(ItemId), nameof(ItemId))]
+    [QueryProperty(nameof(IsNewForm), nameof(IsNewForm))]
     public partial class NoteAddingPage : ContentPage
     {
         public bool formIsCreated = false;
@@ -24,15 +25,18 @@ namespace Notes.Views
             }
         }
 
+        public bool IsNewForm
+        {
+            set { formIsCreated = value; }
+        }
+
         private string NoteText = "";
 
         private bool addToolsView = false;
 
         private bool dontSaveNote = false;
 
-        //public Note curNote = null;
-        private string strOk = "►";
-        private string strNOk = "○";
+        //public Note curNote = null;        
 
         public NoteFlags curNoteFlag = null;
 
@@ -50,11 +54,14 @@ namespace Notes.Views
 
         }
 
+        #region PageSaveLoad
+
         private async void LoadNote(string value)
         {
             try
             {
-                int id = Convert.ToInt32(value);
+
+                Guid id = Guid.Parse(value);
 
                 Note note = await App.NotesDB.GetNoteAsync(id);
 
@@ -67,52 +74,51 @@ namespace Notes.Views
             catch { }
         }
 
-        private async void SaveNote(bool closeForm = true)
+        private async void LoadAllNoteFlags()
         {
             Note note = (Note)BindingContext;
 
-            if (new DateTime(note.Date.Year, note.Date.Month, note.Date.Day) <= new DateTime(1900, 1, 1))
+            allNotesflags = await App.NotesDB.GetNoteFlagsAsync(note.ID);
+
+            collectionView1.ItemsSource = allNotesflags;
+
+            if (allNotesflags.Count > 0)
             {
-                note.Date = DateTime.UtcNow;
-                note.NoteTime = new TimeSpan(note.Date.Hour, note.Date.Minute, note.Date.Second);
+                collectionView1.ScrollTo(allNotesflags[(allNotesflags.Count - 1)]);
             }
 
-            else
+            SetListOfFlagsStatus();
+        }
 
-            {
-                note.Date = new DateTime(note.Date.Year, note.Date.Month, note.Date.Day, note.NoteTime.Hours, note.NoteTime.Minutes, note.NoteTime.Seconds);
-            }
+        private async Task<int> SaveNote(bool closeForm = true)
+        {
+            Note note = (Note)BindingContext;
+            return await App.NotesDB.SaveNoteAsync(note, false, true, false);
 
-            if (note.IsList)
-            {
-                note.Text = "";
-                int i = 0;
-                foreach (NoteFlags item in allNotesflags)
-                {
-                    i++;
-                    string enter = i > 1 ? "\n" : "";
-
-                    if (item.Finished)
-                    {
-                        note.Text = note.Text + enter + strOk + item.Text;
-                    }
-                    else
-                    {
-                        note.Text = note.Text + enter + strNOk + item.Text;
-                    }
-                }
-            }
-
-            //if (!string.IsNullOrWhiteSpace(note.Text))
+            //if (closeForm)
             //{
-                await App.NotesDB.SaveNoteAsync(note);
+            //    //await Shell.Current.GoToAsync(nameof(NotePage));            
+            //    await Navigation.PopAsync();
             //}
-            if (closeForm)
+        }
+
+        #endregion
+
+        #region PageEvents
+        private async void ContentPage_Disappearing(object sender, EventArgs e)
+        {
+            if (curNoteFlag != null)
             {
-                //await Shell.Current.GoToAsync(nameof(NotePage));            
-                await Navigation.PopAsync();
+                await App.NotesDB.SaveNoteFlagAsync(curNoteFlag);
+            }
+            if (!dontSaveNote)
+            {
+                await SaveNote(false);
             }
         }
+
+        #endregion
+
 
         private void Stepper1_ValueChanged(object sender, ValueChangedEventArgs e)
         {
@@ -142,57 +148,32 @@ namespace Notes.Views
 
             if (note != null)
             {
-
                 if (note.IsList == true)
                 {
 
                     if (formIsCreated)
                     {
-                        App.NotesDB.DeleteNoteFlagsAsync(note.ID);
-
-                        if (!string.IsNullOrEmpty(note.Text))
+                        if (note.ID == Guid.Empty)
                         {
-                            int i = 0;
-                            NoteFlags flag = null;
+                            int rowID = await SaveNote(false);
 
-                            foreach (string item in note.Text.Split('\n'))
-                            {
-                                i++;
-
-                                bool isFinished = item.StartsWith(strOk);
-
-                                string curText = "";
-
-                                if (item.StartsWith(strOk) || item.StartsWith(strNOk))
-                                {
-                                    curText = item.Substring(1);
-                                }
-                                else
-                                {
-                                    curText = item;
-                                }
-
-                                flag = new NoteFlags
-                                {
-                                    NoteID = note.ID,
-                                    Text = curText,
-                                    Finished = isFinished
-                                };
-                                await App.NotesDB.SaveNoteFlagAsync(flag);
-                            }
+                            //if (note.ID==Guid.Empty)
+                            //{
+                            //    //SELECT guid FROM Foo WHERE rowid = x;
+                            //    Note newNoteInBD = await App.NotesDB.GetNoteAsync(rowID);
+                            //    if (newNoteInBD != null)
+                            //    {
+                            //        note.ID = newNoteInBD.ID;
+                            //    }
+                            //}
                         }
+
+                        App.NotesDB.CreateNoteFlagsFromNote(note);
                     }
 
                     LoadAllNoteFlags();
                 }
-
-                else
-                {
-                    //TextEditor1.IsVisible = true;
-                }
-
                 SetElementsVisability();
-
             }
         }
 
@@ -214,24 +195,6 @@ namespace Notes.Views
                 TotalFinished.IsVisible = false;
             }
 
-            SetListOfFlagsStatus(note);
-        }
-
-        private async void LoadAllNoteFlags()
-        {
-            Note note = (Note)BindingContext;
-
-            allNotesflags = await App.NotesDB.GetNoteFlagsAsync(note.ID);
-
-            collectionView1.ItemsSource = allNotesflags;
-
-            SetListOfFlagsStatus();
-        }
-
-        private void toolbarItem1_Clicked(object sender, EventArgs e)
-        {
-            addToolsView = !addToolsView;
-
             if (addToolsView)
             {
                 stackLayoutAddtools.IsVisible = true;
@@ -243,6 +206,15 @@ namespace Notes.Views
                 stackLayoutAddtools.IsVisible = false;
                 gridAddtools.IsVisible = false;
             }
+
+            SetListOfFlagsStatus(note);
+        }
+
+        private void toolbarItem1_Clicked(object sender, EventArgs e)
+        {
+            addToolsView = !addToolsView;
+
+            SetElementsVisability();
         }
 
         private void Button_Clicked(object sender, EventArgs e)
@@ -277,9 +249,16 @@ namespace Notes.Views
             }
         }
 
-        private void toDelete_Invoked(object sender, EventArgs e)
+        private async void toDelete_Invoked(object sender, EventArgs e)
         {
+            Guid id = (Guid)((MenuItem)sender).CommandParameter;
 
+            if (id != Guid.Empty)
+            {
+                await App.NotesDB.DeleteNoteFlagAsync(id);
+
+                LoadAllNoteFlags();
+            }
         }
 
         private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
@@ -315,21 +294,22 @@ namespace Notes.Views
             //SaveNote(false);
         }
 
-        private async void CurItem_TextChanged(object sender, TextChangedEventArgs e)
+        private void CurItem_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!String.IsNullOrEmpty(e.NewTextValue) && e.NewTextValue.EndsWith("\n"))
             {
-                (sender as Editor).Text = e.NewTextValue.Replace("\n", "");
+                (sender as Editor).Text = e.NewTextValue.Trim();
+                    //Replace("\n", "");
                 (sender as Editor).Unfocus();
 
-                if (curNoteFlag != null)
-                {
-                    curNoteFlag.Text = (sender as Editor).Text;
-                    await App.NotesDB.SaveNoteFlagAsync(curNoteFlag);
-                    //curNoteFlag = null;
-                }
-                //SaveNote(false);
-                //collectionView1.ScrollTo(1);
+                //if (curNoteFlag != null)
+                //{
+                //    curNoteFlag.Text = (sender as Editor).Text;
+                //    await App.NotesDB.SaveNoteFlagAsync(curNoteFlag);
+                //    curNoteFlag = null;
+                //}
+                ////SaveNote(false);
+                //collectionView1.ScrollTo(((List<NoteFlags>)collectionView1.ItemsSource).Count - 1);
             }
         }
 
@@ -341,14 +321,6 @@ namespace Notes.Views
         private void noteTime_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
 
-        }
-
-        private void ContentPage_Disappearing(object sender, EventArgs e)
-        {
-            if (!dontSaveNote)
-            {
-                SaveNote(false);
-            }
         }
 
         private void СolorListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -374,6 +346,7 @@ namespace Notes.Views
             {
                 TextEditor1.Focus();
             }
+            //formIsCreated = true;
         }
 
         private void cbFinished_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -391,7 +364,7 @@ namespace Notes.Views
             if (note == null)
             {
                 note = (Note)BindingContext;
-            }           
+            }
 
             if (note.IsList)
             {
@@ -419,10 +392,10 @@ namespace Notes.Views
         {
             Note note = (Note)BindingContext;
 
-            if (note.ID == 0 && formIsCreated)
-            {
-                SaveNote(false);
-            }
+            //if (note.ID == Guid.Empty && formIsCreated)
+            //{
+            //    SaveNote(false);
+            //}
 
             if (note != null)
             {
@@ -436,6 +409,21 @@ namespace Notes.Views
             }
 
             LoadAllNoteFlags();
+        }
+
+        private async void CurItem_Unfocused(object sender, FocusEventArgs e)
+        {
+            //if (curNoteFlag != null)
+            //{
+            //    curNoteFlag.Text = (sender as Editor).Text;
+            //    await App.NotesDB.SaveNoteFlagAsync(curNoteFlag);
+            //    curNoteFlag = null;
+            //}
+            foreach (NoteFlags item in collectionView1.ItemsSource)
+            {
+                await App.NotesDB.SaveNoteFlagAsync(item);
+            }
+            
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using SQLite;
 using Notes.Models;
 using System.Threading.Tasks;
+using Xamarin.CommunityToolkit.Extensions;
 using System.IO;
 
 namespace Notes.Data
@@ -11,57 +12,115 @@ namespace Notes.Data
     public class NotesDB
     {
         readonly SQLiteAsyncConnection db;
+        private string strOk = "►";
+        private string strNOk = "○";
 
         public NotesDB(string connectionString)
         {
             db = new SQLiteAsyncConnection(connectionString);
+            //db.DropTableAsync<Note>().Wait();
             db.CreateTableAsync<Note>().Wait();
             //db.DropTableAsync<NoteFlags>().Wait();   
             db.CreateTableAsync<NoteFlags>().Wait();
         }
+
+        #region NotesData
 
         public Task<List<Note>> GetNotesAsync()
         {
             return db.Table<Note>().ToListAsync();
         }
 
-        public Task<Note> GetNoteAsync(int id)
+        public Task<Note> GetNoteAsync(Guid id)
         {
             return db.Table<Note>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveNoteAsync(Note note)
-        {            
-            if (note.ID != 0)
+        public Task<Note> GetNoteAsync(int id)
+        {
+            return db.Table<Note>().Take(id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveNoteAsync(Note note, bool insert = false, bool createTextFromFlags = true, bool saveNoteFlags = true)
+        {
+            if (new DateTime(note.Date.Year, note.Date.Month, note.Date.Day) <= new DateTime(1900, 1, 1))
             {
-                if (note.IsList)
+                note.Date = DateTime.UtcNow;
+                note.NoteTime = new TimeSpan(note.Date.Hour, note.Date.Minute, note.Date.Second);
+            }
+            else
+            {
+                note.Date = new DateTime(note.Date.Year, note.Date.Month, note.Date.Day, note.NoteTime.Hours, note.NoteTime.Minutes, note.NoteTime.Seconds);
+            }
+
+            if (note.IsList && createTextFromFlags)
+            {
+                note.Text = "";
+                int i = 0;
+                List<NoteFlags> allNotesflags = await GetNoteFlagsAsync(note.ID);
+
+                foreach (NoteFlags item in allNotesflags)
                 {
-                    db.UpdateAsync(note);
+                    i++;
+                    string enter = i > 1 ? "\n" : "";
+
+                    if (item.Finished)
+                    {
+                        note.Text = note.Text + enter + strOk + item.Text;
+                    }
+                    else
+                    {
+                        note.Text = note.Text + enter + strNOk + item.Text;
+                    }
+                }
+            }
+
+            string curText = note.Text;
+
+            if (!String.IsNullOrEmpty(curText))
+            {
+                if (curText.Length >= 200)
+                {
+                    curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
+                }
+            }
+            note.ShortText = curText;
+
+            if (note.ID != Guid.Empty && !insert)
+            {
+                if (note.IsList && saveNoteFlags)
+                {
+                    await db.UpdateAsync(note);
                 }
                 else
                 {
-                    return db.UpdateAsync(note);
+                    return await db.UpdateAsync(note);
                 }
             }
 
             else
             {
-                if (note.IsList)
+                if (note.IsList && saveNoteFlags)
                 {
-                    db.InsertAsync(note);
+                    await db.InsertAsync(note);
                 }
                 else
                 {
-                    return db.InsertAsync(note);
+                    return await db.InsertAsync(note);                    
                 }
             }
 
             if (!note.IsList)
             {
-                DeleteNoteFlagsAsync(note.ID);                
+                DeleteNoteFlagsAsync(note.ID);
             }
 
-            return SaveNoteFlagsAsync(note.ID);            
+            if (saveNoteFlags)
+            {
+                await SaveNoteFlagsAsync(note.ID);
+            }
+
+            return 0;
         }
 
         public Task<int> DeleteNoteAsync(Note note)
@@ -69,9 +128,11 @@ namespace Notes.Data
             return db.DeleteAsync(note);
         }
 
+        #endregion
+
         #region NotesFlags
 
-        public async Task<int> SaveNoteFlagsAsync(int noteId)
+        public async Task<int> SaveNoteFlagsAsync(Guid noteId)
         {
             List<NoteFlags> curTable = await db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
             int i = 0;
@@ -84,10 +145,13 @@ namespace Notes.Data
             return i;
         }
 
-        public Task<int> SaveNoteFlagAsync(NoteFlags noteFlag)
+        public Task<int> SaveNoteFlagAsync(NoteFlags noteFlag, bool insert = false)
         {
-            if (noteFlag.ID != Guid.Empty)
+            if (noteFlag.ID != Guid.Empty && !insert)
             {
+//#if DEBUG
+//DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
+//#endif
                 return db.UpdateAsync(noteFlag);
             }
 
@@ -102,11 +166,18 @@ namespace Notes.Data
             return db.DeleteAsync(noteFlag);
         }
 
-        public async void DeleteNoteFlagsAsync(int noteId)
+        public async Task<int> DeleteNoteFlagAsync(Guid noteFlagGuid)
+        {
+            NoteFlags noteFlag = await GetNoteFlagAsync(noteFlagGuid);
+            await DeleteNoteFlagAsync(noteFlag);
+            return 1;
+        }
+
+        public async void DeleteNoteFlagsAsync(Guid noteId)
         {
             List<NoteFlags> curTable = await db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
             int i = 0;
-            
+
             foreach (NoteFlags item in curTable)
             {
                 i++;
@@ -117,15 +188,56 @@ namespace Notes.Data
             //return i;
         }
 
-        public Task<List<NoteFlags>> GetNoteFlagsAsync(int noteId)
+        public Task<List<NoteFlags>> GetNoteFlagsAsync(Guid noteId)
         {
             return db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
-            //return db.Table<NoteFlags>().ToListAsync();
         }
 
-        public Task<NoteFlags> GetNoteFlagAsync(Guid id, int noteId)
+        public Task<NoteFlags> GetNoteFlagAsync(Guid noteFlagId)
+        {
+            return db.Table<NoteFlags>().Where(x => x.ID == noteFlagId).FirstOrDefaultAsync();
+        }
+
+        public Task<NoteFlags> GetNoteFlagAsync(Guid id, Guid noteId)
         {
             return db.Table<NoteFlags>().Where(i => i.ID == id && i.NoteID == noteId).FirstOrDefaultAsync();
+        }
+
+        public async void CreateNoteFlagsFromNote(Note note)
+        {
+            DeleteNoteFlagsAsync(note.ID);
+
+            if (!string.IsNullOrEmpty(note.Text))
+            {
+                int i = 0;
+                NoteFlags flag = null;
+
+                foreach (string item in note.Text.Split('\n'))
+                {
+                    i++;
+
+                    bool isFinished = item.StartsWith(strOk);
+
+                    string curText = "";
+
+                    if (item.StartsWith(strOk) || item.StartsWith(strNOk))
+                    {
+                        curText = item.Substring(1);
+                    }
+                    else
+                    {
+                        curText = item;
+                    }
+
+                    flag = new NoteFlags
+                    {
+                        NoteID = note.ID,
+                        Text = curText,
+                        Finished = isFinished
+                    };
+                    await SaveNoteFlagAsync(flag);
+                }
+            }
         }
 
         #endregion

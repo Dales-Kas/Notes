@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
              mc:Ignorable="d"
              x:Class="Notes.Views.NotePage"
              Title="Нотатки">
@@ -21,26 +22,49 @@
 
                 <StackLayout Margin="10,0">
                     <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
-                        <CollectionView x:Name="collectionView" Margin="0,0" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
+                        <CollectionView x:Name="collectionView" Margin="0,0" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepLastItemInView" android:ListView.IsFastScrollEnabled="true">
                             <CollectionView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
+                                <!--<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" SnapPointsAlignment="Center" SnapPointsType="Mandatory"></LinearItemsLayout>-->
+                                <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="5" VerticalItemSpacing="5" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
 
                                     <SwipeView>
+                                        <SwipeView.GestureRecognizers>
+                                            <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped" CommandParameter="{x:Reference collectionViewitem}"/>
+                                            <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped_1" CommandParameter="{x:Reference collectionViewitem}"/>
+                                        </SwipeView.GestureRecognizers>
                                         <SwipeView.LeftItems>
-                                            <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded">
-                                                <SwipeItem x:Name="toArchiv1" Text="В архів" IconImageSource="arhive1.png" BackgroundColor="WhiteSmoke" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}" ></SwipeItem>
-                                                <SwipeItem x:Name="toDelete" Text="Видалити" IconImageSource="delete.png" BackgroundColor="WhiteSmoke" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                            <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded" CollectionChanged="SwipeItems_CollectionChanged">
+                                                <SwipeItem x:Name="toDelete" 
+                                                           Text="Видалити" 
+                                                           IconImageSource="delete.png" 
+                                                           BackgroundColor="#FC8989"                                                            
+                                                           Invoked="toDelete_Invoked"
+                                                           DescendantAdded="toDelete_DescendantAdded"                                                           
+                                                           CommandParameter="{Binding ID}">
+                                                </SwipeItem>
                                             </SwipeItems>
                                         </SwipeView.LeftItems>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded">
+                                                <SwipeItem x:Name="toArchiv1" 
+                                                           Text="В архів" 
+                                                           IconImageSource="arhive1.png"
+                                                           BackgroundColor="#FFB55A" 
+                                                           Invoked="toArchiv1_Invoked" 
+                                                           CommandParameter="{Binding ID}">
+                                                </SwipeItem>
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
 
-                                        <StackLayout BackgroundColor="WhiteSmoke" Orientation="Vertical">
+
+                                        <StackLayout x:Name="collectionViewitem"  Orientation="Vertical" VerticalOptions="Start" BackgroundColor="WhiteSmoke">
                                             <Frame BackgroundColor="{Binding NoteColorBackGround}" BorderColor="{Binding NoteColorText}" HasShadow="True" CornerRadius="15">
                                                 <StackLayout>
                                                     <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="{Binding NoteColorText}" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
-                                                    <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                                                    <Label x:Name="CurItem" Text="{Binding ShortText}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged" LineBreakMode="WordWrap"></Label>
                                                     <Label Text="{Binding Date}" FontSize="Small" TextColor="Brown" LineBreakMode="TailTruncation"></Label>
                                                 </StackLayout>
                                             </Frame>
@@ -115,7 +139,7 @@
                        HorizontalOptions="FillAndExpand"/>
             </StackLayout>
             <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
-                <CollectionView x:Name="collectionView1" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset">
+                <CollectionView x:Name="collectionView1" Margin="10" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepScrollOffset" android:ListView.IsFastScrollEnabled="true">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"></LinearItemsLayout>
                     </CollectionView.ItemsLayout>
@@ -126,8 +150,18 @@
 
                                 <SwipeView.RightItems>
                                     <SwipeItems>
-                                        <SwipeItem x:Name="toArchiv1" Text="Не архів" IconImageSource="arhive2.png" BackgroundColor="WhiteSmoke" Invoked="toArchiv1_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
-                                        <SwipeItem x:Name="toDelete" Text="Видалити" IconImageSource="delete.png" BackgroundColor="WhiteSmoke" Invoked="toDelete_Invoked" CommandParameter="{Binding ID}"></SwipeItem>
+                                        <SwipeItem x:Name="toArchiv1" 
+                                                   Text="Не архів"  
+                                                   IconImageSource="arhive2.png" 
+                                                   BackgroundColor="#FFB55A"
+                                                   Invoked="toArchiv1_Invoked" 
+                                                   CommandParameter="{Binding ID}"></SwipeItem>
+                                        <SwipeItem x:Name="toDelete" 
+                                                   Text="Видалити" 
+                                                   IconImageSource="delete.png" 
+                                                   BackgroundColor="#FC8989"
+                                                   Invoked="toDelete_Invoked" 
+                                                   CommandParameter="{Binding ID}"></SwipeItem>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
 
@@ -135,7 +169,7 @@
                                     <Frame BackgroundColor="Silver" HasShadow="True" CornerRadius="15">
                                         <StackLayout Orientation="Vertical">
                                             <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="Black" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
-                                            <Label x:Name="CurItem" Text="{Binding Text}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
+                                            <Label x:Name="CurItem" Text="{Binding ShortText}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
                                             <Label Text="{Binding Date}" FontSize="Small" TextColor="GhostWhite"></Label>
                                         </StackLayout>
                                     </Frame>
@@ -150,8 +184,8 @@
 
             </RefreshView>
 
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                <Label Text="Архівні нотатки" FontSize="Medium" TextColor="Brown" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="0" VerticalOptions="Center">
+                <Label Text="Архівні нотатки" FontSize="Medium" TextColor="Brown" Margin="0" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
             </StackLayout>
 
         </StackLayout>

@@ -23,10 +23,12 @@ namespace Notes.Models
         [PrimaryKey, AutoIncrement]
         public Guid ID { get; set; }
 
-        public int NoteID { get; set; }
+        public Guid NoteID { get; set; }
         public bool Finished { get; set; }
 
         public string Text { get; set; }
+
+        public int Code { get; set; }
 
     }
 }
