@@ -19,7 +19,9 @@ namespace Notes
             Routing.RegisterRoute(nameof(NotePage), typeof(NotePage));
             Routing.RegisterRoute(nameof(NoteAddingPage),typeof(NoteAddingPage));
             Routing.RegisterRoute(nameof(AboutPage), typeof(AboutPage));
-            
+            Routing.RegisterRoute(nameof(NoteCategoriesView), typeof(NoteCategoriesView));
+            Routing.RegisterRoute(nameof(NoteCategoryForm), typeof(NoteCategoryForm)); 
+
         }
         private void btnAbout_Clicked(object sender, EventArgs e)
         {

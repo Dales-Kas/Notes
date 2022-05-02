@@ -16,7 +16,10 @@
             <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
         </Tab>
     </FlyoutItem>
-
+    <FlyoutItem Title="Категорії нотаток" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"></ShellContent>
+    </FlyoutItem>
     <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Про програму" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>

@@ -22,6 +22,8 @@ namespace Notes.Data
             db.CreateTableAsync<Note>().Wait();
             //db.DropTableAsync<NoteFlags>().Wait();   
             db.CreateTableAsync<NoteFlags>().Wait();
+            db.CreateTableAsync<NoteCategory>().Wait();
+            
         }
 
         #region NotesData
@@ -241,6 +243,55 @@ namespace Notes.Data
         }
 
         #endregion
+
+        #region NoteCategory
+
+        public Task<NoteCategory> GetNoteCategoryAsync(int id)
+        {
+            return db.Table<NoteCategory>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
+
+        public NoteCategory GetNoteCategory(int id)
+        {
+            return db.Table<NoteCategory>().Where(i => i.ID == id).FirstOrDefaultAsync().Result;
+        }
+
+        public Task<List<NoteCategory>> GetNotesCategoriesAsync()
+        {
+            return db.Table<NoteCategory>().ToListAsync();
+        }
+
+        public Task<int> SaveNoteCategoryAsync(NoteCategory noteCategory, bool insert = false)
+        {
+            if (noteCategory.ID != 0 && !insert)
+            {
+                return db.UpdateAsync(noteCategory);
+            }
+
+            else
+            {
+                return db.InsertAsync(noteCategory);
+            }
+        }
+
+        public string GetNoteCategoryName(int ID)
+        {
+            string categoryText = "";
+
+            NoteCategory noteCategory = GetNoteCategoryAsync(ID).Result;
+
+            if (noteCategory != null)
+            {
+                categoryText = noteCategory.Name;
+            }
+            else
+            {
+                categoryText = "";
+            }
+
+            return categoryText;
+        }
+        #endregion  
 
     }
 }

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Notes.Views.NoteCategoriesView"
+             Shell.PresentationMode = "Animated">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Добавити" Clicked="Button_Clicked"></ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" Margin="10">
+            <ListView x:Name="MyListView"
+            ItemsSource="{Binding Items}"
+            ItemTapped="Handle_ItemTapped"
+            CachingStrategy="RecycleElement" Refreshing="MyListView_Refreshing" IsPullToRefreshEnabled="True">
+                <!--Built in Cells-->
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                        <SwipeView>
+                            <SwipeView.LeftItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded" CollectionChanged="SwipeItems_CollectionChanged">
+                                <SwipeItem x:Name="BtnEdit" 
+                                                           Text="Редагувати"                                                            
+                                                           BackgroundColor="LightGreen"                                                            
+                                                           Invoked="BtnEdit_Invoked"                                                           
+                                                           CommandParameter="{Binding ID}">
+                                </SwipeItem>
+                            </SwipeView.LeftItems>
+                            <StackLayout Orientation="Vertical">
+                                <Label Text="{Binding Name}" FontSize="Large" TextColor="Black"></Label>
+                                <Label Text="{Binding ID}" FontSize="Medium" TextColor="Blue"></Label>
+                                    <Ellipse WidthRequest="4"></Ellipse>
+                            </StackLayout>
+                        </SwipeView>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+                <!--Custom View Cells-->
+                <!--
+    <ListView.ItemTemplate>
+      <DataTemplate>
+        <ViewCell>
+          <StackLayout>
+            <Label Text="{Binding Text}" 
+                   Style="{DynamicResource ListItemTextStyle}" />
+            <Label Text="{Binding Detail}" 
+                   Style="{DynamicResource ListItemDetailTextStyle}"/>
+          </StackLayout>
+        </ViewCell>
+      </DataTemplate>
+    </ListView.ItemTemplate>
+    -->
+            </ListView>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

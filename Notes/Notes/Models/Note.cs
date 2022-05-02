@@ -25,6 +25,8 @@ namespace Notes.Models
 
         public double Rate { get; set; }
 
+        public int Category { get; set; }
+        
         public int NoteFontSize { get; set; } = 18;
 
         //public Color NoteColor { get; set; }

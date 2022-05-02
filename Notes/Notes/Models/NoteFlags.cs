@@ -28,7 +28,6 @@ namespace Notes.Models
 
         public string Text { get; set; }
 
-        public int Code { get; set; }
-
+        public int Code { get; set; }            
     }
 }

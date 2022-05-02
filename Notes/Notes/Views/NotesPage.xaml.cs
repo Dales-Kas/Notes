@@ -252,5 +252,21 @@ namespace Notes.Views
         {
 
         }
+
+        private void Label_BindingContextChanged(object sender, EventArgs e)
+        {
+            string curText = ((Label)sender).Text;
+            int.TryParse(curText, out int id);
+
+            if (id != 0) 
+            {
+                ((Label)sender).Text = $"#{App.NotesDB.GetNoteCategoryName(id)}";
+            }
+            else
+            {
+                //((Label)sender).Text = "";
+                ((Label)sender).IsVisible = false;
+            }
+        }
     }
 }

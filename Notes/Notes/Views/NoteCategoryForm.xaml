@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Notes.Views.NoteCategoryForm">
+    <StackLayout Orientation="Vertical">
+        <Entry x:Name="CategoryID" Text="{Binding ID}" IsEnabled="False" Placeholder="ID"></Entry>
+        <Entry x:Name="CategoryName" Text="{Binding Name}" Placeholder="Назва категорії"></Entry>
+        <Button Text="Зберегти" x:Name="BtnSave" Clicked="BtnSave_Clicked"></Button>
+    </StackLayout>
+</ContentPage>

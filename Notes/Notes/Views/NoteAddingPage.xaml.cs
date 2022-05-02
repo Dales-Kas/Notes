@@ -13,11 +13,12 @@ namespace Notes.Views
 {
     [QueryProperty(nameof(ItemId), nameof(ItemId))]
     [QueryProperty(nameof(IsNewForm), nameof(IsNewForm))]
+    [QueryProperty(nameof(CategoryID), nameof(CategoryID))]
     public partial class NoteAddingPage : ContentPage
     {
         public bool formIsCreated = false;
+        private Note currentNote = null;
         public string ItemId
-
         {
             set
             {
@@ -28,6 +29,50 @@ namespace Notes.Views
         public bool IsNewForm
         {
             set { formIsCreated = value; }
+        }
+        public string CategoryID
+        {
+            set
+            {
+                Note note = (Note)BindingContext;
+
+                if (note != null)
+                {
+                    int.TryParse(value, out int newId);
+                    note.Category = newId;
+
+                    SetCategoryName(newId);
+                }
+            }
+
+            get
+            {
+                return SetCategoryName(currentNote.Category);
+            }
+        }
+
+        private string SetCategoryName(int curCategoryID)
+        {
+            NoteCategory.Text = "";
+
+            NoteCategory noteCategory = App.NotesDB.GetNoteCategoryAsync(curCategoryID).Result;
+
+            if (noteCategory != null)
+            {
+                NoteCategory.Text = noteCategory.Name;
+            }
+            else
+            {
+                NoteCategory.Text = "";
+            }
+
+            return NoteCategory.Text;
+        }
+
+        public string NoteCategoryDescr
+        {
+            get { return App.NotesDB.GetNoteCategory(((Note)BindingContext).Category).Name; }
+            set { NoteCategoryDescr = value; }
         }
 
         private string NoteText = "";
@@ -43,12 +88,15 @@ namespace Notes.Views
         public List<NoteFlags> allNotesflags;
         public NoteAddingPage()
         {
-            InitializeComponent();
+            currentNote = new Note();
 
-            BindingContext = new Note();
+            BindingContext = currentNote;
+
+            InitializeComponent();
 
             stackLayoutAddtools.IsVisible = false;
             gridAddtools.IsVisible = false;
+            //SetCategoryName();
 
             SetElementsVisability();
 
@@ -58,6 +106,11 @@ namespace Notes.Views
 
         private async void LoadNote(string value)
         {
+            if (value == null)
+            {
+                return;
+            }
+
             try
             {
 
@@ -66,6 +119,9 @@ namespace Notes.Views
                 Note note = await App.NotesDB.GetNoteAsync(id);
 
                 BindingContext = note;
+
+                currentNote = note;
+                SetCategoryName(currentNote.Category);
 
                 NoteText = note.Text;
 
@@ -93,13 +149,7 @@ namespace Notes.Views
         private async Task<int> SaveNote(bool closeForm = true)
         {
             Note note = (Note)BindingContext;
-            return await App.NotesDB.SaveNoteAsync(note, false, true, false);
-
-            //if (closeForm)
-            //{
-            //    //await Shell.Current.GoToAsync(nameof(NotePage));            
-            //    await Navigation.PopAsync();
-            //}
+            return await App.NotesDB.SaveNoteAsync(note, false, true, false);            
         }
 
         #endregion
@@ -299,7 +349,7 @@ namespace Notes.Views
             if (!String.IsNullOrEmpty(e.NewTextValue) && e.NewTextValue.EndsWith("\n"))
             {
                 (sender as Editor).Text = e.NewTextValue.Trim();
-                    //Replace("\n", "");
+                //Replace("\n", "");
                 (sender as Editor).Unfocus();
 
                 //if (curNoteFlag != null)
@@ -423,7 +473,17 @@ namespace Notes.Views
             {
                 await App.NotesDB.SaveNoteFlagAsync(item);
             }
-            
+
+        }
+
+        private async void BtnSelectCategory_Clicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync(nameof(NoteCategoriesView), true);
+        }
+
+        private void NoteCategory_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

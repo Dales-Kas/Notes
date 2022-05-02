@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Notes.Views.NoteAddingPage"
-             xmlns:local="clr-namespace:Notes"             
+             xmlns:local="clr-namespace:Notes" 
+             x:Name="ThisNote"
              Disappearing="ContentPage_Disappearing" Appearing="ContentPage_Appearing">
 
     <ContentPage.ToolbarItems>
@@ -12,7 +13,7 @@
     <ContentPage.Content>
         <StackLayout x:Name="MainStackLayout" BackgroundColor="{Binding NoteColorBackGround}">
             <StackLayout Orientation="Horizontal" Margin="0">
-                <Entry x:Name="NoteDescripton" Margin="10,0" HorizontalOptions="FillAndExpand" Placeholder="Назва нотатки..." Text="{Binding Descripton}" FontSize="{Binding NoteFontSize}" FontAttributes="Bold"></Entry>
+                <Entry x:Name="NoteDescripton" Margin="10,0" HorizontalOptions="FillAndExpand" Placeholder="Назва нотатки..." Text="{Binding Descripton}" FontSize="{Binding NoteFontSize}" FontAttributes="Bold" TextTransform ="Uppercase"></Entry>
                 <Label x:Name="TotalFinished" Margin="5,0,10,0" Text="" HorizontalOptions="End" VerticalOptions="Center"></Label>
             </StackLayout>
             <ScrollView x:Name="scrollView1" Margin="10,0" VerticalOptions="FillAndExpand">
@@ -27,7 +28,7 @@
             </ScrollView>
 
             <StackLayout x:Name="collectionViewFlags" Orientation="Vertical" Margin="10,0">
-                <CollectionView x:Name="collectionView1" Margin="10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepLastItemInView" SelectionChanged="collectionView1_SelectionChanged">
+                <CollectionView x:Name="collectionView1" Margin="10,0" SelectionMode="Single" ItemsUpdatingScrollMode="KeepLastItemInView" SelectionChanged="collectionView1_SelectionChanged" >
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="1"></LinearItemsLayout>
                     </CollectionView.ItemsLayout>
@@ -103,6 +104,11 @@
                 </StackLayout>
             </StackLayout>
 
+            <StackLayout Orientation="Horizontal" Padding="10,0">
+                <Label Text="#" VerticalOptions="Center" FontAttributes="Bold" FontSize="Medium" TextColor="Black"></Label>
+                <Entry x:Name="NoteCategory" Text="{Binding Source={x:Reference ThisNote}, Path=CategoryID, Mode=OneWay}" TextChanged="NoteCategory_TextChanged" ClearButtonVisibility="WhileEditing" HorizontalOptions="FillAndExpand"></Entry>
+                <Button Text="..." x:Name="BtnSelectCategory" Clicked="BtnSelectCategory_Clicked" HeightRequest="12" WidthRequest="50" HorizontalOptions="End"></Button>
+            </StackLayout>
             <StackLayout Orientation="Horizontal" >
                 <ImageButton Margin="15,0,15,0" x:Name="toolbarItem1" Clicked="toolbarItem1_Clicked" Source="ic_action_assignment.png" HorizontalOptions="StartAndExpand"></ImageButton>
                 <DatePicker x:Name="noteDate" Date="{Binding Date}" PropertyChanged="noteDate_PropertyChanged"></DatePicker>

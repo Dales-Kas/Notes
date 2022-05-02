@@ -65,7 +65,12 @@
                                                 <StackLayout>
                                                     <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="{Binding NoteColorText}" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
                                                     <Label x:Name="CurItem" Text="{Binding ShortText}" FontSize="Medium" TextColor="{Binding NoteColorText}" BindingContextChanged="CurItem_BindingContextChanged" LineBreakMode="WordWrap"></Label>
-                                                    <Label Text="{Binding Date}" FontSize="Small" TextColor="Brown" LineBreakMode="TailTruncation"></Label>
+                                                    <StackLayout Orientation="Vertical">
+                                                        <Label Text="{Binding Date}" FontSize="Small" TextColor="Brown" LineBreakMode="TailTruncation"></Label>
+                                                        <Frame BackgroundColor="WhiteSmoke" CornerRadius="10" HeightRequest="20" Margin="0" Padding="0" HorizontalOptions="FillAndExpand" IsVisible="{Binding Source={x:Reference LblCategory}, Path=IsVisible}">
+                                                            <Label Text="{Binding Category}" x:Name="LblCategory" FontSize="Small" TextColor="Blue" LineBreakMode="TailTruncation" BindingContextChanged="Label_BindingContextChanged" HorizontalOptions="Center"></Label>
+                                                        </Frame>
+                                                    </StackLayout>
                                                 </StackLayout>
                                             </Frame>
                                             <!--<Ellipse HorizontalOptions="FillAndExpand" BackgroundColor="#2196F3"></Ellipse>-->
@@ -171,6 +176,9 @@
                                             <Label x:Name="CurDescripton" Text="{Binding Descripton}" FontSize="Medium" FontAttributes="Bold" TextColor="Black" BindingContextChanged="CurDescripton_BindingContextChanged"></Label>
                                             <Label x:Name="CurItem" Text="{Binding ShortText}" FontSize="Medium" TextColor="Black" BindingContextChanged="CurItem_BindingContextChanged"></Label>
                                             <Label Text="{Binding Date}" FontSize="Small" TextColor="GhostWhite"></Label>
+                                            <Frame BackgroundColor="WhiteSmoke" CornerRadius="10" HeightRequest="20" Margin="0" Padding="0" HorizontalOptions="FillAndExpand" IsVisible="{Binding Source={x:Reference LblCategory}, Path=IsVisible}">
+                                                <Label Text="{Binding Category}" x:Name="LblCategory" FontSize="Small" TextColor="Blue" LineBreakMode="TailTruncation" BindingContextChanged="Label_BindingContextChanged" HorizontalOptions="Center"></Label>
+                                            </Frame>
                                         </StackLayout>
                                     </Frame>
                                 </StackLayout>
