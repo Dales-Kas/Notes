@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CarouselPage xmlns="http://xamarin.com/schemas/2014/forms"
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
              mc:Ignorable="d"
              x:Class="Notes.Views.NotePage"
-             Title="Нотатки">
-    <ContentPage BackgroundColor="WhiteSmoke" Title="Нотатки">
+             Title="Нотатки"
+              CurrentPageChanged="CarouselPage_CurrentPageChanged">
+    <ContentPage BackgroundColor="WhiteSmoke" Title="Актуальні" x:Name="Notes1">
         <ContentPage.ToolbarItems>
             <!--<ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>-->
         </ContentPage.ToolbarItems>
@@ -20,7 +21,7 @@
                        AnchorX="10"                               
                        AnchorY="50"/>
 
-                <StackLayout Margin="10,0">
+                <AbsoluteLayout Margin="10,0">
                     <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
                         <CollectionView x:Name="collectionView" Margin="0,0" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepLastItemInView" android:ListView.IsFastScrollEnabled="true">
                             <CollectionView.ItemsLayout>
@@ -126,12 +127,15 @@
                     TextColor="White"
                     Margin="10,0,10,10"
                     BorderColor="Black"                        
-                    HorizontalOptions="End"/>
-                </StackLayout>
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                            />
+                </AbsoluteLayout>
             </StackLayout>
         </ContentPage.Content>
     </ContentPage>
-    <ContentPage Title="Архів" BackgroundColor="WhiteSmoke">
+    <ContentPage Title="Архів" BackgroundColor="WhiteSmoke" x:Name="Notes2">
         <ContentPage.ToolbarItems>
             <ToolbarItem Text="Архів" Order="Primary"></ToolbarItem>
         </ContentPage.ToolbarItems>
@@ -192,11 +196,11 @@
 
             </RefreshView>
 
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="0" VerticalOptions="Center">
+            <!--<StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="0" VerticalOptions="Center">
                 <Label Text="Архівні нотатки" FontSize="Medium" TextColor="Brown" Margin="0" VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
-            </StackLayout>
+            </StackLayout>-->
 
         </StackLayout>
 
     </ContentPage>
-</CarouselPage>
+</TabbedPage>

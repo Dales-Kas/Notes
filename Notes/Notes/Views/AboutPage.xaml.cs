@@ -8,6 +8,7 @@ using Xamarin.Forms.Xaml;
 using Xamarin.Essentials;
 using Newtonsoft.Json;
 using Notes.Models;
+using Notes.Models.Car;
 
 namespace Notes.Views
 {
@@ -19,72 +20,6 @@ namespace Notes.Views
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
-        {
-            //// SwipeItems
-            //SwipeItem favoriteSwipeItem = new SwipeItem
-            //{
-            //    Text = "Favorite",
-            //    IconImageSource = "pic2.png",
-            //    BackgroundColor = Color.LightGreen
-            //};
-            //favoriteSwipeItem.Invoked += OnFavoriteSwipeItemInvoked;
-
-            //SwipeItem deleteSwipeItem = new SwipeItem
-            //{
-            //    Text = "Delete",
-            //    IconImageSource = "pic1.png",
-            //    BackgroundColor = Color.LightPink
-            //};
-            //deleteSwipeItem.Invoked += OnDeleteSwipeItemInvoked;
-
-            //List<SwipeItem> swipeItems = new List<SwipeItem>() { favoriteSwipeItem, deleteSwipeItem };
-
-            //// SwipeView content
-            //Grid grid = new Grid
-            //{
-            //    HeightRequest = 60,
-            //    WidthRequest = 300,
-            //    BackgroundColor = Color.LightGray
-            //};
-            //grid.Children.Add(new Label
-            //{
-            //    Text = "Swipe right",
-            //    HorizontalOptions = LayoutOptions.Center,
-            //    VerticalOptions = LayoutOptions.Center
-            //});
-
-            //SwipeView swipeView = new SwipeView
-            //{
-            //    LeftItems = new SwipeItems(swipeItems),
-            //    Content = grid
-            //};
-
-            //Content = grid;
-
-            //base.OnAppearing();
-        }
-
-        private void OnDeleteSwipeItemInvoked(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnFavoriteSwipeItemInvoked(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SwipeItem_Invoked(object sender, EventArgs e)
-        {
-
-        }
-
-        private void SwipeItem_Invoked_1(object sender, EventArgs e)
-        {
-
-        }
-
         private void ImportJSON_Clicked(object sender, EventArgs e)
         {
             var res = PickAndShow();
@@ -92,7 +27,7 @@ namespace Notes.Views
 
         private async Task<FileResult> PickAndShow()
         {
-            string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "Notes", "NotesFlags");
+            string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "NotesAndNotesFlags", "Cars");
 
             if (resault1 != null && resault1 != "Відміна")
             {
@@ -105,7 +40,7 @@ namespace Notes.Views
 
             var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                         {
-                            { DevicePlatform.Android, new[] { "application/json" } 
+                            { DevicePlatform.Android, new[] { "application/json" }
                         }
                     });
             var options = new PickOptions
@@ -120,45 +55,106 @@ namespace Notes.Views
                 if (result != null)
                 {
                     string Text = $"File Name: {result.FileName}";
-                    var stream = await result.OpenReadAsync();                    
+                    var stream = await result.OpenReadAsync();
                     var reader = new System.IO.StreamReader(stream);
 
                     var jsonString = reader.ReadToEnd();
 
                     switch (resault1)
                     {
-                        case "Notes":
+                        case "NotesAndNotesFlags":
                             {
-                                List<Note> jsonData = JsonConvert.DeserializeObject<List<Note>>(jsonString);
+                                App.NotesDB.DropTable(nameof(Note));
 
-                                foreach (Note item in jsonData)
-                                {
-                                    item.Date = DateTime.Now;
-                                    await App.NotesDB.SaveNoteAsync(item, true,true, false);
-                                }
+                                await ImportAndSaveToBase(jsonString);
+
                                 break;
                             }
-                        case "NotesFlags":
+                        case "Cars":
                             {
-                                List<NoteFlags> jsonData = JsonConvert.DeserializeObject<List<NoteFlags>>(jsonString);
+                                App.NotesDB.DropTable(nameof(Cars));
 
-                                foreach (NoteFlags item in jsonData)
-                                {
-                                    await App.NotesDB.SaveNoteFlagAsync(item, true);
-                                }
+                                await ImportAndSaveToBase(jsonString);
+
                                 break;
                             }
                     }
-                }
 
-                return result;
+                    return result;
+                }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("УВАГА!", ex.Message, "ОК");                
+                await DisplayAlert("УВАГА!", ex.Message, "ОК");
             }
 
             return null;
+        }
+
+        public async Task ImportAndSaveToBase(string jsonString)
+        {
+            List<ImportData> jsonData = JsonConvert.DeserializeObject<List<ImportData>>(jsonString);
+
+            foreach (ImportData item in jsonData)
+            {
+                if (item.Name == "Notes")
+                {
+                    foreach (Note note in item.Notes)
+                    {
+                        note.Date = DateTime.Now;
+                        await App.NotesDB.SaveNoteAsync(note, true, true, false);
+                    }
+                }
+                else if (item.Name == "NotesFlags")
+                {
+                    foreach (NoteFlags noteFlag in item.NotesFlags)
+                    {
+                        try
+                        {
+                            await App.NotesDB.SaveNoteFlagAsync(noteFlag);
+                        }
+                        catch (Exception ex)
+                        {
+                            await DisplayAlert("УВАГА!", ex.Message, "ОК");
+                        }
+                    }
+                }
+                else if (item.Name == "Cars")
+                {
+                    foreach (Cars car in item.Cars)
+                    {
+                        await App.NotesDB.SaveCarAsync(car, true);
+                    }
+                }
+                else if (item.Name == "CarDescription")
+                {
+                    foreach (CarDescription carDescription in item.CarDescription)
+                    {
+                        //await App.NotesDB.SaveCarAsync(car, true);
+                        await App.NotesDB.SaveAsync((object)carDescription, nameof(carDescription), true);
+                    }
+                }
+                else if (item.Name == "CarNotes")
+                {
+                    foreach (CarNotes carNotes in item.CarNotes)
+                    {
+                        //await App.NotesDB.SaveCarAsync(car, true);
+                        await App.NotesDB.SaveAsync((object)carNotes, nameof(carNotes), true);
+                    }
+                }
+            }
+        }
+
+        public class ImportData
+        {
+            public string Name { get; set; }
+            //NOTES:
+            public List <Note> Notes { get; set; }
+            public List <NoteFlags> NotesFlags { get; set; }
+            //CARS:
+            public List <Cars> Cars { get; set; }
+            public List<CarDescription> CarDescription { get; set; }
+            public List<CarNotes> CarNotes { get; set; }
         }
     }
 }

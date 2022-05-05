@@ -38,7 +38,7 @@ namespace Notes.Views
             MyListView.ItemsSource = Items;
         }
 
-        async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)
+        void Handle_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             if (e.Item == null)
                 return;

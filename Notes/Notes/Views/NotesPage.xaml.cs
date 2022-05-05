@@ -15,7 +15,7 @@ using System.Threading;
 namespace Notes.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class NotePage : CarouselPage
+    public partial class NotePage : TabbedPage
     {
         public List<Note> allNotes = null;
 
@@ -266,6 +266,18 @@ namespace Notes.Views
             {
                 //((Label)sender).Text = "";
                 ((Label)sender).IsVisible = false;
+            }
+        }
+
+        private void CarouselPage_CurrentPageChanged(object sender, EventArgs e)
+        {
+            if (this.CurrentPage==Notes1)
+            {
+                Title = "Нотатки";                
+            }
+            else
+            {
+                Title = "Архівні нотатки";                
             }
         }
     }

@@ -9,6 +9,7 @@
     <ContentPage.Content>
         <StackLayout Orientation="Vertical" Margin="10">
             <ListView x:Name="MyListView"
+                      RowHeight="50"
             ItemsSource="{Binding Items}"
             ItemTapped="Handle_ItemTapped"
             CachingStrategy="RecycleElement" Refreshing="MyListView_Refreshing" IsPullToRefreshEnabled="True">
@@ -16,21 +17,21 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                        <SwipeView>
-                            <SwipeView.LeftItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded" CollectionChanged="SwipeItems_CollectionChanged">
-                                <SwipeItem x:Name="BtnEdit" 
+                            <SwipeView>
+                                <SwipeView.RightItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded" CollectionChanged="SwipeItems_CollectionChanged">
+                                    <SwipeItem x:Name="BtnEdit" 
                                                            Text="Редагувати"                                                            
                                                            BackgroundColor="LightGreen"                                                            
                                                            Invoked="BtnEdit_Invoked"                                                           
                                                            CommandParameter="{Binding ID}">
-                                </SwipeItem>
-                            </SwipeView.LeftItems>
-                            <StackLayout Orientation="Vertical">
-                                <Label Text="{Binding Name}" FontSize="Large" TextColor="Black"></Label>
-                                <Label Text="{Binding ID}" FontSize="Medium" TextColor="Blue"></Label>
-                                    <Ellipse WidthRequest="4"></Ellipse>
-                            </StackLayout>
-                        </SwipeView>
+                                    </SwipeItem>
+                                </SwipeView.RightItems>
+                                <Grid ColumnDefinitions="50">
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="Medium" LineBreakMode="WordWrap" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"></Label>
+                                    <Label Grid.Column="0" Text="{Binding ID}" FontSize="Small" TextColor="Blue" VerticalOptions="Center"></Label>
+                                    <!--<Ellipse Grid.Row="1" WidthRequest="4"></Ellipse>-->
+                                </Grid>
+                            </SwipeView>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -51,7 +52,7 @@
     </ListView.ItemTemplate>
     -->
             </ListView>
-            
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

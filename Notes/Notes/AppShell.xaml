@@ -5,7 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="Notes.AppShell"
-             xmlns:views="clr-namespace:Notes.Views" Navigated="Shell_Navigated">
+             xmlns:views="clr-namespace:Notes.Views"
+             xmlns:viewsCar="clr-namespace:Notes.Views.Car"      
+       Navigated="Shell_Navigated">
     <Shell.FlyoutHeader>
         <views:HeaderContentView/>
     </Shell.FlyoutHeader>
@@ -19,6 +21,10 @@
     <FlyoutItem Title="Категорії нотаток" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
                 FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Авто" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
     </FlyoutItem>
     <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">

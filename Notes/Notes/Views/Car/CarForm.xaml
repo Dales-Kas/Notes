@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+             mc:Ignorable="d"
+             x:Class="Notes.Views.Car.CarForm"             
+              Shell.FlyoutBehavior="Disabled"
+              Title="Авто">
+    <ContentPage x:Name="MainInfo" BackgroundColor="White" Title="Основна інформація">
+        <ContentPage.Content>
+            <StackLayout Margin="10,0">
+                <Label Text="{Binding Source={x:Reference MainInfo}, Path=Title}" FontSize="Large" FontAttributes="Bold"></Label>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40*"/>
+                        <ColumnDefinition Width="60*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Назва авто:" VerticalOptions="Center"></Label>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="Name" Text="{Binding Name}" Placeholder="Назва авто" HorizontalOptions="Fill" FlowDirection="MatchParent"></Entry>
+                    
+                    <Label Grid.Row="1" Grid.Column="0" Text="Дата виготовлення:" VerticalOptions="Center"></Label>
+                    <DatePicker Grid.Row="1" Grid.Column="1" x:Name="ManufactureDate" Date="{Binding ManufactureDate}" HorizontalOptions="Fill"></DatePicker>
+                    
+                    <Label Grid.Row="2" Grid.Column="0" Text="VIN №:" VerticalOptions="Center"></Label>
+                    <Entry Grid.Row="2" Grid.Column="1" x:Name="VINNumber" Text="{Binding VINNumber}" Placeholder="VIN №" HorizontalOptions="Fill"></Entry>
+                    
+                    <Label Grid.Row="3" Grid.Column="0" Text="Номерний знак:" VerticalOptions="Center"></Label>
+                    <Entry Grid.Row="3" Grid.Column="1" x:Name="Number" Text="{Binding Number}" Placeholder="Номерний знак" HorizontalOptions="Fill"></Entry>
+                    
+                    <Label Grid.Row="4" Grid.Column="0" Text="Тип палива:" VerticalOptions="Center"></Label>
+                    <Entry Grid.Row="4" Grid.Column="1" x:Name="FuelType" Text="{Binding FuelType}" Placeholder="Тип палива" HorizontalOptions="Fill"></Entry>
+                    
+                    <Label Grid.Row="5" Grid.Column="0" Text="Колір:" VerticalOptions="Center"></Label>
+                    <Entry Grid.Row="5" Grid.Column="1" x:Name="CarColor" Text="{Binding CarColor}" Placeholder="Колір" HorizontalOptions="Fill"></Entry>
+                    
+                    <Label Grid.Row="6" Grid.Column="0" Text="Дата купівлі:" VerticalOptions="Center"></Label>
+                    <DatePicker Grid.Row="6" Grid.Column="1" x:Name="PurchaseDate" Date="{Binding PurchaseDate}" HorizontalOptions="Fill"></DatePicker>
+                    
+                    <Label Grid.Row="7" Grid.Column="0" Text="Дата продажу:" VerticalOptions="Center"></Label>
+                    <DatePicker Grid.Row="7" Grid.Column="1" x:Name="SaleDate" Date="{Binding SaleDate}" HorizontalOptions="Fill"></DatePicker>
+                    
+                    <Label Grid.Row="8" Grid.Column="0" Text="Коментар:" VerticalOptions="Center"></Label>
+                    <Editor Grid.Row="8" Grid.Column="1" x:Name="Comment" Text="{Binding Comment}" Placeholder="Коментар" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
+                </Grid>
+            </StackLayout>
+        </ContentPage.Content>
+    </ContentPage>
+    <ContentPage x:Name="CarDescriptionInfo" BackgroundColor="White" Title="Опис авто">
+        <ContentPage.Content>
+            <StackLayout Margin="10,0">
+                <Label Text="{Binding Source={x:Reference CarDescriptionInfo}, Path=Title}" FontSize="Large" FontAttributes="Bold"></Label>
+                <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" Refreshing="RefreshView_Refreshing">
+                    <CollectionView x:Name="CarDescriptionList">
+                        <!--<CollectionView x:Name="CarDescriptionList" ItemsSource="{Binding ListCarDescription}">-->
+                        <!--CachingStrategy="RecycleElement" ItemTapped="ListView_ItemTapped">-->
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <!--<StackLayout Orientation="Vertical">
+                                    <Label Text="{Binding ID}"></Label>
+                                    <Label Text="{Binding DescrProperty}"></Label>
+                                    <Label Text="{Binding DescrValue}"></Label>
+                                </StackLayout>-->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="10*"></ColumnDefinition>
+                                        <ColumnDefinition Width="40*"></ColumnDefinition>
+                                        <ColumnDefinition Width="50*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="1"/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Column="0" Text="{Binding Code}" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="Start"></Label>
+                                    <Label Grid.Column="1" Text="{Binding DescrProperty}" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="Start" TextColor="#642700"></Label>
+                                    <Label Grid.Column="2" Text="{Binding DescrValue}" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="Center" TextColor="#040070"></Label>
+                                    <Ellipse Grid.Row="1" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="Silver"></Ellipse>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+            </StackLayout>
+        </ContentPage.Content>
+    </ContentPage>
+    <ContentPage x:Name="CarNotesInfo" BackgroundColor="White" Title="Нотатки">
+        <ContentPage.Content>
+            <StackLayout Margin="10,0">
+                <Label Text="{Binding Source={x:Reference CarNotesInfo}, Path=Title}" FontSize="Large" FontAttributes="Bold"></Label>
+                <CollectionView x:Name="CarNotesList">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="0" Text="{Binding Text}" VerticalOptions="FillAndExpand"></Label>
+                                <Ellipse Grid.Row="1" HeightRequest="2" BackgroundColor="Silver"></Ellipse>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </ContentPage.Content>
+    </ContentPage>
+    
+</TabbedPage>

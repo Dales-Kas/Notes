@@ -28,6 +28,7 @@ namespace Notes.Models
 
         public string Text { get; set; }
 
+        // string №:
         public int Code { get; set; }            
     }
 }

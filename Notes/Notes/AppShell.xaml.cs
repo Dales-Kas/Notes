@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Views;
+using Notes.Views.Car;
 
 namespace Notes
 {
@@ -20,7 +21,9 @@ namespace Notes
             Routing.RegisterRoute(nameof(NoteAddingPage),typeof(NoteAddingPage));
             Routing.RegisterRoute(nameof(AboutPage), typeof(AboutPage));
             Routing.RegisterRoute(nameof(NoteCategoriesView), typeof(NoteCategoriesView));
-            Routing.RegisterRoute(nameof(NoteCategoryForm), typeof(NoteCategoryForm)); 
+            Routing.RegisterRoute(nameof(NoteCategoryForm), typeof(NoteCategoryForm));
+            Routing.RegisterRoute(nameof(CarsView), typeof(CarsView));
+            Routing.RegisterRoute(nameof(CarForm), typeof(CarForm));
 
         }
         private void btnAbout_Clicked(object sender, EventArgs e)

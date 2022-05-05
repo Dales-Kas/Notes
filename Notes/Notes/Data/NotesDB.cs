@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SQLite;
 using Notes.Models;
+using Notes.Models.Car;
 using System.Threading.Tasks;
 using Xamarin.CommunityToolkit.Extensions;
 using System.IO;
@@ -18,12 +19,34 @@ namespace Notes.Data
         public NotesDB(string connectionString)
         {
             db = new SQLiteAsyncConnection(connectionString);
-            //db.DropTableAsync<Note>().Wait();
+            //NOTES:
             db.CreateTableAsync<Note>().Wait();
-            //db.DropTableAsync<NoteFlags>().Wait();   
             db.CreateTableAsync<NoteFlags>().Wait();
             db.CreateTableAsync<NoteCategory>().Wait();
-            
+            //CARS:
+            db.CreateTableAsync<Cars>().Wait();
+            db.CreateTableAsync<CarDescription>().Wait();
+            db.CreateTableAsync<CarNotes>().Wait();
+        }
+
+        public void DropTable(string tableName)
+        {
+            if (tableName == "Note")
+            {
+                db.DropTableAsync<Note>().Wait();
+                db.CreateTableAsync<Note>().Wait();
+                db.DropTableAsync<NoteFlags>().Wait();
+                db.CreateTableAsync<NoteFlags>().Wait();
+            }
+            else if (tableName == "Cars")
+            {
+                db.DropTableAsync<Cars>().Wait();
+                db.CreateTableAsync<Cars>().Wait();
+                db.DropTableAsync<CarNotes>().Wait();
+                db.CreateTableAsync<CarNotes>().Wait();
+                db.DropTableAsync<CarDescription>().Wait();
+                db.CreateTableAsync<CarDescription>().Wait();
+            }
         }
 
         #region NotesData
@@ -291,7 +314,96 @@ namespace Notes.Data
 
             return categoryText;
         }
-        #endregion  
+        #endregion
 
+        #region Cars
+
+        public Task<List<Cars>> GetCarsAsync()
+        {
+            return db.Table<Cars>().ToListAsync();
+        }
+
+        public Task<Cars> GetCarAsync(Guid id)
+        {
+            return db.Table<Cars>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<List<CarDescription>> GetCarDescriptionAsync(Guid carid)
+        {
+            return db.Table<CarDescription>().Where(i => i.CarID == carid).ToListAsync();
+        }
+
+        public Task<List<CarNotes>> GetCarNotesAsync(Guid carid)
+        {
+            return db.Table<CarNotes>().Where(i => i.CarID == carid).ToListAsync();
+        }
+
+        public Task<int> SaveCarAsync(Cars car, bool insert = false)
+        {
+            if (car.ID != Guid.Empty && !insert)
+            {
+                return db.UpdateAsync(car);
+            }
+
+            else
+            {
+                return db.InsertAsync(car);
+            }
+        }
+
+        public Task<int> DeleteCarAsync(Cars car)
+        {
+            return db.DeleteAsync(car);
+        }
+
+
+        #endregion
+
+        #region AllClass
+
+        public Task<int> SaveAsync(object car, string objectType, bool findByID = true, bool insert = false)
+        {
+            int EmtyInt = 0;
+            Guid EmtyGuid = Guid.Empty;
+            
+            bool flUpdate = false;
+
+            switch (objectType)
+            {
+                case "Cars": 
+                    {
+                        flUpdate = ((Cars)car).ID != EmtyGuid;
+                        break;
+                    }
+                case "CarDescription":
+                    {
+                        flUpdate = ((CarDescription)car).ID != EmtyInt;
+                        break;
+                    }
+
+                case "CarNotes":
+                    {
+                        flUpdate = ((CarNotes)car).ID != EmtyInt;
+                        break;
+                    }
+            }
+
+            if (flUpdate && !insert)
+            {
+                return db.UpdateAsync(car);
+            }
+
+            else
+            {
+                return db.InsertAsync(car);
+            }
+        }
+
+        //public Task<int> DeleteCarAsync(Cars car)
+        //{
+        //    return db.DeleteAsync(car);
+        //}
+
+        #endregion
     }
 }
