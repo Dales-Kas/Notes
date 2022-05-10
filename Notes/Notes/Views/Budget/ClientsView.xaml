@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Notes"
+             x:Class="Notes.Views.Budget.ClientsView" Title="Контрагенти">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:GetCashFlowDetailedTypeFromGuid x:Key="typeGuid" />
+            <local:GetUnbool x:Key="boolValue" />
+            <local:GetVisabilityOfGuidRef x:Key="guidValue" />
+            <local:GetVisabilityOfString x:Key="stringValue" />
+            <local:GetVisabilityOfDouble x:Key="doubleValue" />
+            <local:GetGroupTypeColor x:Key="groupTypeColor" DefaultColor="#483D8B" SetColor="Black"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <StackLayout Orientation="Vertical">
+        <Label x:Name="pathURL" Text=""/>
+        <Button x:Name="backParentButton" Text="{Binding CurrentParentName}"
+                Clicked="backParentButton_Clicked" 
+                ImageSource="group.png"
+                BorderColor="White" 
+                BackgroundColor="AliceBlue" 
+                FontAttributes="Bold" 
+                FontSize="Medium"/>
+        <CollectionView x:Name="MyListView"
+                        ItemsSource="{Binding Items}" 
+                        Margin="10,0"
+                        SelectionMode="Single" 
+                        SelectedItem="{Binding ID}"
+                        SelectionChanged="MyListView_SelectionChanged">
+             <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="1"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="35*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Row="0" Grid.Column="0" 
+                               Source="group.png" 
+                               Aspect="AspectFit" 
+                               HeightRequest="20"
+                               WidthRequest="20"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsGroup}"/>
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="{Binding Name}"
+                               FontSize="Large" 
+                               Style="{DynamicResource ListItemTextStyle}"                               
+                               TextColor="{Binding IsGroup,Converter={x:StaticResource groupTypeColor}}"
+                               FontAttributes="None"/>
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="{Binding Comment}"
+                               IsVisible="{Binding Comment, Converter={x:StaticResource stringValue}}" 
+                               Style="{DynamicResource ListItemDetailTextStyle}"
+                               TextColor="#015722"
+                               FontSize="Micro"/>
+                        <Label Grid.Row="0" Grid.Column="2" 
+                               Text="{Binding DefaultCashFlowDetailedType, Converter={StaticResource typeGuid}}"
+                               IsVisible="{Binding DefaultCashFlowDetailedType,Converter={StaticResource guidValue}}" 
+                               Style="{DynamicResource ListItemDetailTextStyle}" 
+                               HorizontalTextAlignment="End"
+                               VerticalTextAlignment="Center"
+                               TextColor="Brown"
+                               FontSize="Micro"
+                               FontAttributes="Bold"/>
+                        <StackLayout Grid.Row="1" Grid.Column="2" 
+                                     Orientation="Horizontal" 
+                                     HorizontalOptions="End" 
+                                     IsVisible="{Binding PercentageCommission, Converter={StaticResource doubleValue}}">
+                            <Label Text="комісія:"/>
+                            <Label Text="{Binding PercentageCommission}" HorizontalTextAlignment="End" TextColor="#430000"/>
+                            <Label Text="%"/>
+                        </StackLayout>
+                        <Ellipse Grid.Row="2" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </StackLayout>
+</ContentPage>

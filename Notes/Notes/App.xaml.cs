@@ -63,6 +63,6 @@ namespace Notes
             };
             
             return toastOptions;
-        }
+        }       
     }
 }

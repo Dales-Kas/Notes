@@ -4,6 +4,7 @@ using System.Text;
 using SQLite;
 using Notes.Models;
 using Notes.Models.Car;
+using Notes.Models.Budget;
 using System.Threading.Tasks;
 using Xamarin.CommunityToolkit.Extensions;
 using System.IO;
@@ -27,28 +28,54 @@ namespace Notes.Data
             db.CreateTableAsync<Cars>().Wait();
             db.CreateTableAsync<CarDescription>().Wait();
             db.CreateTableAsync<CarNotes>().Wait();
+            //BUDGET:
+            db.CreateTableAsync<Currencies>().Wait();
+            db.CreateTableAsync<CashFlowDetailedType>().Wait();
+            db.CreateTableAsync<CashFlowOperations>().Wait();
+            db.CreateTableAsync<Clients>().Wait();
+            db.CreateTableAsync<MoneyStorages>().Wait();
         }
 
         public void DropTable(string tableName)
         {
-            if (tableName == "Note")
+            switch (tableName)
             {
-                db.DropTableAsync<Note>().Wait();
-                db.CreateTableAsync<Note>().Wait();
-                db.DropTableAsync<NoteFlags>().Wait();
-                db.CreateTableAsync<NoteFlags>().Wait();
-            }
-            else if (tableName == "Cars")
-            {
-                db.DropTableAsync<Cars>().Wait();
-                db.CreateTableAsync<Cars>().Wait();
-                db.DropTableAsync<CarNotes>().Wait();
-                db.CreateTableAsync<CarNotes>().Wait();
-                db.DropTableAsync<CarDescription>().Wait();
-                db.CreateTableAsync<CarDescription>().Wait();
+                case "Note":
+                    {
+                        db.DropTableAsync<Note>().Wait();
+                        db.CreateTableAsync<Note>().Wait();
+                        db.DropTableAsync<NoteFlags>().Wait();
+                        db.CreateTableAsync<NoteFlags>().Wait();
+                        break;
+                    }
+
+                case "Cars":
+                    {
+                        db.DropTableAsync<Cars>().Wait();
+                        db.CreateTableAsync<Cars>().Wait();
+                        db.DropTableAsync<CarNotes>().Wait();
+                        db.CreateTableAsync<CarNotes>().Wait();
+                        db.DropTableAsync<CarDescription>().Wait();
+                        db.CreateTableAsync<CarDescription>().Wait();
+                        break;
+                    }
+
+                case "Budget":
+                    {
+                        db.DropTableAsync<Currencies>().Wait();
+                        db.CreateTableAsync<Currencies>().Wait();
+                        db.DropTableAsync<CashFlowDetailedType>().Wait();
+                        db.CreateTableAsync<CashFlowDetailedType>().Wait();
+                        db.DropTableAsync<CashFlowOperations>().Wait();
+                        db.CreateTableAsync<CashFlowOperations>().Wait();
+                        db.DropTableAsync<Clients>().Wait();
+                        db.CreateTableAsync<Clients>().Wait();
+                        db.DropTableAsync<MoneyStorages>().Wait();
+                        db.CreateTableAsync<MoneyStorages>().Wait();
+                        break;
+                    }
             }
         }
-
         #region NotesData
 
         public Task<List<Note>> GetNotesAsync()
@@ -357,6 +384,51 @@ namespace Notes.Data
         }
 
 
+        #endregion
+
+        #region Currencies
+
+        public Task<List<Currencies>> GetCurrenciesAsync()
+        {
+            return db.Table<Currencies>().ToListAsync();
+        }
+
+        #endregion
+
+        #region CashFlowDetailedType
+
+        public Task<List<CashFlowDetailedType>> GetCashFlowDetailedTypeAsync()
+        {
+            return db.Table<CashFlowDetailedType>().ToListAsync();
+        }
+
+        public Task<CashFlowDetailedType> GetCashFlowDetailedTypeAsync(Guid id)
+        {
+            return db.Table<CashFlowDetailedType>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
+
+        #endregion
+
+        #region CashFlowOperations
+
+        public Task<List<CashFlowOperations>> GetCashFlowOperationsAsync()
+        {
+            return db.Table<CashFlowOperations>().ToListAsync();
+        }
+
+        #endregion
+
+        #region Clients
+
+        public Task<List<Clients>> GetClientsAsync()
+        {
+            return db.Table<Clients>().ToListAsync();
+        }
+
+        public Task<Clients> GetClientAsync(Guid id)
+        {
+            return db.Table<Clients>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
         #endregion
 
         #region AllClass

@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:local="clr-namespace:Notes"
+            x:Class="Notes.Views.Budget.CashFlowOperationsView"
+            Title ="Фінанси"
+            x:Name="thisPage">
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Text="Оновити" Clicked="ToolbarItem_Clicked">
+        </ToolbarItem>
+    </TabbedPage.ToolbarItems>
+    <TabbedPage.Resources>
+        <ResourceDictionary>
+            <local:GetClientNameFromGuid x:Key="clientGuid" />
+            <local:GetCashFlowDetailedTypeFromGuid x:Key="typeGuid" />
+            <local:GetOperationTypeColor x:Key="operationColor" />
+            <local:GetDetailedOperationTypeColor x:Key="det_operationColor" />
+        </ResourceDictionary>
+    </TabbedPage.Resources>
+
+    <ContentPage Title="Карточка">
+
+
+        <StackLayout Orientation="Vertical">
+            <Grid Margin="10">
+                <Label Grid.Column="0" x:Name="CardIn" Text="Прихід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Black" FontSize="Large"/>
+                <Image Grid.Column="1" Source="mono.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
+                <Label Grid.Column="2" x:Name="CardOut" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="Large"/>
+            </Grid>
+            <CollectionView x:Name="MyListView0"
+            ItemsSource="{Binding Items0}" Margin="10,0" SelectedItem="{Binding ID}" SelectionChanged="MyListView0_SelectionChanged" SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <!--<RowDefinition Height="auto"/>-->
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="50*"/>
+                                <ColumnDefinition Width="40*"/>
+                            </Grid.ColumnDefinitions>
+                            <Frame Grid.RowSpan="3" Grid.Column="0"
+                                   BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" 
+                                   HeightRequest="5" 
+                                   WidthRequest="5" 
+                                   Margin="7,7,7,0">
+                            </Frame>
+                            <Label Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}"
+                                   TextColor="#483D8B"
+                                   FontSize="Medium" 
+                                   FontAttributes="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding Description}" 
+                                   TextColor="#008B8B"/>
+                            <Label Grid.Row="0" Grid.Column="2"
+                                   Text="{Binding Amount,StringFormat='{0:#,#.00}'}" 
+                                   TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
+                                   FontSize="Medium"
+                                   LineBreakMode="CharacterWrap"
+                                   FontAttributes="Bold" 
+                                   HorizontalTextAlignment="End"/>
+                            <Label Grid.Row="1" Grid.Column="2" 
+                                   Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" 
+                                   TextColor="Brown" 
+                                   HorizontalTextAlignment="End" 
+                                   LineBreakMode="WordWrap"/>
+                            <Label Grid.Row="2" Grid.Column="2" 
+                                   Text="{Binding Date}" 
+                                   TextColor="Gray" 
+                                   HorizontalTextAlignment="End"/>
+                            <!--<StackLayout Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="10">
+                                <Label Text="{Binding StorageID}"/>
+                            </StackLayout>-->
+                            <Ellipse Grid.Row="3" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </ContentPage>
+    <ContentPage Title="Готівка">
+        <CollectionView x:Name="MyListView1"
+            ItemsSource="{Binding Items1}" Margin="10,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="1"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10*"/>
+                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="40*"/>
+                        </Grid.ColumnDefinitions>
+                        <Frame Grid.RowSpan="3" Grid.Column="0" BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" HeightRequest="5" WidthRequest="5" Margin="7,7,7,0"></Frame>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
+                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,#.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>
+                        <Label Grid.Row="2" Grid.Column="2" Text="{Binding Date}" TextColor="Gray" HorizontalTextAlignment="End"/>
+                        <StackLayout Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="10">
+                            <Label Text="{Binding StorageID}"/>
+                            <Label Text="{Binding CurrencyID}"/>
+                        </StackLayout>
+                        <Ellipse Grid.Row="4" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </ContentPage>
+    <ContentPage Title="Резерв">
+        <CollectionView x:Name="MyListView2"
+            ItemsSource="{Binding Items2}" Margin="10,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="1"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10*"/>
+                            <ColumnDefinition Width="50*"/>
+                            <ColumnDefinition Width="40*"/>
+                        </Grid.ColumnDefinitions>
+                        <Frame Grid.RowSpan="3" Grid.Column="0" BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" HeightRequest="5" WidthRequest="5" Margin="7,7,7,0"></Frame>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
+                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,#.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>
+                        <Label Grid.Row="2" Grid.Column="2" Text="{Binding Date}" TextColor="Gray" HorizontalTextAlignment="End"/>
+                        <StackLayout Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="10">
+                            <Label Text="{Binding StorageID}"/>
+                            <Label Text="{Binding CurrencyID}"/>
+                        </StackLayout>
+                        <Ellipse Grid.Row="4" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </ContentPage>
+</TabbedPage>

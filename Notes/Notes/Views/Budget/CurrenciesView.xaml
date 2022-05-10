@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Notes.Views.Budget.CurrenciesView">
+    <CollectionView x:Name="MyListView"
+            ItemsSource="{Binding Items}" Margin="10,0">
+            <!--ItemTapped="Handle_ItemTapped"
+            CachingStrategy="RecycleElement"--> 
+        <!--Built in Cells-->
+        <!--<ListView.ItemTemplate>
+        <DataTemplate>
+            <TextCell Text="{Binding .}" />
+        </DataTemplate>
+    </ListView.ItemTemplate>-->
+
+        <!--Custom View Cells-->
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="2"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*"/>
+                        <ColumnDefinition Width="30*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Descripton}" FontSize="Large" 
+                   Style="{DynamicResource ListItemTextStyle}" TextColor="#0D0D0D" FontAttributes="Bold" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding CharName}" 
+                   Style="{DynamicResource ListItemDetailTextStyle}" TextColor="#015722"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Code}" 
+                   Style="{DynamicResource ListItemDetailTextStyle}" HorizontalTextAlignment="End" TextColor="#001B73" FontAttributes="Bold"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding CharCode}" HorizontalTextAlignment="End" TextColor="#430000"/>
+                    <Ellipse Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+    </CollectionView>
+</ContentPage>

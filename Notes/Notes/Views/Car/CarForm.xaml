@@ -10,6 +10,7 @@
               Title="Авто">
     <ContentPage x:Name="MainInfo" BackgroundColor="White" Title="Основна інформація">
         <ContentPage.Content>
+            <ScrollView>
             <StackLayout Margin="10,0">
                 <Label Text="{Binding Source={x:Reference MainInfo}, Path=Title}" FontSize="Large" FontAttributes="Bold"></Label>
                 <Grid>
@@ -43,8 +44,21 @@
                     
                     <Label Grid.Row="8" Grid.Column="0" Text="Коментар:" VerticalOptions="Center"></Label>
                     <Editor Grid.Row="8" Grid.Column="1" x:Name="Comment" Text="{Binding Comment}" Placeholder="Коментар" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
+
+                    <Label Grid.Row="9" Grid.Column="0" Text="Одометр на початок:" VerticalOptions="Center"></Label>
+                    <Editor Grid.Row="9" Grid.Column="1" x:Name="OdoStart" Text="{Binding OdoStart}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
+
+                    <Label Grid.Row="10" Grid.Column="0" Text="Одометр на кінець:" VerticalOptions="Center"></Label>
+                    <Editor Grid.Row="10" Grid.Column="1" x:Name="OdoEnd" Text="{Binding OdoEnd}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
+
+                    <Label Grid.Row="11" Grid.Column="0" Text="Одометр пройдено (від купівлі):" VerticalOptions="Center"></Label>
+                    <Editor Grid.Row="11" Grid.Column="1" x:Name="OdoTotal" Text="{Binding OdoTotal}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
+
+                    <Label Grid.Row="12" Grid.Column="0" Text="Середній розхід:" VerticalOptions="Center"></Label>
+                    <Editor Grid.Row="12" Grid.Column="1" x:Name="AverageFlow" Text="{Binding AverageFlow}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill"></Editor>
                 </Grid>
             </StackLayout>
+            </ScrollView>
         </ContentPage.Content>
     </ContentPage>
     <ContentPage x:Name="CarDescriptionInfo" BackgroundColor="White" Title="Опис авто">

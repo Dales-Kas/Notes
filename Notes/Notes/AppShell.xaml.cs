@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Views;
 using Notes.Views.Car;
+using Notes.Views.Budget;
 
 namespace Notes
 {
@@ -24,6 +25,10 @@ namespace Notes
             Routing.RegisterRoute(nameof(NoteCategoryForm), typeof(NoteCategoryForm));
             Routing.RegisterRoute(nameof(CarsView), typeof(CarsView));
             Routing.RegisterRoute(nameof(CarForm), typeof(CarForm));
+            Routing.RegisterRoute(nameof(CurrenciesView), typeof(CurrenciesView));
+            Routing.RegisterRoute(nameof(CashFlowDetailedTypeView), typeof(CashFlowDetailedTypeView));
+            Routing.RegisterRoute(nameof(CashFlowOperationsView), typeof(CashFlowOperationsView));
+            
 
         }
         private void btnAbout_Clicked(object sender, EventArgs e)

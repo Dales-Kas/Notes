@@ -7,6 +7,7 @@
              x:Class="Notes.AppShell"
              xmlns:views="clr-namespace:Notes.Views"
              xmlns:viewsCar="clr-namespace:Notes.Views.Car"      
+             xmlns:viewsBudget="clr-namespace:Notes.Views.Budget"
        Navigated="Shell_Navigated">
     <Shell.FlyoutHeader>
         <views:HeaderContentView/>
@@ -25,6 +26,22 @@
     <FlyoutItem Title="Авто" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
                 FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Валюти" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Валюти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Статті руху коштів" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Контрагенти" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <ShellContent Title="Фінанси" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowOperationsView}"></ShellContent>
     </FlyoutItem>
     <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
