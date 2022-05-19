@@ -43,7 +43,7 @@ namespace Notes.Views.Car
             ((ListView)sender).SelectedItem = null;
         }
 
-        private async void MyListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void MyListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //if (e.CurrentSelection != null)
             //{

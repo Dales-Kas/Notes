@@ -5,7 +5,7 @@
              x:Class="Notes.Views.Budget.ClientsView" Title="Контрагенти">
     <ContentPage.Resources>
         <ResourceDictionary>
-            <local:GetCashFlowDetailedTypeFromGuid x:Key="typeGuid" />
+            <local:GetRefNameFromGuid x:Key="typeGuid" TypeOfObject="CashFlowDetailedType"/>
             <local:GetUnbool x:Key="boolValue" />
             <local:GetVisabilityOfGuidRef x:Key="guidValue" />
             <local:GetVisabilityOfString x:Key="stringValue" />

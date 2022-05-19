@@ -10,5 +10,10 @@ namespace Notes.Models.Budget
         [PrimaryKey, AutoIncrement]
         public Guid ID { get; set; }        
         public string Name { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

@@ -65,7 +65,7 @@ namespace Notes.Views
                     {
                         case "NotesAndNotesFlags":
                             {
-                                App.NotesDB.DropTable(nameof(Note));
+                                App.NotesDB.DropTable(nameof(Note),false);
 
                                 await ImportAndSaveToBase(jsonString);
 
@@ -73,7 +73,7 @@ namespace Notes.Views
                             }
                         case "Cars":
                             {
-                                App.NotesDB.DropTable(nameof(Cars));
+                                App.NotesDB.DropTable(nameof(Cars),false);
 
                                 await ImportAndSaveToBase(jsonString);
 
@@ -81,7 +81,7 @@ namespace Notes.Views
                             }
                         case "Budget":
                             {
-                                App.NotesDB.DropTable("Budget");
+                                App.NotesDB.DropTable("Budget",false);
 
                                 await ImportAndSaveToBase(jsonString);
 
@@ -90,9 +90,9 @@ namespace Notes.Views
 
                         case "ALL":
                             {
-                                App.NotesDB.DropTable(nameof(Note));
-                                App.NotesDB.DropTable(nameof(Cars));
-                                App.NotesDB.DropTable("Budget");
+                                //App.NotesDB.DropTable(nameof(Note));
+                                //App.NotesDB.DropTable(nameof(Cars));
+                                //App.NotesDB.DropTable("Budget");
 
                                 await ImportAndSaveToBase(jsonString);
 
@@ -119,6 +119,8 @@ namespace Notes.Views
 
             foreach (ImportData item in jsonData)
             {
+                App.NotesDB.DropTable(item.Name);
+
                 if (item.Name == "Notes")
                 {
                     foreach (Note note in item.Notes)
@@ -173,7 +175,7 @@ namespace Notes.Views
                         //DataTable = item.Currencies;
                         foreach (var i in item.Currencies)
                         {
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync((object)i, item.Name,true,true);
                         }
                     }
 

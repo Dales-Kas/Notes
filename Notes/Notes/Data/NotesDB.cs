@@ -36,46 +36,121 @@ namespace Notes.Data
             db.CreateTableAsync<MoneyStorages>().Wait();
         }
 
-        public void DropTable(string tableName)
+        public void DropTable(string tableName, bool oneTable = true)
         {
-            switch (tableName)
+            if (oneTable)
             {
-                case "Note":
-                    {
-                        db.DropTableAsync<Note>().Wait();
-                        db.CreateTableAsync<Note>().Wait();
-                        db.DropTableAsync<NoteFlags>().Wait();
-                        db.CreateTableAsync<NoteFlags>().Wait();
-                        break;
-                    }
+                switch (tableName)
+                {
+                    case "Note":
+                        {
+                            db.DropTableAsync<Note>().Wait();
+                            db.CreateTableAsync<Note>().Wait();
+                            break;
+                        }
 
-                case "Cars":
-                    {
-                        db.DropTableAsync<Cars>().Wait();
-                        db.CreateTableAsync<Cars>().Wait();
-                        db.DropTableAsync<CarNotes>().Wait();
-                        db.CreateTableAsync<CarNotes>().Wait();
-                        db.DropTableAsync<CarDescription>().Wait();
-                        db.CreateTableAsync<CarDescription>().Wait();
-                        break;
-                    }
+                    case "NoteFlags":
+                        {
+                            db.DropTableAsync<NoteFlags>().Wait();
+                            db.CreateTableAsync<NoteFlags>().Wait();
+                            break;
+                        }
 
-                case "Budget":
-                    {
-                        db.DropTableAsync<Currencies>().Wait();
-                        db.CreateTableAsync<Currencies>().Wait();
-                        db.DropTableAsync<CashFlowDetailedType>().Wait();
-                        db.CreateTableAsync<CashFlowDetailedType>().Wait();
-                        db.DropTableAsync<CashFlowOperations>().Wait();
-                        db.CreateTableAsync<CashFlowOperations>().Wait();
-                        db.DropTableAsync<Clients>().Wait();
-                        db.CreateTableAsync<Clients>().Wait();
-                        db.DropTableAsync<MoneyStorages>().Wait();
-                        db.CreateTableAsync<MoneyStorages>().Wait();
-                        break;
-                    }
+                    case "Cars":
+                        {
+                            db.DropTableAsync<Cars>().Wait();
+                            db.CreateTableAsync<Cars>().Wait();
+                            break;
+                        }
+                    case "CarNotes":
+                        {
+                            db.DropTableAsync<CarNotes>().Wait();
+                            db.CreateTableAsync<CarNotes>().Wait();
+                            break;
+                        }
+                    case "CarDescription":
+                        {
+                            db.DropTableAsync<CarDescription>().Wait();
+                            db.CreateTableAsync<CarDescription>().Wait();
+                            break;
+                        }
+
+                    case "Currencies":
+                        {
+                            db.DropTableAsync<Currencies>().Wait();
+                            db.CreateTableAsync<Currencies>().Wait();
+                            break;
+                        }
+                    case "CashFlowDetailedType":
+                        {
+                            db.DropTableAsync<CashFlowDetailedType>().Wait();
+                            db.CreateTableAsync<CashFlowDetailedType>().Wait();
+                            break;
+                        }
+                    case "CashFlowOperations":
+                        {
+                            db.DropTableAsync<CashFlowOperations>().Wait();
+                            db.CreateTableAsync<CashFlowOperations>().Wait();
+                            break;
+                        }
+                    case "Clients":
+                        {
+                            db.DropTableAsync<Clients>().Wait();
+                            db.CreateTableAsync<Clients>().Wait();
+                            break;
+                        }
+                    case "MoneyStorages":
+                        {
+                            db.DropTableAsync<MoneyStorages>().Wait();
+                            db.CreateTableAsync<MoneyStorages>().Wait();
+                            break;
+                        }
+                }
+            }
+
+            else
+            {
+
+                switch (tableName)
+                {
+                    case "Note":
+                        {
+                            db.DropTableAsync<Note>().Wait();
+                            db.CreateTableAsync<Note>().Wait();
+                            db.DropTableAsync<NoteFlags>().Wait();
+                            db.CreateTableAsync<NoteFlags>().Wait();
+                            break;
+                        }
+
+                    case "Cars":
+                        {
+                            db.DropTableAsync<Cars>().Wait();
+                            db.CreateTableAsync<Cars>().Wait();
+                            db.DropTableAsync<CarNotes>().Wait();
+                            db.CreateTableAsync<CarNotes>().Wait();
+                            db.DropTableAsync<CarDescription>().Wait();
+                            db.CreateTableAsync<CarDescription>().Wait();
+                            break;
+                        }
+
+                    case "Budget":
+                        {
+                            db.DropTableAsync<Currencies>().Wait();
+                            db.CreateTableAsync<Currencies>().Wait();
+                            db.DropTableAsync<CashFlowDetailedType>().Wait();
+                            db.CreateTableAsync<CashFlowDetailedType>().Wait();
+                            db.DropTableAsync<CashFlowOperations>().Wait();
+                            db.CreateTableAsync<CashFlowOperations>().Wait();
+                            db.DropTableAsync<Clients>().Wait();
+                            db.CreateTableAsync<Clients>().Wait();
+                            db.DropTableAsync<MoneyStorages>().Wait();
+                            db.CreateTableAsync<MoneyStorages>().Wait();
+                            break;
+                        }
+                }
             }
         }
+
         #region NotesData
 
         public Task<List<Note>> GetNotesAsync()
@@ -158,7 +233,7 @@ namespace Notes.Data
                 }
                 else
                 {
-                    return await db.InsertAsync(note);                    
+                    return await db.InsertAsync(note);
                 }
             }
 
@@ -201,9 +276,9 @@ namespace Notes.Data
         {
             if (noteFlag.ID != Guid.Empty && !insert)
             {
-//#if DEBUG
-//DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
-//#endif
+                //#if DEBUG
+                //DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
+                //#endif
                 return db.UpdateAsync(noteFlag);
             }
 
@@ -392,7 +467,10 @@ namespace Notes.Data
         {
             return db.Table<Currencies>().ToListAsync();
         }
-
+        public Task<Currencies> GetCurrenciesAsync(int id)
+        {
+            return db.Table<Currencies>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
         #endregion
 
         #region CashFlowDetailedType
@@ -431,18 +509,31 @@ namespace Notes.Data
         }
         #endregion
 
+        #region MoneyStorages
+
+        public Task<List<MoneyStorages>> GetMoneyStoragesAsync()
+        {
+            return db.Table<MoneyStorages>().ToListAsync();
+        }
+
+        public Task<MoneyStorages> GetMoneyStoragesAsync(Guid id)
+        {
+            return db.Table<MoneyStorages>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
+        #endregion
+
         #region AllClass
 
         public Task<int> SaveAsync(object car, string objectType, bool findByID = true, bool insert = false)
         {
             int EmtyInt = 0;
             Guid EmtyGuid = Guid.Empty;
-            
+
             bool flUpdate = false;
 
             switch (objectType)
             {
-                case "Cars": 
+                case "Cars":
                     {
                         flUpdate = ((Cars)car).ID != EmtyGuid;
                         break;
@@ -476,6 +567,43 @@ namespace Notes.Data
         //    return db.DeleteAsync(car);
         //}
 
-        #endregion
+        public async Task<Object> GetFromMySQL(Guid guid, Type type)
+        {
+            //TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
+            //try
+            //{
+            //    var i = await db.GetAsync(guid, tableMapping);
+            //    return i;
+            //}
+            //catch (Exception e)
+            //{
+            //    string msg = e.Message;
+                return null;
+            //}
+
+        }
+
+        
+        //string sql = "Select Emp_Id, Emp_No, Emp_Name, Mng_Id from Employee";
+
+        //// Создать объект Command.
+        //MySqlCommand cmd = new MySqlCommand();
+
+        //// Сочетать Command с Connection.
+        //cmd.Connection = conn;
+        //cmd.CommandText = sql;
+
+
+        //using (DbDataReader reader = cmd.ExecuteReader())
+        //{
+        //    if (reader.HasRows)
+        //    {
+
+        //        while (reader.Read())
+        //        {
+        //        }
+
     }
+    #endregion
 }
+

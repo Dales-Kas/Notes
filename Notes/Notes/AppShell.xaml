@@ -8,7 +8,7 @@
              xmlns:views="clr-namespace:Notes.Views"
              xmlns:viewsCar="clr-namespace:Notes.Views.Car"      
              xmlns:viewsBudget="clr-namespace:Notes.Views.Budget"
-       Navigated="Shell_Navigated">
+       Navigated="Shell_Navigated" BackgroundColor="#708090" FlyoutBackgroundColor="#DCDCDC" FlyoutWidth="280" Shell.ForegroundColor="WhiteSmoke" Shell.NavBarHasShadow="True" Shell.TabBarIsVisible="True">
     <Shell.FlyoutHeader>
         <views:HeaderContentView/>
     </Shell.FlyoutHeader>
@@ -19,54 +19,22 @@
             <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
         </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Категорії нотаток" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"></ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Авто" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Валюти" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Валюти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Статті руху коштів" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Контрагенти" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
-    </FlyoutItem>
-    <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
-                FlyoutDisplayOptions="AsSingleItem">
+    <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Фінанси" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowOperationsView}"></ShellContent>
+    </FlyoutItem>
+    <FlyoutItem Title="Довідники" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+                FlyoutDisplayOptions="AsSingleItem">
+        <Tab>
+            <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"/>
+            <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
+            <ShellContent Title="Валюти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
+            <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
+            <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
+        </Tab>
     </FlyoutItem>
     <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Про програму" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>
     </FlyoutItem>
-    <!--<ShellContent Title="Тест" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ListViewPage1}"></ShellContent>-->
 
-    <!--<ShellContent Orientation="Vertical" VerticalOptions="FillAndExpand">
-                <ImageButton WidthRequest="65" HeightRequest="65" Aspect="AspectFit" Source="pic4.png" VerticalOptions="Center" BackgroundColor="White"></ImageButton>
-                <Label Text="Dales Kas ©" VerticalOptions="Center" HorizontalOptions="Center" FontAttributes="Bold"></Label>
-                <BoxView HorizontalOptions="FillAndExpand" Color="Black" HeightRequest="3"></BoxView>
-                <FlexLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                    <Image WidthRequest="24" HeightRequest="24" Aspect="AspectFit" Source="pic1" HorizontalOptions="Start"/>
-                    <Button x:Name="btnNotes" Text="Notes" BackgroundColor="White" Clicked="btnNotes_Clicked" HorizontalOptions="FillAndExpand"></Button>
-                </FlexLayout>
-                <FlexLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
-                    <Image WidthRequest="24" HeightRequest="24" Aspect="AspectFit" Source="pic2" HorizontalOptions="Start"/>
-                    <Button x:Name="btnAbout" Text="About" BackgroundColor="White" Clicked="btnAbout_Clicked" HorizontalOptions="FillAndExpand"></Button>
-                </FlexLayout>
-            </ShellContent>-->
-
-
-
-    <!--<MasterDetailPage.Detail>
-        <ContentPage>
-        </ContentPage>
-    </MasterDetailPage.Detail>-->
 </Shell>
