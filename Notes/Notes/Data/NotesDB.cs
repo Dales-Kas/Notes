@@ -42,7 +42,7 @@ namespace Notes.Data
             {
                 switch (tableName)
                 {
-                    case "Note":
+                    case "Notes":
                         {
                             db.DropTableAsync<Note>().Wait();
                             db.CreateTableAsync<Note>().Wait();
@@ -469,7 +469,7 @@ namespace Notes.Data
         }
         public Task<Currencies> GetCurrenciesAsync(int id)
         {
-            return db.Table<Currencies>().Where(i => i.ID == id).FirstOrDefaultAsync();
+            return db.Table<Currencies>().Where(i => i.Code == id).FirstOrDefaultAsync();
         }
         #endregion
 
@@ -535,7 +535,7 @@ namespace Notes.Data
             {
                 case "Cars":
                     {
-                        flUpdate = ((Cars)car).ID != EmtyGuid;
+                        flUpdate = (car as Cars).ID != EmtyGuid;
                         break;
                     }
                 case "CarDescription":
@@ -547,6 +547,11 @@ namespace Notes.Data
                 case "CarNotes":
                     {
                         flUpdate = ((CarNotes)car).ID != EmtyInt;
+                        break;
+                    }
+                case "Currencies":
+                    {
+                        flUpdate = ((Currencies)car).ID != EmtyInt;
                         break;
                     }
             }

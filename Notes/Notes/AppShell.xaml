@@ -2,6 +2,7 @@
 <Shell xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="Notes.AppShell"
@@ -19,8 +20,8 @@
             <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
         </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Фінанси" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowOperationsView}"></ShellContent>
+    <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" FlyoutDisplayOptions="AsSingleItem" >
+        <ShellContent Title="Фінанси" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowOperationsView}" xct:VisualFeedbackEffect.FeedbackColor="Bisque"></ShellContent>
     </FlyoutItem>
     <FlyoutItem Title="Довідники" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
                 FlyoutDisplayOptions="AsSingleItem">

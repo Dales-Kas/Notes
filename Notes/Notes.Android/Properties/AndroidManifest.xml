@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.companyname.notes" android:installLocation="preferExternal">
-	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="30" />
-	<application android:label="Notes.Android" android:icon="@drawable/pic4" android:theme="@style/MainTheme"></application>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.dales.budget" android:installLocation="preferExternal">
+	<uses-sdk android:minSdkVersion="25" android:targetSdkVersion="30" />
+	<application android:icon="@drawable/pic4" android:theme="@style/MainTheme" android:label="Budget"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_CHECKIN_PROPERTIES" />

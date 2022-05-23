@@ -12,7 +12,7 @@
         <!--<ToolbarItem x:Name="tbFilter" Text="" IconImageSource="filter1.png" Clicked="ToolbarItem_Clicked_1">
         </ToolbarItem>-->
     </TabbedPage.ToolbarItems>
-    
+
     <TabbedPage.Resources>
         <ResourceDictionary>
             <local:GetRefNameFromGuid x:Key="clientGuid" TypeOfObject="Clients"/>
@@ -189,7 +189,7 @@
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text=""/>
                 <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
-                    <Label x:Name="periodView" Text="Період для відображення" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
+                    <Label x:Name="periodView" Text="" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
                         </Label.GestureRecognizers>
@@ -342,21 +342,28 @@
                     <ColumnDefinition Width="25*"/>
                     <ColumnDefinition Width="10*"/>
                 </Grid.ColumnDefinitions>
-                <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source}" Margin="5">
+                <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                     </Image.GestureRecognizers>
                 </Image>
                 <Label Grid.Row="0" Grid.Column="1" Text=""/>
                 <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
-                    <Label Text="{Binding Source={x:Reference periodView}, Path=Text}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
+                    <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
                         </Label.GestureRecognizers>
                     </Label>
                 </Frame>
                 <StackLayout Grid.Row="0" Grid.Column="3">
-                    <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible}" IsBounceEnabled="False" IsScrollAnimated="True" Loop="False" PositionChanged="allPeriods_PositionChanged" HorizontalScrollBarVisibility="Always" ItemsUpdatingScrollMode="KeepItemsInView">
+                    <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
+                                  ItemsSource="{Binding Source={x:Reference allPeriods}, Path=ItemsSource,Mode=TwoWay}"
+                                  CurrentItem="{Binding Source={x:Reference allPeriods}, Path=CurrentItem,Mode=TwoWay}"
+                                  IsBounceEnabled="False"
+                                  IsScrollAnimated="True"
+                                  Loop="False"                                  
+                                  HorizontalScrollBarVisibility="Always"
+                                  ItemsUpdatingScrollMode="KeepItemsInView">
                         <CarouselView.ItemTemplate>
                             <DataTemplate>
                                 <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
@@ -367,7 +374,13 @@
                             </DataTemplate>
                         </CarouselView.ItemTemplate>
                     </CarouselView>
-                    <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible}" IsScrollAnimated="True" Loop="False" PositionChanged="allPeriods_PositionChanged" HorizontalScrollBarVisibility="Always" ItemsUpdatingScrollMode="KeepItemsInView">
+                    <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
+                                  ItemsSource="{Binding Source={x:Reference allYears}, Path=ItemsSource,Mode=TwoWay}"
+                                  CurrentItem="{Binding Source={x:Reference allYears}, Path=CurrentItem,Mode=TwoWay}"
+                                  IsScrollAnimated="True"
+                                  Loop="False"                                  
+                                  HorizontalScrollBarVisibility="Always"
+                                  ItemsUpdatingScrollMode="KeepItemsInView">
                         <CarouselView.ItemTemplate>
                             <DataTemplate>
                                 <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
@@ -445,7 +458,7 @@
                                         </TapGestureRecognizer>
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>                                
+                                <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>
                                 <Ellipse Grid.Row="3" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
                             </Grid>
                         </DataTemplate>
@@ -488,14 +501,63 @@
             </ScrollView>
             <Grid BackgroundColor="#708090" HeightRequest="60">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="10*"/>
                     <ColumnDefinition Width="30*"/>
-                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="30*"/>
+                    <ColumnDefinition Width="25*"/>
+                    <ColumnDefinition Width="10*"/>
                 </Grid.ColumnDefinitions>
-                <!--<xct:BadgeView Grid.Column="0" x:Name="badgeFilter" Text="0" Grid.Row="0" BadgePosition="TopRight" BackgroundColor="Black" TextColor="White" CornerRadius="10" FontSize="Micro" IsClippedToBounds="False">
-                    <Image Source="Filter.png" Aspect="AspectFit"/>
-                </xct:BadgeView>-->
-                <Label Grid.Row="0" Grid.Column="2" x:Name="periodName2" Text="" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold"></Label>
+                <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>
+                <Label Grid.Row="0" Grid.Column="1" Text=""/>
+                <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
+                    <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+                <StackLayout Grid.Row="0" Grid.Column="3">
+                    <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
+                                  ItemsSource="{Binding Source={x:Reference allPeriods}, Path=ItemsSource,Mode=TwoWay}"
+                                  CurrentItem="{Binding Source={x:Reference allPeriods}, Path=CurrentItem,Mode=TwoWay}"
+                                  IsBounceEnabled="False"
+                                  IsScrollAnimated="True"
+                                  Loop="False"                                  
+                                  HorizontalScrollBarVisibility="Always"
+                                  ItemsUpdatingScrollMode="KeepItemsInView">
+                        <CarouselView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </DataTemplate>
+                        </CarouselView.ItemTemplate>
+                    </CarouselView>
+                    <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
+                                  ItemsSource="{Binding Source={x:Reference allYears}, Path=ItemsSource,Mode=TwoWay}"
+                                  CurrentItem="{Binding Source={x:Reference allYears}, Path=CurrentItem,Mode=TwoWay}"
+                                  IsScrollAnimated="True"
+                                  Loop="False"                                  
+                                  HorizontalScrollBarVisibility="Always"
+                                  ItemsUpdatingScrollMode="KeepItemsInView">
+                        <CarouselView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </DataTemplate>
+                        </CarouselView.ItemTemplate>
+                    </CarouselView>
+                </StackLayout>
+                <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
             </Grid>
         </StackLayout>
     </ContentPage>

@@ -28,7 +28,8 @@ namespace Notes.Views
 
         private async Task<FileResult> PickAndShow()
         {
-            string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "NotesAndNotesFlags", "Cars","Budget", "ALL");
+            //string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "NotesAndNotesFlags", "Cars","Budget", "ALL");
+            string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "ALL");
 
             if (resault1 != null && resault1 != "Відміна")
             {
@@ -55,6 +56,11 @@ namespace Notes.Views
                 var result = await FilePicker.PickAsync(options);
                 if (result != null)
                 {
+                    DateTime timeStart = DateTime.Now;
+
+                    loadingText.IsVisible = true;
+                    lblLoadingText.Text = "";
+
                     string Text = $"File Name: {result.FileName}";
                     var stream = await result.OpenReadAsync();
                     var reader = new System.IO.StreamReader(stream);
@@ -63,42 +69,19 @@ namespace Notes.Views
 
                     switch (resault1)
                     {
-                        case "NotesAndNotesFlags":
-                            {
-                                App.NotesDB.DropTable(nameof(Note),false);
-
-                                await ImportAndSaveToBase(jsonString);
-
-                                break;
-                            }
-                        case "Cars":
-                            {
-                                App.NotesDB.DropTable(nameof(Cars),false);
-
-                                await ImportAndSaveToBase(jsonString);
-
-                                break;
-                            }
-                        case "Budget":
-                            {
-                                App.NotesDB.DropTable("Budget",false);
-
-                                await ImportAndSaveToBase(jsonString);
-
-                                break;
-                            }
-
                         case "ALL":
                             {
-                                //App.NotesDB.DropTable(nameof(Note));
-                                //App.NotesDB.DropTable(nameof(Cars));
-                                //App.NotesDB.DropTable("Budget");
-
                                 await ImportAndSaveToBase(jsonString);
 
                                 break;
                             }
                     }
+
+                    loadingText.IsVisible = false;
+
+                    TimeSpan timeEnd = DateTime.Now - timeStart;
+
+                    await DisplayAlert("Дані завантажено", $"Успішно, час виконання {timeEnd.Minutes} хв. {timeEnd.Seconds} сек.", "ОК");
 
                     return result;
                 }
@@ -108,8 +91,6 @@ namespace Notes.Views
                 await DisplayAlert("УВАГА!", ex.Message, "ОК");
             }
 
-            await DisplayAlert("Дані завантажено","", "ОК");
-
             return null;
         }
 
@@ -117,22 +98,32 @@ namespace Notes.Views
         {
             List<ImportData> jsonData = JsonConvert.DeserializeObject<List<ImportData>>(jsonString);
 
+            int iter = 0;            
+
             foreach (ImportData item in jsonData)
             {
                 App.NotesDB.DropTable(item.Name);
-
-                if (item.Name == "Notes")
+                
+                if (item.Name == "Note")
                 {
-                    foreach (Note note in item.Notes)
+                    SetTextOfLoading(ref iter, 0, item.Name, item.Note.Count);
+
+                    foreach (Note note in item.Note)
                     {
+                        SetTextOfLoading(ref iter);
+
                         note.Date = DateTime.Now;
                         await App.NotesDB.SaveNoteAsync(note, true, true, false);
                     }
                 }
-                else if (item.Name == "NotesFlags")
+                else if (item.Name == "NoteFlags")
                 {
-                    foreach (NoteFlags noteFlag in item.NotesFlags)
+                    SetTextOfLoading(ref iter, 0, item.Name, item.NoteFlags.Count);
+
+                    foreach (NoteFlags noteFlag in item.NoteFlags)
                     {
+                        SetTextOfLoading(ref iter);
+
                         try
                         {
                             await App.NotesDB.SaveNoteFlagAsync(noteFlag);
@@ -145,8 +136,12 @@ namespace Notes.Views
                 }
                 else if (item.Name == "Cars")
                 {
+                    SetTextOfLoading(ref iter, 0, item.Name, item.Cars.Count);
+
                     foreach (Cars car in item.Cars)
                     {
+                        SetTextOfLoading(ref iter);
+
                         await App.NotesDB.SaveCarAsync(car, true);
                     }
                 }
@@ -156,57 +151,85 @@ namespace Notes.Views
 
                     if (item.Name == "CarDescription")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.CarDescription.Count);
+
                         //DataTable = item.CarDescription;
                         foreach (CarDescription i in item.CarDescription)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
                     else if (item.Name == "CarNotes")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.CarNotes.Count);
+
                         //DataTable = item.CarDescription;
                         foreach (CarNotes i in item.CarNotes)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
                     else if (item.Name == "Currencies")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.Currencies.Count);
+
                         //DataTable = item.Currencies;
                         foreach (var i in item.Currencies)
                         {
-                            await App.NotesDB.SaveAsync((object)i, item.Name,true,true);
+                            SetTextOfLoading(ref iter);
+
+                            await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
 
                     else if (item.Name == "CashFlowDetailedType")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.CashFlowDetailedType.Count);
+
                         foreach (var i in item.CashFlowDetailedType)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
 
                     else if (item.Name == "CashFlowOperations")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.CashFlowOperations.Count);
+
                         foreach (var i in item.CashFlowOperations)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
 
                     else if (item.Name == "Clients")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.Clients.Count);
+
                         foreach (var i in item.Clients)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
 
                     else if (item.Name == "MoneyStorages")
                     {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.MoneyStorages.Count);
+
                         foreach (var i in item.MoneyStorages)
                         {
+                            SetTextOfLoading(ref iter);
+
                             await App.NotesDB.SaveAsync((object)i, item.Name);
                         }
                     }
@@ -219,12 +242,34 @@ namespace Notes.Views
             }
         }
 
+        public void SetTextOfLoading(ref int i, int stage = 1, string tableName = "", int countTotal = 0)
+        {
+            switch (stage)
+            {
+                case 0:
+                    {
+                        lblLoadingText.Text = $"Завантаження {tableName}: " + countTotal;
+                        lblLoadingInt.Text = "";
+                        i = 0;
+
+                        break;
+                    }
+                case 1:
+                    {
+                        i++;
+                        lblLoadingInt.Text = "/" + i.ToString();
+                        break;
+                    }
+            }
+
+        }
+
         public class ImportData
         {
             public string Name { get; set; }
             //NOTES:
-            public List<Note> Notes { get; set; }
-            public List<NoteFlags> NotesFlags { get; set; }
+            public List<Note> Note { get; set; }
+            public List<NoteFlags> NoteFlags { get; set; }
             //CARS:
             public List<Cars> Cars { get; set; }
             public List<CarDescription> CarDescription { get; set; }

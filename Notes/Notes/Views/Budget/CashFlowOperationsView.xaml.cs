@@ -435,7 +435,7 @@ namespace Notes.Views.Budget
             {
                 //tbFilter.IsEnabled = true;
 
-                CardIn0.Background = inOperationFilter ? Color.CadetBlue : Color.White;
+                CardIn0.Background = inOperationFilter ? Color.FromHex("#E2DFCC") : Color.White;
                 CardOut0.Background = outOperationFilter ? Color.FromHex("#FFE4E1") : Color.White;
 
                 lblClientFilter.Text = ClientFilterName;
@@ -545,6 +545,7 @@ namespace Notes.Views.Budget
 
             int i = 0;
 
+            //foreach (var item in PeriodsOfOperations.OrderByDescending(x=>x.PeriodStart).ToList())            
             foreach (var item in PeriodsOfOperations)
             {
                 periodsString[i] = item.PeriodName;
@@ -560,7 +561,7 @@ namespace Notes.Views.Budget
                 {
                     SetPeriodOfView(resultChoise);
                     allPeriods.CurrentItem = resultChoise;
-                    (sender as Label).Text = resultChoise.PeriodName;
+                    ((Label)sender).Text = resultChoise.PeriodName;
                 }
             }
         }

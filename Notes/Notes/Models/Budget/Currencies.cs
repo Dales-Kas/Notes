@@ -10,7 +10,7 @@ namespace Notes.Models.Budget
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public string Code { get; set; }
+        public int Code { get; set; }
         public string Descripton { get; set; }
 
         public string CharName { get; set; }
