@@ -29,6 +29,7 @@
             <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"/>
             <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
             <ShellContent Title="Валюти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
+            <ShellContent Title="Курси валют" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ExchangeRatesList}"></ShellContent>
             <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
             <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
         </Tab>

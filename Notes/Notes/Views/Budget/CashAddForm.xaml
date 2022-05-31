@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             x:Class="Notes.Views.Budget.CashAddForm">
+    <ContentPage.Content>
+        <StackLayout VerticalOptions="Center" Margin="10">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Сума:" FontSize="Large" HorizontalOptions="Start" VerticalOptions="Center"/>
+                <Entry Keyboard="Numeric" Placeholder="Сума операції" FontSize="Large" Text="" HorizontalTextAlignment="End" HorizontalOptions="FillAndExpand" VerticalOptions="Center" FontAttributes="Bold" ClearButtonVisibility="WhileEditing"/>
+            </StackLayout>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.ColumnSpan="3" x:Name="Client0" xct:CornerRadiusEffect.CornerRadius="25" FontAttributes="Bold" FontSize="Large" Padding="0" HorizontalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="1" Grid.ColumnSpan="2" x:Name="Client1" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Medium" Padding="0" HorizontalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="1" Grid.Column="2" x:Name="Client2" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Medium" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="2" Grid.Column="0" x:Name="Client3" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Medium" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="2" Grid.Column="1" x:Name="Client4" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Medium" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="2" Grid.Column="2" x:Name="Client5" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Medium" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="3" Grid.Column="0" x:Name="Client6" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Small" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="3" Grid.Column="1" x:Name="Client7" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Small" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="3" Grid.Column="2" x:Name="Client8" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Small" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+                <Label Grid.Row="4" Grid.ColumnSpan="3" x:Name="Client9" xct:CornerRadiusEffect.CornerRadius="25" FontSize="Small" FontAttributes="Bold" Padding="0" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="LightGray"></Label>
+            </Grid>
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Контрагент:" FontSize="Large" VerticalOptions="Center"/>
+                <Button FontSize="Large" Text="інший..." VerticalOptions="Center" FontAttributes="Bold" HorizontalOptions="FillAndExpand"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Опис:" FontSize="Large" VerticalOptions="Center"/>
+                <Entry Placeholder="Опис операції" FontSize="Large" Text="" VerticalOptions="Center" HorizontalOptions="FillAndExpand" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+            </StackLayout>
+            <Button x:Name="btnAdd" Text="Добавити операцію" FontAttributes="Bold" TextColor="White" CornerRadius="25"></Button>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

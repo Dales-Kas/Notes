@@ -21,6 +21,12 @@
             <local:GetOperationTypeColor x:Key="operationColor" />
             <local:GetDetailedOperationTypeColor x:Key="det_operationColor" />
             <local:GetUnbool x:Key="boolValue" />
+            <Style x:Key="FrameDetailedTypeStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>
+                <Setter Property="HeightRequest" Value="5"/>
+                <Setter Property="WidthRequest" Value="5"/>
+                <Setter Property="Margin" Value="7,7,7,0"/>
+            </Style>
         </ResourceDictionary>
     </TabbedPage.Resources>
 
@@ -149,11 +155,14 @@
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_2"/>
                         </Image.GestureRecognizers>
                     </Image>
+                    <!--<Frame x:Name="lblClientFilterF" BackgroundColor="LightBlue" Margin="0" Padding="0" CornerRadius="10">-->
+                    
                     <Label x:Name="lblClientFilter" Text="{Binding Source={x:Reference thisPage}, Path=ClientFilterName}" BindingContextChanged="lblClientFilter_BindingContextChanged" PropertyChanged="lblClientFilter_PropertyChanged" TextColor="#483D8B" VerticalOptions="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
                         </Label.GestureRecognizers>
                     </Label>
+                    
                     <Label x:Name="lblDetailedTypeFilter" Text="" TextColor="Brown" VerticalOptions="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_DetailedTypeFilter"/>
@@ -433,7 +442,7 @@
                     AbsoluteLayout.LayoutBounds="0.5, 0.92, AutoSize, AutoSize" xct:ShadowEffect.Color="Black"
                             />
 
-            <Button x:Name="AddItemButton" Text="+"
+            <Button x:Name="AddItemButton" Text="+" Clicked="AddItemButton_Clicked"
                 FontAttributes="Bold"
                 IsVisible="True"                    
                     VerticalOptions="End"

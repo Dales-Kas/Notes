@@ -43,7 +43,7 @@ namespace Notes.Views
 
         private async void AddButton_Clicked(object sender, EventArgs e)
         {            
-            await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true.ToString()}");
+            await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true}");
         }
 
         private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -51,7 +51,7 @@ namespace Notes.Views
             if (e.CurrentSelection != null)
             {
                 Note note = (Note)e.CurrentSelection.FirstOrDefault();
-                string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={note.ID.ToString()}";
+                string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={note.ID}";
                 await Shell.Current.GoToAsync(notePath);
             }
         }
@@ -156,7 +156,7 @@ namespace Notes.Views
 
             if (curEventArg.Parameter != null)
             {
-                string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={curEventArg.Parameter.ToString()}";
+                string notePath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={curEventArg.Parameter}";
 
                 //Device.BeginInvokeOnMainThread(async () =>
                 //{

@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Notes.Views.Budget.CurrenciesView">
-    <CollectionView x:Name="MyListView"
+    <AbsoluteLayout>
+        <CollectionView x:Name="MyListView"
             ItemsSource="{Binding Items}" Margin="10,0">
             <!--ItemTapped="Handle_ItemTapped"
             CachingStrategy="RecycleElement"--> 
@@ -40,4 +41,22 @@
         </CollectionView.ItemTemplate>
 
     </CollectionView>
+        <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"                        
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                            />
+    </AbsoluteLayout>
 </ContentPage>

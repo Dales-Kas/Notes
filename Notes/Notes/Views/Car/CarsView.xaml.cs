@@ -64,5 +64,10 @@ namespace Notes.Views.Car
                 await Shell.Current.GoToAsync(notePath);
             }
         }
+
+        private void AddButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
     }
 }

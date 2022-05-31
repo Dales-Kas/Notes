@@ -17,4 +17,14 @@ namespace Notes.Models.Budget
 
         public string CharCode { get; set; }        
     }
+
+    public class ExchangeRates 
+    {
+        public int CurrencyID { get; set; }
+
+        public DateTime Period { get; set; }
+        public double Rate { get; set; }
+
+        public double Multiply { get; set; }        
+    }
 }

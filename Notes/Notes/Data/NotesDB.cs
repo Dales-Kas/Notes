@@ -14,8 +14,8 @@ namespace Notes.Data
     public class NotesDB
     {
         readonly SQLiteAsyncConnection db;
-        private string strOk = "►";
-        private string strNOk = "○";
+        private readonly string strOk = "►";
+        private readonly string strNOk = "○";
 
         public NotesDB(string connectionString)
         {
@@ -30,6 +30,7 @@ namespace Notes.Data
             db.CreateTableAsync<CarNotes>().Wait();
             //BUDGET:
             db.CreateTableAsync<Currencies>().Wait();
+            db.CreateTableAsync<ExchangeRates>().Wait(); 
             db.CreateTableAsync<CashFlowDetailedType>().Wait();
             db.CreateTableAsync<CashFlowOperations>().Wait();
             db.CreateTableAsync<Clients>().Wait();
@@ -42,7 +43,7 @@ namespace Notes.Data
             {
                 switch (tableName)
                 {
-                    case "Notes":
+                    case "Note":
                         {
                             db.DropTableAsync<Note>().Wait();
                             db.CreateTableAsync<Note>().Wait();
@@ -81,6 +82,13 @@ namespace Notes.Data
                             db.CreateTableAsync<Currencies>().Wait();
                             break;
                         }
+                    case "ExchangeRates":
+                        {
+                            db.DropTableAsync<ExchangeRates>().Wait();
+                            db.CreateTableAsync<ExchangeRates>().Wait(); 
+                            break;
+                        }
+
                     case "CashFlowDetailedType":
                         {
                             db.DropTableAsync<CashFlowDetailedType>().Wait();
@@ -208,7 +216,7 @@ namespace Notes.Data
             {
                 if (curText.Length >= 200)
                 {
-                    curText = string.Concat(curText.Substring(0, 100), "\n...\n", curText.Substring(curText.Length - 99, 99));
+                    curText = string.Concat(curText[..100], "\n...\n", curText.Substring(curText.Length - 99, 99));
                 }
             }
             note.ShortText = curText;
@@ -337,7 +345,7 @@ namespace Notes.Data
             if (!string.IsNullOrEmpty(note.Text))
             {
                 int i = 0;
-                NoteFlags flag = null;
+                NoteFlags flag;
 
                 foreach (string item in note.Text.Split('\n'))
                 {
@@ -349,7 +357,7 @@ namespace Notes.Data
 
                     if (item.StartsWith(strOk) || item.StartsWith(strNOk))
                     {
-                        curText = item.Substring(1);
+                        curText = item[1..];
                     }
                     else
                     {
@@ -401,7 +409,7 @@ namespace Notes.Data
 
         public string GetNoteCategoryName(int ID)
         {
-            string categoryText = "";
+            string categoryText;
 
             NoteCategory noteCategory = GetNoteCategoryAsync(ID).Result;
 
@@ -473,6 +481,23 @@ namespace Notes.Data
         }
         #endregion
 
+        #region ExchangeRates
+
+        public Task<List<ExchangeRates>> GetExchangeRatesAsync()
+        {
+            return db.Table<ExchangeRates>().ToListAsync();
+        }
+        public Task<ExchangeRates> GetExchangeRatesAsync(int currencyID, DateTime date)
+        {
+            return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID && i.Period == date).FirstOrDefaultAsync();
+        }
+
+        public Task<List<ExchangeRates>> GetExchangeRatesAsync(int currencyID)
+        {
+            return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID).ToListAsync();
+        }
+        #endregion
+
         #region CashFlowDetailedType
 
         public Task<List<CashFlowDetailedType>> GetCashFlowDetailedTypeAsync()
@@ -492,6 +517,11 @@ namespace Notes.Data
         public Task<List<CashFlowOperations>> GetCashFlowOperationsAsync()
         {
             return db.Table<CashFlowOperations>().ToListAsync();
+        }
+
+        public Task<CashFlowOperations> GetCashFlowOperationsAsync(Guid id)
+        {
+            return db.Table<CashFlowOperations>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
         #endregion
@@ -524,7 +554,7 @@ namespace Notes.Data
 
         #region AllClass
 
-        public Task<int> SaveAsync(object car, string objectType, bool findByID = true, bool insert = false)
+        public Task<int> SaveAsync(object car, string objectType, bool insert = false)
         {
             int EmtyInt = 0;
             Guid EmtyGuid = Guid.Empty;
@@ -574,17 +604,17 @@ namespace Notes.Data
 
         public async Task<Object> GetFromMySQL(Guid guid, Type type)
         {
-            //TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
-            //try
-            //{
-            //    var i = await db.GetAsync(guid, tableMapping);
-            //    return i;
-            //}
-            //catch (Exception e)
-            //{
-            //    string msg = e.Message;
+            TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
+            try
+            {
+                var i = await db.GetAsync(guid, tableMapping);
+                return i;
+            }
+            catch (Exception e)
+            {
+                //string msg = e.Message;                
                 return null;
-            //}
+            }
 
         }
 

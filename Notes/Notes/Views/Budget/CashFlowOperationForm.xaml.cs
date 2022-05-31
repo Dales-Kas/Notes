@@ -6,15 +6,32 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Notes.Models.Budget;
 
 namespace Notes.Views.Budget
 {
+    [QueryProperty(nameof(OperationId), nameof(OperationId))]
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CashFlowOperationForm : ContentPage
     {
+        public string OperationId
+        {
+            set
+            {
+                Guid.TryParse(value, out Guid Id);
+                CashFlowOperations operation = App.NotesDB.GetCashFlowOperationsAsync(Id).Result;
+                BindingContext = operation;                
+            }
+        }
+
         public CashFlowOperationForm()
         {
             InitializeComponent();
+        }
+
+        private async void Button_Clicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("..");
         }
     }
 }

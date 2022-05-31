@@ -28,8 +28,10 @@ namespace Notes
             Routing.RegisterRoute(nameof(CurrenciesView), typeof(CurrenciesView));
             Routing.RegisterRoute(nameof(CashFlowDetailedTypeView), typeof(CashFlowDetailedTypeView));
             Routing.RegisterRoute(nameof(CashFlowOperationsView), typeof(CashFlowOperationsView));
-            
-
+            Routing.RegisterRoute(nameof(CashFlowOperationForm), typeof(CashFlowOperationForm));
+            Routing.RegisterRoute(nameof(ExchangeRatesList), typeof(ExchangeRatesList));
+            Routing.RegisterRoute(nameof(CashFlowDetailedTypeForm), typeof(CashFlowDetailedTypeForm));
+            Routing.RegisterRoute(nameof(CashAddForm), typeof(CashAddForm));            
         }
         private void btnAbout_Clicked(object sender, EventArgs e)
         {

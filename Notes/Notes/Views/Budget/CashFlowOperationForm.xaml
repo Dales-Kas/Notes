@@ -1,12 +1,99 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Notes.Views.Budget.CashFlowOperationForm">
+             x:Class="Notes.Views.Budget.CashFlowOperationForm"
+             xmlns:local="clr-namespace:Notes"
+             Title="Редагування операції">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:GetRefNameFromGuid x:Key="clientGuid" TypeOfObject="Clients"/>
+            <local:GetRefNameFromGuid x:Key="typeGuid" TypeOfObject="CashFlowDetailedType"/>
+            <local:GetRefNameFromGuid x:Key="storageGuid" TypeOfObject ="MoneyStorages"/>
+            <local:GetRefNameFromGuid x:Key="operationTypeID" TypeOfObject ="OperationType" IsGuid ="False"/>
+            <local:GetRefNameFromGuid x:Key="currencyID" TypeOfObject ="Currencies" IsGuid ="False"/>
+            <local:GetOperationTypeColor x:Key="operationColor" />
+            <local:GetDetailedOperationTypeColor x:Key="det_operationColor" />
+            <local:GetUnbool x:Key="boolValue" />
+            <local:DateTimeToTimeSpanConverter x:Key="timeSpanConverter"/>
+            <Style x:Key="AmountEntryStyle" TargetType="Entry">
+                <Setter Property="Text" Value="{Binding Amount,StringFormat='{0:#,0.00}'}"></Setter>
+                <Setter Property="FontSize" Value="Large"></Setter>
+                <Setter Property="TextColor" Value="{Binding OperationType, Converter={StaticResource operationColor}}"></Setter>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"></Setter>
+                <Setter Property="VerticalOptions" Value="Center"></Setter>
+                <Setter Property="FontAttributes" Value="Bold"></Setter>
+                <Setter Property="HorizontalTextAlignment" Value="End"></Setter>
+                <Setter Property="Keyboard" Value="Numeric"></Setter>
+                <Setter Property="ClearButtonVisibility" Value="WhileEditing"></Setter>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="93*"/>
+                <RowDefinition Height="7*"/>
+            </Grid.RowDefinitions>
+            <StackLayout VerticalOptions="Start">
+                <Grid>
+                    <Label Grid.Column="0" Text="Дата операції:" VerticalOptions="Center"/>
+                    <!--<Label Text="{Binding Date}" FontSize="Large"/>-->
+                    <DatePicker Grid.Column="1" x:Name="noteDate" Date="{Binding Date}" VerticalOptions="Center"></DatePicker>
+                    <TimePicker Grid.Column="2" x:Name="noteTime" Time="{Binding Date, Converter={StaticResource timeSpanConverter}, Mode=TwoWay}" VerticalOptions="Center"></TimePicker>
+                    <Label Grid.Column="3" Text="{Binding OperationType, Converter={StaticResource operationTypeID}}" FontSize="Large" VerticalOptions="Center" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{Binding OperationType, Converter={StaticResource operationColor}}"/>
+                </Grid>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <Grid>
+                    <Label Grid.Column="0" Text="Контрагент:" VerticalOptions="Center"/>
+                    <Label Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" FontSize="Large" HorizontalOptions="End" VerticalOptions="Center" FontAttributes="Bold" HorizontalTextAlignment="End" Style="{StaticResource ClientLblStyle}"/>
+                </Grid>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="60*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80"/>
+                    </Grid.RowDefinitions>
+                    <Frame Grid.Column="0" BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>
+                    <Label Grid.Column="1" Text="Стаття:" VerticalOptions="Center"/>
+                    <Label Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" FontSize="Large" HorizontalOptions="FillAndExpand" FontAttributes="Bold" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Style="{StaticResource DetailedTypeLblStyle}"/>
+                </Grid>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <Frame BackgroundColor="LightGray">
+                    <Grid Margin="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="35*"/>
+                        </Grid.RowDefinitions>
+                        <Label Text="Сумма:"/>
+                        <Entry Grid.Row="1" Grid.Column="0" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" Style="{StaticResource AmountEntryStyle}"/>
+                        <Label Grid.Column="1" Text="Курс:"/>
+                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding ExchangeRate,StringFormat='{0:#,0.00}'}" Style="{StaticResource AmountEntryStyle}"/>
+                        <Label Grid.Column="2" Text="Сумма (вал):"/>
+                        <Entry Grid.Row="1" Grid.Column="2" Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" Style="{StaticResource AmountEntryStyle}"/>
+                    </Grid>
+                </Frame>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <Grid>
+                    <Label Text="Місце зберігання:" VerticalOptions="Center"/>
+                    <Label Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" Style="{StaticResource StorageLblStyle}" FontSize="Large" FontAttributes="Bold" HorizontalOptions="End"/>
+                </Grid>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="72*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Text="Опис операції:" VerticalOptions="Center"/>
+                    <Editor Grid.Column="1" Text="{Binding Description}" FontSize="Large" HorizontalOptions="FillAndExpand" FontAttributes="Bold" Style="{StaticResource DescriptionLblStyle}" IsTextPredictionEnabled="True" Placeholder="Опис операції..." AutoSize="TextChanges"/>
+                </Grid>
+                <!--<Label Text="{Binding TypeID}" FontSize="Large"/>-->
+
+            </StackLayout>
+            <Button Grid.Row="1" Text="OK" HorizontalOptions="FillAndExpand" Clicked="Button_Clicked" VerticalOptions="End" />
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

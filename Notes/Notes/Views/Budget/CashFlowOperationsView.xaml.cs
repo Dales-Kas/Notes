@@ -45,6 +45,8 @@ namespace Notes.Views.Budget
             set { }
         }
 
+        public int LastItem1 = 0;
+
         public DateTime dateFilter = DateTime.MinValue;
 
         public DateTime periodStart;
@@ -64,6 +66,8 @@ namespace Notes.Views.Budget
 
         public List<PeriodsOfOperations> PeriodsOfOperations { get; set; } = new List<PeriodsOfOperations>();
         public List<PeriodsOfOperations> YearsOfOperations { get; set; } = new List<PeriodsOfOperations>();
+
+        public PeriodsOfOperations currentPeriodOfUserChoice;
 
         public string[] periodViewChoise = new string[3];
 
@@ -98,21 +102,22 @@ namespace Notes.Views.Budget
 
             //Get all mounth from Items:
             if (getAllPeriods)
+            //if (PeriodsOfOperations.Count==0 || YearsOfOperations.Count==0)
             {
                 GetAndSetAllPeriods(setTypeOfPeriod);
             }
 
-            Items = Items.Where(x => x.Date >= periodStart && x.Date <= periodEnd).ToList();
+            var filteredItems = Items.Where(x => x.Date >= periodStart && x.Date <= periodEnd);
 
             if (detailedTypeFilter != null)
             {
-                Items = Items.Where(x => x.DetailedTypeID == detailedTypeFilter.ID).ToList();
+                filteredItems = filteredItems.Where(x => x.DetailedTypeID == detailedTypeFilter.ID);
                 badgeFilterNum++;
             }
 
             if (clientFilter != null)
             {
-                Items = Items.Where(x => x.Client == clientFilter.ID).ToList();
+                filteredItems = filteredItems.Where(x => x.Client == clientFilter.ID);
                 badgeFilterNum++;
             }
 
@@ -121,32 +126,85 @@ namespace Notes.Views.Budget
                 DateTime dateFilterMin = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day);
                 DateTime dateFilterMax = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day, 23, 59, 59);
 
-                Items = Items.Where(x => x.Date >= dateFilterMin && x.Date <= dateFilterMax).ToList();
+                filteredItems = filteredItems.Where(x => x.Date >= dateFilterMin && x.Date <= dateFilterMax);
 
                 badgeFilterNum++;
             }
 
             if (inOperationFilter)
             {
-                Items = Items.Where(x => x.OperationType == Models.OperationType.InOperation).ToList();
+                filteredItems = filteredItems.Where(x => x.OperationType == Models.OperationType.InOperation);
 
                 badgeFilterNum++;
             }
 
             if (outOperationFilter)
             {
-                Items = Items.Where(x => x.OperationType == Models.OperationType.OutOperation).ToList();
+                filteredItems = filteredItems.Where(x => x.OperationType == Models.OperationType.OutOperation);
 
                 badgeFilterNum++;
             }
 
-            MyListView0.ItemsSource = Items.Where(x => x.TypeID == 0).OrderByDescending(x => x.Date);
-            MyListView1.ItemsSource = Items.Where(x => x.TypeID == 1).OrderByDescending(x => x.Date);
-            MyListView2.ItemsSource = Items.Where(x => x.TypeID == 2).OrderByDescending(x => x.Date);
+            //GetInOutValues(ref inAmount0, ref outAmount0, 0);
+            //GetInOutValues(ref inAmount1, ref outAmount1, 1);
+            //GetInOutValues(ref inAmount2, ref outAmount2, 2);
 
-            GetInOutValues(ref inAmount0, ref outAmount0, Items, 0);
-            GetInOutValues(ref inAmount1, ref outAmount1, Items, 1);
-            GetInOutValues(ref inAmount2, ref outAmount2, Items, 2);
+            //Final values on top of Lists:
+
+            inAmount0 = 0;
+            outAmount0 = 0;
+            inAmount1 = 0;
+            outAmount1 = 0;
+            inAmount2 = 0;
+            outAmount2 = 0;
+
+            filteredItems.AsParallel().ForAll(item =>
+            {
+                double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;
+
+                if (item.DontUseInCashFlow) { }
+                else if (item.TypeID == 0)
+                {
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        inAmount0 += curValue;
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        outAmount0 += curValue;
+                    }
+                }
+                else if (item.TypeID == 1)
+                {
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        inAmount1 += curValue;
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        outAmount1 += curValue;
+                    }
+                }
+                else if (item.TypeID == 2)
+                {
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        inAmount1 += curValue;
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        outAmount1 += curValue;
+                    }
+                }
+            });
+
+            MyListView0.ItemsSource = filteredItems.Where(x => x.TypeID == 0).OrderByDescending(x => x.Date).ToList();
+            MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).OrderByDescending(x => x.Date).ToList();
+            MyListView2.ItemsSource = filteredItems.Where(x => x.TypeID == 2).OrderByDescending(x => x.Date).ToList();
+
+            //Set current items:
+
+            MyListView1.ScrollTo(LastItem1, animate: false);
 
             string amountFormat = "#,#.00";
             string amountFormat0 = "-";
@@ -157,6 +215,8 @@ namespace Notes.Views.Budget
             CardOut1.Text = outAmount1 != 0 ? outAmount1.ToString(amountFormat) : amountFormat0;
             CardIn2.Text = inAmount2 != 0 ? inAmount2.ToString(amountFormat) : amountFormat0;
             CardOut2.Text = outAmount2 != 0 ? outAmount2.ToString(amountFormat) : amountFormat0;
+
+            SetTitleText(currentPeriodOfUserChoice);
 
             // badgeFilter.Text = badgeFilterNum.ToString();
         }
@@ -237,44 +297,66 @@ namespace Notes.Views.Budget
         {
             if (curPeriodsOfOperations.Count > 0)
             {
-                PeriodsOfOperations curItem = curPeriodsOfOperations[curPeriodsOfOperations.Count - 1];
+                currentPeriodOfUserChoice = curPeriodsOfOperations[^1];
 
                 if (curtypeOfPeriod == 0)
                 {
-                    allPeriods.CurrentItem = curItem;
+                    allPeriods.CurrentItem = currentPeriodOfUserChoice;
                 }
                 else if (curtypeOfPeriod == 1)
                 {
-                    allYears.CurrentItem = curItem;
+                    allYears.CurrentItem = currentPeriodOfUserChoice;
                 }
 
-                SetPeriodValues(curItem);
+                SetPeriodValues(currentPeriodOfUserChoice);
 
             }
         }
 
-        private void GetInOutValues(ref double inValue, ref double outValue, List<CashFlowOperations> collectionOfValues, int typeID)
+        private void GetInOutValues(ref double inValue, ref double outValue, int typeID)
         {
             inValue = 0;
             outValue = 0;
 
-            foreach (var item in Items)
-            {
-                if (item.DontUseInCashFlow || item.TypeID != typeID)
-                {
-                    continue;
-                }
+            double inValue1 = 0;
+            double outValue1 = 0;
 
-                if (item.OperationType == Models.OperationType.InOperation)
+            Items.AsParallel().ForAll(item =>
+            {
+
+                if (item.DontUseInCashFlow || item.TypeID != typeID) { }
+
+                else if (item.OperationType == Models.OperationType.InOperation)
                 {
-                    inValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+                    inValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
                 }
 
                 else if (item.OperationType == Models.OperationType.OutOperation)
                 {
-                    outValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+                    outValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
                 }
-            }
+            });
+
+            inValue = inValue1;
+            outValue = outValue1;
+
+            //foreach (var item in Items)
+            //{
+            //    if (item.DontUseInCashFlow || item.TypeID != typeID)
+            //    {
+            //        continue;
+            //    }
+
+            //    if (item.OperationType == Models.OperationType.InOperation)
+            //    {
+            //        inValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+            //    }
+
+            //    else if (item.OperationType == Models.OperationType.OutOperation)
+            //    {
+            //        outValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+            //    }
+            //}
         }
 
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)
@@ -306,15 +388,17 @@ namespace Notes.Views.Budget
 
         private void MyListView0_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //if (e.CurrentSelection != null)
+            //CashFlowOperations operation = (CashFlowOperations)e.CurrentSelection.FirstOrDefault();
+
+            //if (operation != null)
             //{
-                CashFlowOperations operation = (CashFlowOperations)e.CurrentSelection.FirstOrDefault();
-            //string operationPath = $"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.ItemId)}={note.ID.ToString()}";
-            //await Shell.Current.GoToAsync(notePath);
+            //    string operationPath = $"{nameof(CashFlowOperationForm)}?{nameof(CashFlowOperationForm.OperationId)}={operation.ID}";
+            //    await Shell.Current.GoToAsync(operationPath);
 
-            //CashFlowOperations operation1 = (CashFlowOperations)App.NotesDB.GetFromMySQL(operation.ID, typeof(CashFlowOperations)).Result;
+            //    MyListView0.SelectedItem = null;
+            //    MyListView1.SelectedItem = null;
+            //    MyListView2.SelectedItem = null;
             //}
-
         }
 
         #region FiltersOfOperations
@@ -429,6 +513,8 @@ namespace Notes.Views.Budget
 
                 CardIn0.Background = Color.White;
                 CardOut0.Background = Color.White;
+
+                //SetTitleText(null);
             }
 
             else
@@ -440,6 +526,7 @@ namespace Notes.Views.Budget
 
                 lblClientFilter.Text = ClientFilterName;
                 lblClientFilter.IsVisible = !string.IsNullOrEmpty(lblClientFilter.Text);
+                //lblClientFilterF.IsVisible = lblClientFilter.IsVisible;
 
                 lblDetailedTypeFilter.Text = DetailedTypeFilterName;
                 lblDetailedTypeFilter.IsVisible = !string.IsNullOrEmpty(lblDetailedTypeFilter.Text);
@@ -452,6 +539,8 @@ namespace Notes.Views.Budget
 
                 lblOutOperationFilter.Text = outOperationFilter ? "Тільки вихідні операції" : "";
                 lblOutOperationFilter.IsVisible = outOperationFilter;
+
+                SetTitleText(null);
             }
 
             filterGroup.IsVisible = !resetFilter;
@@ -460,7 +549,7 @@ namespace Notes.Views.Budget
             CardIn1.Background = CardIn0.Background;
             CardIn2.Background = CardIn0.Background;
             CardOut1.Background = CardOut0.Background;
-            CardOut2.Background = CardOut0.Background;            
+            CardOut2.Background = CardOut0.Background;
 
         }
 
@@ -520,14 +609,43 @@ namespace Notes.Views.Budget
 
         public void SetTitleText(PeriodsOfOperations period)
         {
-            if (typeOfPeriod != 2)
+            string val = !foreignCurrency ? "грн" : "$";
+
+            if (IsFilterFilled())
             {
-                string val = !foreignCurrency ? "грн" : "$";
-                this.Title = $"Фінанси ({period.PeriodName.ToLower()}) {val}";
+                double inAll = inAmount0 + inAmount1;
+                double outAll = outAmount0 + outAmount1;
+
+                string valueFormat = "#,0.00";
+
+                if (inAll>0 && outAll>0)
+                {
+                    this.Title = $"Прихід: {inAll.ToString(valueFormat)} Розхід: {outAll.ToString(valueFormat)} ({val})";
+                }
+                else if (inAll > 0)
+                {
+                    this.Title = $"Всього прихід: {inAll.ToString(valueFormat)} {val}";
+                }
+                else if (outAll > 0)
+                {
+                    this.Title = $"Всього розхід: {outAll.ToString(valueFormat)} {val}";
+                }                
             }
+
             else
             {
-                this.Title = "Фінанси (за весь період)";
+                if (period == null)
+                {
+                    this.Title = "Фінанси";
+                }
+                else if (typeOfPeriod != 2)
+                {                    
+                    this.Title = $"Фінанси ({period.PeriodName.ToLower()}) {val}";
+                }
+                else
+                {
+                    this.Title = "Фінанси (за весь період)";
+                }
             }
         }
 
@@ -545,8 +663,8 @@ namespace Notes.Views.Budget
 
             int i = 0;
 
-            //foreach (var item in PeriodsOfOperations.OrderByDescending(x=>x.PeriodStart).ToList())            
-            foreach (var item in PeriodsOfOperations)
+            foreach (var item in PeriodsOfOperations.OrderByDescending(x => x.PeriodStart).ToList())
+            //foreach (var item in PeriodsOfOperations)
             {
                 periodsString[i] = item.PeriodName;
                 data.Add(item.PeriodName, item);
@@ -561,7 +679,7 @@ namespace Notes.Views.Budget
                 {
                     SetPeriodOfView(resultChoise);
                     allPeriods.CurrentItem = resultChoise;
-                    ((Label)sender).Text = resultChoise.PeriodName;
+                    //((Label)sender).Text = resultChoise.PeriodName;
                 }
             }
         }
@@ -618,25 +736,25 @@ namespace Notes.Views.Budget
                 (sender as Image).Source = "UAH.png";
             }
 
-            PeriodsOfOperations period = null;
+            PeriodsOfOperations period;
 
             if (typeOfPeriod == 0)
             {
-                period = allPeriods.CurrentItem as PeriodsOfOperations;
-                SetTitleText(period);
+                period = allPeriods.CurrentItem as PeriodsOfOperations;                
             }
             else if (typeOfPeriod == 1)
             {
-                period = allYears.CurrentItem as PeriodsOfOperations;
-                SetTitleText(period);
+                period = allYears.CurrentItem as PeriodsOfOperations;                
             }
 
-            else 
+            else
             {
-                this.Title = "Фінанси";
+                period = null;                
             }
 
             LoadAllData();
+            
+            SetTitleText(period);
         }
 
         private void lblClientFilter_BindingContextChanged(object sender, EventArgs e)
@@ -656,6 +774,86 @@ namespace Notes.Views.Budget
             LoadAllData();
         }
 
+        private async void TapGestureRecognizer_Tapped_3(object sender, EventArgs e)
+        {
+            CashFlowOperations operation = (CashFlowOperations)(e as TappedEventArgs).Parameter;
+
+            if (operation != null)
+            {
+                string operationPath = $"{nameof(CashFlowOperationForm)}?{nameof(CashFlowOperationForm.OperationId)}={operation.ID}";
+                await Shell.Current.GoToAsync(operationPath);
+
+                MyListView0.SelectedItem = null;
+                MyListView1.SelectedItem = null;
+                MyListView2.SelectedItem = null;
+            }
+        }
+
+        private void MyListView1_ScrollToRequested(object sender, ScrollToRequestEventArgs e)
+        {
+
+        }
+
+        private async void MyListView1_Scrolled(object sender, ItemsViewScrolledEventArgs e)
+        {
+            LastItem1 = e.FirstVisibleItemIndex;
+
+            AddItemButton.IsVisible = e.FirstVisibleItemIndex == 0 && !IsFilterFilled();
+
+            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+
+            if (e.FirstVisibleItemIndex == 0)
+            {
+                List1Up.IsVisible = false;
+                List1Down.IsVisible = false;
+            }
+            else if (e.LastVisibleItemIndex == list.Count - 1)
+            {
+                List1Up.IsVisible = true;
+                List1Down.IsVisible = false;
+            }
+            else
+            {
+                List1Up.IsVisible = true;
+                List1Down.IsVisible = true;
+            }
+
+            await Task.Delay(4000).ContinueWith(t =>
+            {
+                //List1UpVisibility = false;
+                //List1Down.IsVisible = false;
+            });
+
+            List1Up.IsVisible = false;
+            List1Down.IsVisible = false;
+        }
+
+        private void List1Up_Clicked(object sender, EventArgs e)
+        {
+            MyListView1.ScrollTo(0, animate: false);
+        }
+
+        private void List1Down_Clicked(object sender, EventArgs e)
+        {
+            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+
+            var count = list[list.Count - 1];
+            MyListView1.ScrollTo(count, animate: false);
+        }
+
+        private async void AddItemButton_Clicked(object sender, EventArgs e)
+        {
+            string inName = "Надходження коштів";
+            string outName = "Розхід коштів";
+
+            string resault = await DisplayActionSheet("Тип операції", "Відміна", null, inName, outName);
+
+            if (resault != null && resault != "Відміна")
+            {
+                string operationPath = $"{nameof(CashAddForm)}?{nameof(CashAddForm.IsOut)}={resault == outName}";
+                await Shell.Current.GoToAsync(operationPath);
+            }
+        }
     }
 
     public class PeriodsOfOperations

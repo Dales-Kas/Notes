@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Notes.Views.Budget.ExchangeRatesList"
+             xmlns:local="clr-namespace:Notes">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:GetRefNameFromGuid x:Key="currencyID" TypeOfObject ="Currencies" IsGuid ="False"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <StackLayout>
+        <Grid BackgroundColor="#708090" MinimumHeightRequest="20">
+            <Label Text="Валюта" Margin="10,0" FontAttributes="Bold" FontSize="Large"></Label>
+            <Label Grid.Column="1" Text="Дата" FontAttributes="Bold" FontSize="Large"></Label>
+            <Label Grid.Column="2" Text="Курс" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+            <Label Grid.Column="3" Text="Крат-сть" Margin="10,0" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+        </Grid>
+        <RefreshView Refreshing="RefreshView_Refreshing" Margin="10,0,10,0">
+        <CollectionView x:Name="MyListView"
+            ItemsSource="{Binding Items}" ItemSizingStrategy="MeasureAllItems" ItemsUpdatingScrollMode="KeepScrollOffset" SelectionMode="Single">
+            <!--<CollectionView.Header>
+                <Grid>
+                    <Label Text="Валюта" FontAttributes="Bold" FontSize="Large"></Label>
+                    <Label Grid.Column="1" Text="Дата" FontAttributes="Bold" FontSize="Large"></Label>
+                    <Label Grid.Column="2" Text="Курс" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+                    <Label Grid.Column="3" Text="Кратність" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+                </Grid>
+            </CollectionView.Header>-->
+           
+            <CollectionView.EmptyView>
+                <StackLayout Margin="10" VerticalOptions="Center">
+                    <Label Text="Немає даних для відображення..." HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+            <!--<CollectionView.Footer>
+                <Grid>
+                    <Label Text="Валюта"></Label>
+                    <Label Grid.Column="1" Text="Дата"></Label>
+                    <Label Grid.Column="2" Text="Курс"></Label>
+                    <Label Grid.Column="3" Text="Кратність"></Label>
+                </Grid>
+            </CollectionView.Footer>-->
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="1"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="15*"/>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="35*"/>
+                            <ColumnDefinition Width="20*"/>
+                        </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" FontSize="Large" TextColor="#015722" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="1" Text="{Binding Period}" FontSize="Large" HorizontalTextAlignment="Center"/>
+                        <Label Grid.Column="2" Text="{Binding Rate}" FontSize="Large" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Column="3" Text="{Binding Multiply}" FontSize="Large" HorizontalTextAlignment="End"/>
+                        <Ellipse Grid.Row="1" Grid.ColumnSpan="4" BackgroundColor="LightGray" HeightRequest="1"></Ellipse>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+        <!--<Ellipse BackgroundColor="Black" Margin="0" HeightRequest="2"></Ellipse>-->
+        <StackLayout Orientation="Horizontal">
+        <Picker x:Name="pkrCurrency" Margin="0" 
+                VerticalOptions="Center"
+                HorizontalTextAlignment="Center"
+                HorizontalOptions="FillAndExpand"
+                SelectedIndexChanged="pkrCurrency_SelectedIndexChanged"
+                SelectedIndex="0"
+                FontAttributes="Bold"
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
+                FontSize="Title"/>
+        <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"                        
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                            />
+        </StackLayout>
+    </StackLayout>
+</ContentPage>

@@ -149,6 +149,11 @@ namespace Notes.Views.Budget
 
         }
 
+        private void AddButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
         //private void MyParentsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         //{
         //    if (e.CurrentSelection != null)

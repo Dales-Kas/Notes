@@ -90,6 +90,24 @@ namespace Notes
                         }
                         break;
                     }
+
+                case "OperationType":
+                    {
+                        int curOper = (int)value;
+
+                        if (curOper == 0)
+                        {
+                            return "Прихід";
+                        }
+                        else if (curOper == 1)
+                        {
+                            return "Розхід";
+                        }
+                        else 
+                        {
+                            return "";
+                        }                        
+                    }
             }
 
             return returnValue;
@@ -100,56 +118,6 @@ namespace Notes
             return "";
         }
     }
-
-    //public class GetClientNameFromGuid : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        if ((Guid)value == Guid.Empty)
-    //        {
-    //            return "";
-    //        }
-
-    //        Clients clients = App.NotesDB.GetClientAsync((Guid)value).Result;
-
-    //        if (clients != null)
-    //        {
-    //            return clients.Name;
-    //        }
-
-    //        return value.ToString();
-    //    }
-
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        return "";
-    //    }
-    //}
-
-    //public class GetCashFlowDetailedTypeFromGuid : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        if ((Guid)value == Guid.Empty)
-    //        {
-    //            return "";
-    //        }
-
-    //        CashFlowDetailedType type = App.NotesDB.GetCashFlowDetailedTypeAsync((Guid)value).Result;
-
-    //        if (type != null)
-    //        {
-    //            return type.Name;
-    //        }
-
-    //        return value.ToString();
-    //    }
-
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        return "";
-    //    }
-    //}
 
     public class GetOperationTypeColor : IValueConverter
     {
@@ -285,6 +253,38 @@ namespace Notes
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return true;
+        }
+    }
+
+    public class DateTimeToTimeSpanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((DateTime)value).TimeOfDay;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            DateTime DateOfValue = (DateTime)parameter;
+
+            var incomingTimeSpan = (TimeSpan)value;
+            return new DateTime(DateOfValue.Year, DateOfValue.Month, DateOfValue.Day, incomingTimeSpan.Hours, incomingTimeSpan.Minutes, incomingTimeSpan.Seconds);
+        }
+    }
+
+    public class SetBoolValue : IValueConverter
+    {
+        public string Booltrue { get; set; }
+        public string BoolFalse { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? Booltrue : BoolFalse;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value;
         }
     }
 }

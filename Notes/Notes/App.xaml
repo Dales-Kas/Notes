@@ -6,6 +6,23 @@
              mc:Ignorable="d"
              x:Class="Notes.App">
     <Application.Resources>
-
+        <ResourceDictionary>
+            <Style x:Key="ClientLblStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#483D8B"></Setter>
+                <Setter Property="FontSize" Value="Medium"></Setter>
+                <Setter Property="FontAttributes" Value="Bold"></Setter>
+            </Style>
+            <Style x:Key="DescriptionLblStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#008B8B"></Setter>                
+            </Style>
+            <Style x:Key="DescriptionEntryStyle" TargetType="Label" BasedOn="{StaticResource DescriptionLblStyle}">
+            </Style>
+            <Style x:Key="DetailedTypeLblStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Brown"></Setter>
+            </Style>
+            <Style x:Key="StorageLblStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#4169E1"></Setter>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

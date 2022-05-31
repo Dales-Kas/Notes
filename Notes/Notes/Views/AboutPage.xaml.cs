@@ -23,10 +23,10 @@ namespace Notes.Views
 
         private void ImportJSON_Clicked(object sender, EventArgs e)
         {
-            var res = PickAndShow();
+            PickAndShow();
         }
 
-        private async Task<FileResult> PickAndShow()
+        private async void PickAndShow()
         {
             //string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "NotesAndNotesFlags", "Cars","Budget", "ALL");
             string resault1 = await DisplayActionSheet("Виберіть тип завантаження", "Відміна", null, "ALL");
@@ -37,7 +37,7 @@ namespace Notes.Views
             }
             else
             {
-                return null;
+                return;
             }
 
             var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -83,7 +83,7 @@ namespace Notes.Views
 
                     await DisplayAlert("Дані завантажено", $"Успішно, час виконання {timeEnd.Minutes} хв. {timeEnd.Seconds} сек.", "ОК");
 
-                    return result;
+                    return;
                 }
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace Notes.Views
                 await DisplayAlert("УВАГА!", ex.Message, "ОК");
             }
 
-            return null;
+            return;
         }
 
         public async Task ImportAndSaveToBase(string jsonString)
@@ -179,6 +179,18 @@ namespace Notes.Views
 
                         //DataTable = item.Currencies;
                         foreach (var i in item.Currencies)
+                        {
+                            SetTextOfLoading(ref iter);
+
+                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                        }
+                    }
+
+                    else if (item.Name == "ExchangeRates")
+                    {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.ExchangeRates.Count);
+
+                        foreach (var i in item.ExchangeRates)
                         {
                             SetTextOfLoading(ref iter);
 
@@ -276,6 +288,8 @@ namespace Notes.Views
             public List<CarNotes> CarNotes { get; set; }
 
             public List<Currencies> Currencies { get; set; }
+
+            public List<ExchangeRates> ExchangeRates { get; set; }            
 
             public List<CashFlowDetailedType> CashFlowDetailedType { get; set; }
 

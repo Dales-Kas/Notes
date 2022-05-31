@@ -60,7 +60,7 @@
                                IsVisible="{Binding Comment, Converter={x:StaticResource stringValue}}" 
                                Style="{DynamicResource ListItemDetailTextStyle}"
                                TextColor="#015722"
-                               FontSize="Micro"/>
+                               FontSize="Default"/>
                         <Label Grid.Row="0" Grid.Column="2" 
                                Text="{Binding DefaultCashFlowDetailedType, Converter={StaticResource typeGuid}}"
                                IsVisible="{Binding DefaultCashFlowDetailedType,Converter={StaticResource guidValue}}" 
@@ -68,7 +68,7 @@
                                HorizontalTextAlignment="End"
                                VerticalTextAlignment="Center"
                                TextColor="Brown"
-                               FontSize="Micro"
+                               FontSize="Small"
                                FontAttributes="Bold"/>
                         <StackLayout Grid.Row="1" Grid.Column="2" 
                                      Orientation="Horizontal" 
@@ -84,5 +84,22 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"                        
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                            />
     </StackLayout>
 </ContentPage>

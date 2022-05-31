@@ -42,5 +42,10 @@ namespace Notes.Views.Budget
             //Deselect Item
             ((ListView)sender).SelectedItem = null;
         }
+
+        private void AddButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
     }
 }

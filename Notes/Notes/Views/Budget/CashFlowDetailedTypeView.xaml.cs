@@ -13,21 +13,25 @@ namespace Notes.Views.Budget
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CashFlowDetailedTypeView : ContentPage
     {
+        public string searchText = "";
+
         public List<CashFlowDetailedType> Items { get; set; }
 
         public CashFlowDetailedTypeView()
         {
             InitializeComponent();
 
-            Items = App.NotesDB.GetCashFlowDetailedTypeAsync().Result;
-            //    new ObservableCollection<string>
-            //{
-            //    "Item 1",
-            //    "Item 2",
-            //    "Item 3",
-            //    "Item 4",
-            //    "Item 5"
-            //};
+            LoadList();
+        }
+
+        public async void LoadList()
+        {
+            Items = await App.NotesDB.GetCashFlowDetailedTypeAsync();
+
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                Items = Items.Where(x=>x.Name.ToLower().Contains(searchText.ToLower())).ToList();
+            }
 
             MyListView.ItemsSource = Items.OrderBy(x => x.Name);
         }
@@ -41,6 +45,35 @@ namespace Notes.Views.Budget
 
             //Deselect Item
             ((ListView)sender).SelectedItem = null;
+        }
+
+        private void AddButton_Clicked(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void searchBar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            searchText = ((SearchBar)sender).Text;
+
+            LoadList();
+        }
+
+        private void RefreshView_Refreshing(object sender, EventArgs e)
+        {
+            LoadList();
+            (sender as RefreshView).IsRefreshing = false;
+        }
+
+        private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+        {
+            Guid id = ((Guid)(e as TappedEventArgs).Parameter);
+
+            if (id!=Guid.Empty)
+            {
+                await Shell.Current.GoToAsync($"{nameof(CashFlowDetailedTypeForm)}?{nameof(CashFlowDetailedTypeForm.Id)}={id}");
+                //await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true}");
+            }            
         }
     }
 }

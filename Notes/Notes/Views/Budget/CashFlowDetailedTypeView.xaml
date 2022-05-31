@@ -1,36 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Notes"
              x:Class="Notes.Views.Budget.CashFlowDetailedTypeView">
-    <CollectionView x:Name="MyListView"
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:SetBoolValue x:Key="boolToString" Booltrue ="-" BoolFalse="облік"/>
+            <local:GetUnbool x:Key="boolValue" />
+            <local:GetVisabilityOfString x:Key="visabilityOfString"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <AbsoluteLayout>
+        <RefreshView Refreshing="RefreshView_Refreshing" AnchorY="70">
+        <CollectionView x:Name="MyListView"
             ItemsSource="{Binding Items}" Margin="10,0">
-        <!--Custom View Cells-->
+
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                        <Label Text="Не знайдно даних..." VerticalOptions="CenterAndExpand" HorizontalOptions="Center"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            
         <CollectionView.ItemTemplate>
             <DataTemplate>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="2"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80*"/>
-                        <ColumnDefinition Width="20*"/>
-                    </Grid.ColumnDefinitions>
+                    <StackLayout Padding="5">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding ID}"/>
+                            </StackLayout.GestureRecognizers>
+                        <Frame BorderColor ="{Binding OperationColor}" Margin="0" Padding="0" CornerRadius="15" HasShadow="True" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20*"/>
+                                <ColumnDefinition Width="80*"/>
+                            </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" FontSize="Large" FontAttributes="Bold" LineBreakMode="WordWrap"/>
-                    <Frame Grid.RowSpan="2" Grid.Column="1" BackgroundColor="{Binding OperationColor}" HeightRequest="20" WidthRequest="20">
-                        <StackLayout Orientation="Vertical" Margin="0">
-                            <Label TextColor="{Binding OperationTextColor}" Text="{Binding DontUseInCashFlow}" FontSize="Small"/>
-                            <!--<Label TextColor="{Binding OperationTextColor}" Text="{Binding DontUseInPlanning}" FontSize="Small"/>-->
-                        </StackLayout>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" FontSize="Large" FontAttributes="Bold" LineBreakMode="WordWrap" Margin="10" HorizontalTextAlignment="Center"/>
+                            <Frame Grid.RowSpan="3" Grid.Column="0" BackgroundColor="{Binding OperationColor}" HeightRequest="10" WidthRequest="10" Margin="0" Padding="0">
+                                <StackLayout Orientation="Vertical" Margin="0" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label TextColor="{Binding OperationTextColor}" Text="{Binding DontUseInCashFlow,Converter={x:StaticResource boolToString}}" FontSize="Micro" HorizontalTextAlignment="Center"/>
+                                    <Switch IsToggled="{Binding DontUseInCashFlow,Converter={x:StaticResource boolValue}}" IsEnabled="False"/>
+                                    <!--<Label TextColor="{Binding OperationTextColor}" Text="{Binding DontUseInPlanning}" FontSize="Small"/>-->
+                                </StackLayout>
+                            </Frame>
+                                <Label Grid.Row="1" Grid.Column ="1" Text="{Binding Descripton}" Margin="10" IsVisible="{Binding Descripton, Converter={x:StaticResource visabilityOfString}}" HorizontalTextAlignment="Center"/>
+                            <!--<Ellipse Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="LightGray"></Ellipse>-->
+                        </Grid>
                     </Frame>
-                    <Label Grid.Row="1" Grid.Column ="0" Text="{Binding Descripton}"/>
-                    <Ellipse Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
-                </Grid>
-
-            </DataTemplate>
+                    </StackLayout>
+                </DataTemplate>
         </CollectionView.ItemTemplate>
 
     </CollectionView>
+        </RefreshView>
+        
+        <SearchBar x:Name="searchBar"
+                       TextChanged="searchBar_TextChanged"
+                       Placeholder="Пошук"
+                       HorizontalOptions="FillAndExpand"
+                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.985, 260, AutoSize"/>
+        
+        <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                Clicked="AddButton_Clicked" IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"                        
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                            />
+    </AbsoluteLayout>
 </ContentPage>
