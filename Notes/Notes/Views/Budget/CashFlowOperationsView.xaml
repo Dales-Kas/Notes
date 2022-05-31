@@ -5,14 +5,13 @@
             xmlns:local="clr-namespace:Notes"
             x:Class="Notes.Views.Budget.CashFlowOperationsView"
             Title ="Фінанси"
-            x:Name="thisPage" IsBusy="True" xct:StatusBarEffect.Color="#DCDCDC" SelectedTabColor="NavajoWhite" UnselectedTabColor="LightGray">
+            x:Name="thisPage" IsBusy="True" xct:StatusBarEffect.Color="#708090" SelectedTabColor="NavajoWhite" UnselectedTabColor="LightGray" xct:StatusBarEffect.Style="DarkContent">
     <TabbedPage.ToolbarItems>
         <!--<ToolbarItem Text="" IconImageSource="refresh1.png" Clicked="ToolbarItem_Clicked">
         </ToolbarItem>-->
         <!--<ToolbarItem x:Name="tbFilter" Text="" IconImageSource="filter1.png" Clicked="ToolbarItem_Clicked_1">
         </ToolbarItem>-->
     </TabbedPage.ToolbarItems>
-
     <TabbedPage.Resources>
         <ResourceDictionary>
             <local:GetRefNameFromGuid x:Key="clientGuid" TypeOfObject="Clients"/>
@@ -24,7 +23,7 @@
             <local:GetUnbool x:Key="boolValue" />
         </ResourceDictionary>
     </TabbedPage.Resources>
-    
+
     <ContentPage Title="Карточка" x:Name="cardContentPage">
         <StackLayout Orientation="Vertical">
             <Grid Margin="10">
@@ -45,92 +44,98 @@
                     </Label.GestureRecognizers>
                 </Label>
             </Grid>
-            <!--<Label Text="{Binding Source={x:Reference thisPage}, Path=IsEditable}"/>-->
             <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+
             <RefreshView x:Name="refreshMyListView0" IsRefreshing="True" Refreshing="refreshMyListView0_Refreshing">
-                <CollectionView x:Name="MyListView0"
-            ItemsSource="{Binding Items0}" Margin="10,0" SelectedItem="{Binding ID}" SelectionChanged="MyListView0_SelectionChanged" SelectionMode="Single">
+                <CollectionView x:Name="MyListView0" ItemsSource="{Binding Items0}" 
+                                                     Margin="10,0" 
+                                                     SelectedItem="{Binding ID}"
+                                                     SelectionChanged="MyListView0_SelectionChanged" 
+                                                     SelectionMode="Single">
+                    <CollectionView.EmptyView>
+                        <StackLayout>
+                            <Label Text="Не знайдено даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
+                        </StackLayout>
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <SwipeView>
+                                <SwipeView.LeftItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="В резерв" BackgroundColor="Orange" CommandParameter="{Binding ID}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}"></SwipeItem>
+                                    </SwipeItems>
+                                </SwipeView.LeftItems>
                                 <SwipeView.RightItems>
                                     <SwipeItems>
                                         <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" CommandParameter="{Binding ID}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}"></SwipeItem>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
                                 <Grid>
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_3" CommandParameter="{Binding .}"/>
+                                    </Grid.GestureRecognizers>
+
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto"/>
                                         <RowDefinition Height="auto"/>
                                         <RowDefinition Height="auto"/>
-                                        <!--<RowDefinition Height="auto"/>-->
                                         <RowDefinition Height="1"/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="10*"/>
-                                        <ColumnDefinition Width="50*"/>
+                                        <ColumnDefinition Width="8*"/>
+                                        <ColumnDefinition Width="54*"/>
                                         <ColumnDefinition Width="40*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Frame Grid.RowSpan="3" Grid.Column="0"
-                                   BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" 
-                                   HeightRequest="5" 
-                                   WidthRequest="5" 
-                                   Margin="7,7,7,0">
+
+                                    <Frame Grid.RowSpan="3" Grid.Column="0" Style="{StaticResource FrameDetailedTypeStyle}">
                                         <Frame.GestureRecognizers>
                                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DetailedTypeTap_Tapped" CommandParameter="{Binding DetailedTypeID}">
                                             </TapGestureRecognizer>
                                         </Frame.GestureRecognizers>
                                     </Frame>
-                                    <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}"
-                                   TextColor="#483D8B"
-                                   FontSize="Medium" 
-                                   FontAttributes="Bold">
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" Style="{StaticResource ClientLblStyle}">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
                                             </TapGestureRecognizer>
                                         </Label.GestureRecognizers>
                                     </Label>
-                                    <Label Grid.Row="1" Grid.Column="1"
-                                   Text="{Binding Description}" 
-                                   TextColor="#008B8B"/>
 
-                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" Style="{StaticResource DescriptionLblStyle}"/>
 
-                                    <Label Grid.Row="0" Grid.Column="2"
-                                   Text="{Binding Amount,StringFormat='{0:#,0.00}'}" 
-                                   TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
-                                   FontSize="Medium"
-                                   LineBreakMode="CharacterWrap"
-                                   FontAttributes="Bold" 
-                                   HorizontalTextAlignment="End"
-                                   IsVisible="{Binding Source={x:Reference thisPage}, Path=foreignCurrency, Converter={StaticResource boolValue}}"/>
-                                    <Label Grid.Row="0" Grid.Column="2"
-                                   Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" 
-                                   TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
-                                   FontSize="Medium"
-                                   LineBreakMode="CharacterWrap"
-                                   FontAttributes="Bold" 
-                                   HorizontalTextAlignment="End"
-                                   IsVisible="{Binding Source={x:Reference thisPage}, Path=foreignCurrency}"/>
-                                    <Label Grid.Row="1" Grid.Column="2" 
-                                   Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" 
-                                   TextColor="Brown" 
-                                   HorizontalTextAlignment="End" 
-                                   LineBreakMode="WordWrap"/>
-                                    <Label Grid.Row="2" Grid.Column="2" 
-                                   Text="{Binding Date}" 
-                                   TextColor="Gray" 
-                                   HorizontalTextAlignment="End">
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" Style="{StaticResource StorageLblStyle}" HorizontalTextAlignment="Start"/>
+
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" 
+                                                                        TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
+                                                                        FontSize="Medium"
+                                                                        LineBreakMode="CharacterWrap"
+                                                                        FontAttributes="Bold" 
+                                                                        HorizontalTextAlignment="End"
+                                                                        IsVisible="{Binding Source={x:Reference thisPage}, Path=foreignCurrency, Converter={StaticResource boolValue}}"/>
+
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" 
+                                                                        TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
+                                                                        FontSize="Medium"
+                                                                        LineBreakMode="CharacterWrap"
+                                                                        FontAttributes="Bold" 
+                                                                        HorizontalTextAlignment="End"
+                                                                        IsVisible="{Binding Source={x:Reference thisPage}, Path=foreignCurrency}"/>
+
+                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" 
+                                                                        Style="{StaticResource DetailedTypeLblStyle}"
+                                                                        HorizontalTextAlignment="End" 
+                                                                        LineBreakMode="WordWrap"/>
+
+                                    <Label Grid.Row="2" Grid.Column="2" Text="{Binding Date}" 
+                                                                        TextColor="Gray" 
+                                                                        HorizontalTextAlignment="End">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DateTap_Tapped" CommandParameter="{Binding Date}">
                                             </TapGestureRecognizer>
                                         </Label.GestureRecognizers>
                                     </Label>
-                                    <!--<StackLayout Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="10">
-                                <Label Text="{Binding StorageID}"/>
-                            </StackLayout>-->
+
                                     <Ellipse Grid.Row="3" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+
                                 </Grid>
                             </SwipeView>
                         </DataTemplate>
@@ -224,139 +229,145 @@
         </StackLayout>
     </ContentPage>
     <ContentPage Title="Готівка">
-        <StackLayout>
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="42*"></ColumnDefinition>
-                    <ColumnDefinition Width="16*"></ColumnDefinition>
-                    <ColumnDefinition Width="42*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" x:Name="CardIn1" Text="Прихід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Black" FontSize="28" FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <Image Grid.Column="1" Source="cash.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
-                <Label Grid.Column="2" x:Name="CardOut1" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-            </Grid>
-            <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
-            <RefreshView Refreshing="refreshMyListView0_Refreshing">
-                <CollectionView x:Name="MyListView1"
-            ItemsSource="{Binding Items1}" Margin="10,0">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="1"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="10*"/>
-                                    <ColumnDefinition Width="50*"/>
-                                    <ColumnDefinition Width="40*"/>
-                                </Grid.ColumnDefinitions>
-                                <Frame Grid.RowSpan="3" Grid.Column="0"
-                                   BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" 
-                                   HeightRequest="5" 
-                                   WidthRequest="5" 
-                                   Margin="7,7,7,0">
-                                    <Frame.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DetailedTypeTap_Tapped" CommandParameter="{Binding DetailedTypeID}">
-                                        </TapGestureRecognizer>
-                                    </Frame.GestureRecognizers>
-                                </Frame>
-                                <Label Grid.Row="0" Grid.Column="1" 
+        <AbsoluteLayout>
+            <StackLayout AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42*"></ColumnDefinition>
+                        <ColumnDefinition Width="16*"></ColumnDefinition>
+                        <ColumnDefinition Width="42*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Column="0" x:Name="CardIn1" Text="Прихід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Black" FontSize="28" FontAttributes="Bold">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Image Grid.Column="1" Source="cash.jpg" Aspect="AspectFit" HeightRequest="60" WidthRequest="50" HorizontalOptions="Center"/>
+                    <Label Grid.Column="2" x:Name="CardOut1" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Ellipse Grid.Row="1" Grid.ColumnSpan="3"  HeightRequest="1" BackgroundColor="#FFDCDCDC" AbsoluteLayout.LayoutFlags="PositionProportional"></Ellipse>
+                </Grid>
+                <RefreshView Refreshing="refreshMyListView0_Refreshing" Margin="0">
+                    <CollectionView x:Name="MyListView1"
+            ItemsSource="{Binding Items1}" Margin="10,0" ScrollToRequested="MyListView1_ScrollToRequested" Scrolled="MyListView1_Scrolled">
+                        <CollectionView.EmptyView>
+                            <StackLayout>
+                                <Label Text="Не знайдено даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
+                            </StackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="1"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="8*"/>
+                                        <ColumnDefinition Width="54*"/>
+                                        <ColumnDefinition Width="40*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Frame Grid.RowSpan="3" Grid.Column="0" Style="{StaticResource FrameDetailedTypeStyle}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DetailedTypeTap_Tapped" CommandParameter="{Binding DetailedTypeID}">
+                                            </TapGestureRecognizer>
+                                        </Frame.GestureRecognizers>
+                                    </Frame>
+                                    <Label Grid.Row="0" Grid.Column="1" 
                                    Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" 
                                    TextColor="#483D8B" 
                                    FontSize="Medium" 
                                    FontAttributes="Bold">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
-                                        </TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
-                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>
-                                <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>
-                                <Label Grid.Row="2" Grid.Column="2" 
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
+                                            </TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Row="2" Grid.Column="2" 
                                    Text="{Binding Date}" 
                                    TextColor="Gray" 
                                    HorizontalTextAlignment="End">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DateTap_Tapped" CommandParameter="{Binding Date}">
-                                        </TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Ellipse Grid.Row="3" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
-            <ScrollView Orientation="Horizontal" IsVisible="{Binding Source={x:Reference filterGroup}, Path=IsVisible}">
-                <StackLayout Orientation="Horizontal" Margin="1" VerticalOptions="End" HeightRequest="35">
-                    <Image Source="{Binding Source={x:Reference imgFilterCancel}, Path=Source}" Aspect="AspectFit" Scale="0.70" VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DateTap_Tapped" CommandParameter="{Binding Date}">
+                                            </TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Ellipse Grid.Row="3" Grid.ColumnSpan="3" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+                <ScrollView Orientation="Horizontal" IsVisible="{Binding Source={x:Reference filterGroup}, Path=IsVisible}">
+                    <StackLayout Orientation="Horizontal" Margin="1" VerticalOptions="End" HeightRequest="35">
+                        <Image Source="{Binding Source={x:Reference imgFilterCancel}, Path=Source}" Aspect="AspectFit" Scale="0.70" VerticalOptions="Center">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_2"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label Text="{Binding Source={x:Reference lblClientFilter}, Path=Text}" TextColor="#483D8B" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblClientFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=Text}" TextColor="Brown" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_DetailedTypeFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblDateFilter}, Path=Text}" TextColor="Gray" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDateFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_DateFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblInOperationFilter}, Path=Text}" TextColor="Black" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblInOperationFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_InOperationFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblOutOperationFilter}, Path=Text}" TextColor="Red" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblOutOperationFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_OutOperationFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </ScrollView>
+                <Grid BackgroundColor="#708090" HeightRequest="60" Margin="0" Padding="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="25*"/>
+                        <ColumnDefinition Width="10*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
                         <Image.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_2"/>
+                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                         </Image.GestureRecognizers>
                     </Image>
-                    <Label Text="{Binding Source={x:Reference lblClientFilter}, Path=Text}" TextColor="#483D8B" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblClientFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=Text}" TextColor="Brown" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_DetailedTypeFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblDateFilter}, Path=Text}" TextColor="Gray" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDateFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_DateFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblInOperationFilter}, Path=Text}" TextColor="Black" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblInOperationFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_InOperationFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblOutOperationFilter}, Path=Text}" TextColor="Red" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblOutOperationFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_OutOperationFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </StackLayout>
-            </ScrollView>
-            <Grid BackgroundColor="#708090" HeightRequest="60">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10*"/>
-                    <ColumnDefinition Width="30*"/>
-                    <ColumnDefinition Width="30*"/>
-                    <ColumnDefinition Width="25*"/>
-                    <ColumnDefinition Width="10*"/>
-                </Grid.ColumnDefinitions>
-                <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
-                    </Image.GestureRecognizers>
-                </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text=""/>
-                <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
-                    <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Frame>
-                <StackLayout Grid.Row="0" Grid.Column="3">
-                    <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
+                    <Label Grid.Row="0" Grid.Column="1" Text=""/>
+                    <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
+                        <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Frame>
+                    <StackLayout Grid.Row="0" Grid.Column="3">
+                        <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
                                   ItemsSource="{Binding Source={x:Reference allPeriods}, Path=ItemsSource,Mode=TwoWay}"
                                   CurrentItem="{Binding Source={x:Reference allPeriods}, Path=CurrentItem,Mode=TwoWay}"
                                   IsBounceEnabled="False"
@@ -364,164 +375,216 @@
                                   Loop="False"                                  
                                   HorizontalScrollBarVisibility="Always"
                                   ItemsUpdatingScrollMode="KeepItemsInView">
-                        <CarouselView.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </DataTemplate>
-                        </CarouselView.ItemTemplate>
-                    </CarouselView>
-                    <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
+                            <CarouselView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </DataTemplate>
+                            </CarouselView.ItemTemplate>
+                        </CarouselView>
+                        <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
                                   ItemsSource="{Binding Source={x:Reference allYears}, Path=ItemsSource,Mode=TwoWay}"
                                   CurrentItem="{Binding Source={x:Reference allYears}, Path=CurrentItem,Mode=TwoWay}"
                                   IsScrollAnimated="True"
                                   Loop="False"                                  
                                   HorizontalScrollBarVisibility="Always"
                                   ItemsUpdatingScrollMode="KeepItemsInView">
-                        <CarouselView.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </DataTemplate>
-                        </CarouselView.ItemTemplate>
-                    </CarouselView>
-                </StackLayout>
-                <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
-            </Grid>
-        </StackLayout>
+                            <CarouselView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </DataTemplate>
+                            </CarouselView.ItemTemplate>
+                        </CarouselView>
+                    </StackLayout>
+                    <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
+                </Grid>
+
+            </StackLayout>
+
+            <Button x:Name="List1Up" Text="▲" Clicked="List1Up_Clicked"
+                    FontAttributes="Bold"
+                    HeightRequest="40"
+                    WidthRequest="42"
+                    CornerRadius="45"
+                    Opacity="0.5"
+                    BackgroundColor="LightGray"
+                    TextColor="Black"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="0.5, 0.11, AutoSize, AutoSize" xct:ShadowEffect.Color="Gray"
+                            />
+            <Button x:Name="List1Down" Text="▼" Clicked="List1Down_Clicked"
+                    FontAttributes="Bold"
+                    HeightRequest="40"
+                    WidthRequest="42"
+                    CornerRadius="45"
+                    Opacity="0.5"
+                    
+                    BackgroundColor="LightGray"                    
+                    TextColor="Black"
+                    
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="0.5, 0.92, AutoSize, AutoSize" xct:ShadowEffect.Color="Black"
+                            />
+
+            <Button x:Name="AddItemButton" Text="+"
+                FontAttributes="Bold"
+                IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="0.97"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 0.938, AutoSize, AutoSize" xct:ShadowEffect.Color="Gray"
+                            />
+
+        </AbsoluteLayout>
     </ContentPage>
     <ContentPage Title="Резерв">
-        <StackLayout>
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="42*"></ColumnDefinition>
-                    <ColumnDefinition Width="16*"></ColumnDefinition>
-                    <ColumnDefinition Width="42*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" x:Name="CardIn2" Text="Прихід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Black" FontSize="28" FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <Image Grid.Column="1" Source="arhiv.png" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
-                <Label Grid.Column="2" x:Name="CardOut2" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
-            </Grid>
-            <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
-            <RefreshView Refreshing="refreshMyListView0_Refreshing">
-                <CollectionView x:Name="MyListView2"
+        <AbsoluteLayout>
+            <StackLayout AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42*"></ColumnDefinition>
+                        <ColumnDefinition Width="16*"></ColumnDefinition>
+                        <ColumnDefinition Width="42*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" x:Name="CardIn2" Text="Прихід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Black" FontSize="28" FontAttributes="Bold">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Image Grid.Column="1" Source="arhiv.png" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
+                    <Label Grid.Column="2" x:Name="CardOut2" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+                <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                <RefreshView Refreshing="refreshMyListView0_Refreshing">
+                    <CollectionView x:Name="MyListView2"
             ItemsSource="{Binding Items2}" Margin="10,0">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="1"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="10*"/>
-                                    <ColumnDefinition Width="40*"/>
-                                    <ColumnDefinition Width="10*"/>
-                                    <ColumnDefinition Width="40*"/>
-                                </Grid.ColumnDefinitions>
-                                <Frame Grid.RowSpan="3" Grid.Column="0" BackgroundColor="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}" HeightRequest="5" WidthRequest="5" Margin="7,7,7,0">
-                                    <Frame.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DetailedTypeTap_Tapped" CommandParameter="{Binding DetailedTypeID}">
-                                        </TapGestureRecognizer>
-                                    </Frame.GestureRecognizers>
-                                </Frame>
-                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
-                                        </TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
-                                <Label Grid.Row="0" Grid.Column="2" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" VerticalOptions="Center"/>
-                                <!--<Label Grid.Row="1" Grid.Column="2" Text="{Binding StorageID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>-->
-                                <Label Grid.Row="0" Grid.Column="3" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                <Label Grid.Row="1" Grid.Column="3" Text="{Binding Date}" TextColor="Gray" HorizontalTextAlignment="End">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DateTap_Tapped" CommandParameter="{Binding Date}">
-                                        </TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>
-                                <Ellipse Grid.Row="3" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
-            <ScrollView Orientation="Horizontal" IsVisible="{Binding Source={x:Reference filterGroup}, Path=IsVisible}">
-                <StackLayout Orientation="Horizontal" Margin="1" VerticalOptions="End" HeightRequest="35">
-                    <Image Source="{Binding Source={x:Reference imgFilterCancel}, Path=Source}" Aspect="AspectFit" Scale="0.70" VerticalOptions="Center">
+                        <CollectionView.EmptyView>
+                            <StackLayout>
+                                <Label Text="Не знайдено даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
+                            </StackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="auto"/>
+                                        <RowDefinition Height="1"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="8*"/>
+                                        <ColumnDefinition Width="42*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="40*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Frame Grid.RowSpan="3" Grid.Column="0" Style="{StaticResource FrameDetailedTypeStyle}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DetailedTypeTap_Tapped" CommandParameter="{Binding DetailedTypeID}">
+                                            </TapGestureRecognizer>
+                                        </Frame.GestureRecognizers>
+                                    </Frame>
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
+                                            </TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" VerticalOptions="Center"/>
+                                    <!--<Label Grid.Row="1" Grid.Column="2" Text="{Binding StorageID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>-->
+                                    <Label Grid.Row="0" Grid.Column="3" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding Date}" TextColor="Gray" HorizontalTextAlignment="End">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="DateTap_Tapped" CommandParameter="{Binding Date}">
+                                            </TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>
+                                    <Ellipse Grid.Row="3" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+                <ScrollView Orientation="Horizontal" IsVisible="{Binding Source={x:Reference filterGroup}, Path=IsVisible}">
+                    <StackLayout Orientation="Horizontal" Margin="1" VerticalOptions="End" HeightRequest="35">
+                        <Image Source="{Binding Source={x:Reference imgFilterCancel}, Path=Source}" Aspect="AspectFit" Scale="0.70" VerticalOptions="Center">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_2"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label Text="{Binding Source={x:Reference lblClientFilter}, Path=Text}" TextColor="#483D8B" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblClientFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=Text}" TextColor="Brown" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_DetailedTypeFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblDateFilter}, Path=Text}" TextColor="Gray" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDateFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_DateFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblInOperationFilter}, Path=Text}" TextColor="Black" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblInOperationFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_InOperationFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="{Binding Source={x:Reference lblOutOperationFilter}, Path=Text}" TextColor="Red" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblOutOperationFilter}, Path=IsVisible}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="TapGestureRecognizer_OutOperationFilter"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </ScrollView>
+                <Grid BackgroundColor="#708090" HeightRequest="60">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="25*"/>
+                        <ColumnDefinition Width="10*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
                         <Image.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_2"/>
+                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                         </Image.GestureRecognizers>
                     </Image>
-                    <Label Text="{Binding Source={x:Reference lblClientFilter}, Path=Text}" TextColor="#483D8B" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblClientFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=Text}" TextColor="Brown" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDetailedTypeFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_DetailedTypeFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblDateFilter}, Path=Text}" TextColor="Gray" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblDateFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_DateFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblInOperationFilter}, Path=Text}" TextColor="Black" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblInOperationFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_InOperationFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Label Text="{Binding Source={x:Reference lblOutOperationFilter}, Path=Text}" TextColor="Red" VerticalOptions="Center" IsVisible="{Binding Source={x:Reference lblOutOperationFilter}, Path=IsVisible}">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_OutOperationFilter"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </StackLayout>
-            </ScrollView>
-            <Grid BackgroundColor="#708090" HeightRequest="60">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10*"/>
-                    <ColumnDefinition Width="30*"/>
-                    <ColumnDefinition Width="30*"/>
-                    <ColumnDefinition Width="25*"/>
-                    <ColumnDefinition Width="10*"/>
-                </Grid.ColumnDefinitions>
-                <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
-                    </Image.GestureRecognizers>
-                </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text=""/>
-                <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
-                    <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Frame>
-                <StackLayout Grid.Row="0" Grid.Column="3">
-                    <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
+                    <Label Grid.Row="0" Grid.Column="1" Text=""/>
+                    <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
+                        <Label Text="{Binding Source={x:Reference periodView}, Path=Text,Mode=TwoWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="periodView_SelectedIndexChanged"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Frame>
+                    <StackLayout Grid.Row="0" Grid.Column="3">
+                        <CarouselView IsVisible="{Binding Source={x:Reference allPeriods}, Path=IsVisible,Mode=TwoWay}"
                                   ItemsSource="{Binding Source={x:Reference allPeriods}, Path=ItemsSource,Mode=TwoWay}"
                                   CurrentItem="{Binding Source={x:Reference allPeriods}, Path=CurrentItem,Mode=TwoWay}"
                                   IsBounceEnabled="False"
@@ -529,37 +592,55 @@
                                   Loop="False"                                  
                                   HorizontalScrollBarVisibility="Always"
                                   ItemsUpdatingScrollMode="KeepItemsInView">
-                        <CarouselView.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </DataTemplate>
-                        </CarouselView.ItemTemplate>
-                    </CarouselView>
-                    <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
+                            <CarouselView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Medium">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </DataTemplate>
+                            </CarouselView.ItemTemplate>
+                        </CarouselView>
+                        <CarouselView IsVisible="{Binding Source={x:Reference allYears}, Path=IsVisible,Mode=TwoWay}"
                                   ItemsSource="{Binding Source={x:Reference allYears}, Path=ItemsSource,Mode=TwoWay}"
                                   CurrentItem="{Binding Source={x:Reference allYears}, Path=CurrentItem,Mode=TwoWay}"
                                   IsScrollAnimated="True"
                                   Loop="False"                                  
                                   HorizontalScrollBarVisibility="Always"
                                   ItemsUpdatingScrollMode="KeepItemsInView">
-                        <CarouselView.ItemTemplate>
-                            <DataTemplate>
-                                <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </DataTemplate>
-                        </CarouselView.ItemTemplate>
-                    </CarouselView>
-                </StackLayout>
-                <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
-            </Grid>
-        </StackLayout>
+                            <CarouselView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding PeriodName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" FontAttributes="Bold" FontSize="Large">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </DataTemplate>
+                            </CarouselView.ItemTemplate>
+                        </CarouselView>
+                    </StackLayout>
+                    <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
+                </Grid>
+            </StackLayout>
+            <Button x:Name="AddItemButton2" Text="+"
+                FontAttributes="Bold"
+                IsVisible="True"                    
+                    VerticalOptions="End"
+                    HeightRequest="50"
+                    WidthRequest="50"
+                    CornerRadius="25"
+                    Opacity="20"
+                    FontSize="Large"
+                    BackgroundColor="#708090"
+                    TextColor="White"
+                    Margin="10,0,10,10"
+                    BorderColor="#708090"                        
+                    HorizontalOptions="End"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    AbsoluteLayout.LayoutBounds="1, 0.938, AutoSize, AutoSize"
+                            xct:ShadowEffect.Color="Gray" xct:TouchEffect.HoveredBackgroundColor="Beige"/>
+        </AbsoluteLayout>
     </ContentPage>
     <ContentPage Title="" IconImageSource="statistic.png">
         <StackLayout VerticalOptions="Fill">
