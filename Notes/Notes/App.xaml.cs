@@ -43,6 +43,8 @@ namespace Notes
             MainPage = new AppShell();
             //MainPage = new MainPage();
 
+            //Для тесту пробую одержати курси валют з різних бвнків, потрібно буде потім це перекинути у правильний namespace...
+
             MonoAPI();
 
             BankGovUA();
