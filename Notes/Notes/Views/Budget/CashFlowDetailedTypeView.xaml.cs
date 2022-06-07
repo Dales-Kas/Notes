@@ -71,8 +71,7 @@ namespace Notes.Views.Budget
 
             if (id!=Guid.Empty)
             {
-                await Shell.Current.GoToAsync($"{nameof(CashFlowDetailedTypeForm)}?{nameof(CashFlowDetailedTypeForm.Id)}={id}");
-                //await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true}");
+                await Shell.Current.GoToAsync($"{nameof(CashFlowDetailedTypeForm)}?{nameof(CashFlowDetailedTypeForm.Id)}={id}");                
             }            
         }
     }

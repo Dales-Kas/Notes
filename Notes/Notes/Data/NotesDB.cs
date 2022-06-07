@@ -604,6 +604,8 @@ namespace Notes.Data
 
         public async Task<Object> GetFromMySQL(Guid guid, Type type)
         {
+            //Чогось через цей метод програма тормозить, поки не використовую... Треба розібратись
+
             TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
             try
             {
@@ -617,27 +619,6 @@ namespace Notes.Data
             }
 
         }
-
-        
-        //string sql = "Select Emp_Id, Emp_No, Emp_Name, Mng_Id from Employee";
-
-        //// Создать объект Command.
-        //MySqlCommand cmd = new MySqlCommand();
-
-        //// Сочетать Command с Connection.
-        //cmd.Connection = conn;
-        //cmd.CommandText = sql;
-
-
-        //using (DbDataReader reader = cmd.ExecuteReader())
-        //{
-        //    if (reader.HasRows)
-        //    {
-
-        //        while (reader.Read())
-        //        {
-        //        }
-
     }
     #endregion
 }

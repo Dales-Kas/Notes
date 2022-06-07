@@ -52,6 +52,8 @@ namespace Notes.Views.Budget
                     Amount = x.Sum(c => c.Amount)
                 }).OrderByDescending(x => x.Amount).Take(10).ToList();
 
+            //TOP 10 CLients for quick access:
+
             Label[] buttons = new Label[10];
             buttons[0] = (Label)Client0;
             buttons[1] = (Label)Client1;

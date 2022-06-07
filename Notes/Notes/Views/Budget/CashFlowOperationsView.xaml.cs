@@ -75,6 +75,8 @@ namespace Notes.Views.Budget
 
         public bool IsEditable { get; set; }
 
+        Dictionary<string, Button> buttonsVisible = new Dictionary<string, Button>();
+        
         public CashFlowOperationsView()
         {
             InitializeComponent();
@@ -92,7 +94,13 @@ namespace Notes.Views.Budget
 
             BindingContext = this;
 
+            buttonsVisible.Add("AddItemButton1", AddItemButton1);
+            buttonsVisible.Add("List1Up", List1Up);
+            buttonsVisible.Add("List1Down", List1Down);
+
         }
+
+        #region GetDataFromBase
 
         public async void LoadAllData(bool getAllPeriods = false, bool setTypeOfPeriod = true)
         {
@@ -224,8 +232,7 @@ namespace Notes.Views.Budget
         public void GetAndSetAllPeriods(bool setTypeOfPeriod = true)
         {
             //Get all periods:
-            //var curPeriodsOfOperations = new List<PeriodsOfOperations>();
-
+            
             if (setTypeOfPeriod)
             {
                 PeriodsOfOperations.Clear();
@@ -283,33 +290,11 @@ namespace Notes.Views.Budget
 
             if (setTypeOfPeriod)
             {
-                //string[] periodViewChoise = new string[{ "Дані за місяць" }; { "Дані за рік"}; { "Усі дані";];
                 periodViewChoise[0] = "Дані за місяць";
                 periodViewChoise[1] = "Дані за рік";
                 periodViewChoise[2] = "Усі дані";
-                //periodView.ItemsSource = periodViewChoise;
-
+                
                 periodView.Text = periodViewChoise[0];
-            }
-        }
-
-        public void SetCurrentPeriodView(List<PeriodsOfOperations> curPeriodsOfOperations, int curtypeOfPeriod)
-        {
-            if (curPeriodsOfOperations.Count > 0)
-            {
-                currentPeriodOfUserChoice = curPeriodsOfOperations[^1];
-
-                if (curtypeOfPeriod == 0)
-                {
-                    allPeriods.CurrentItem = currentPeriodOfUserChoice;
-                }
-                else if (curtypeOfPeriod == 1)
-                {
-                    allYears.CurrentItem = currentPeriodOfUserChoice;
-                }
-
-                SetPeriodValues(currentPeriodOfUserChoice);
-
             }
         }
 
@@ -359,6 +344,97 @@ namespace Notes.Views.Budget
             //}
         }
 
+        #endregion
+  
+        #region FormItemsVisability
+
+        public void SetPeriodOfView(PeriodsOfOperations period)
+        {
+            if (period != null)
+            {
+                SetPeriodValues(period);
+
+                SetTitleText(period);
+
+                LoadAllData();
+
+                SetFilterViewOnForm(!IsFilterFilled());
+            }
+
+            else
+            {
+                this.Title = "Фінанси";
+            }
+        }
+
+        public void SetTitleText(PeriodsOfOperations period)
+        {
+            string val = !foreignCurrency ? "грн" : "$";
+
+            if (IsFilterFilled())
+            {
+                double inAll = inAmount0 + inAmount1;
+                double outAll = outAmount0 + outAmount1;
+
+                string valueFormat = "#,0.00";
+
+                if (inAll > 0 && outAll > 0)
+                {
+                    this.Title = $"Прихід: {inAll.ToString(valueFormat)} Розхід: {outAll.ToString(valueFormat)} ({val})";
+                }
+                else if (inAll > 0)
+                {
+                    this.Title = $"Всього прихід: {inAll.ToString(valueFormat)} {val}";
+                }
+                else if (outAll > 0)
+                {
+                    this.Title = $"Всього розхід: {outAll.ToString(valueFormat)} {val}";
+                }
+            }
+
+            else
+            {
+                if (period == null)
+                {
+                    this.Title = "Фінанси";
+                }
+                else if (typeOfPeriod != 2)
+                {
+                    this.Title = $"Фінанси ({period.PeriodName.ToLower()}) {val}";
+                }
+                else
+                {
+                    this.Title = "Фінанси (за весь період)";
+                }
+            }
+        }
+
+        public void SetPeriodValues(PeriodsOfOperations period)
+        {
+            periodStart = period.PeriodStart;
+            periodEnd = new DateTime(period.PeriodEnd.Year, period.PeriodEnd.Month, DateTime.DaysInMonth(period.PeriodEnd.Year, period.PeriodEnd.Month), 23, 59, 59);
+        }
+
+        public void SetCurrentPeriodView(List<PeriodsOfOperations> curPeriodsOfOperations, int curtypeOfPeriod)
+        {
+            if (curPeriodsOfOperations.Count > 0)
+            {
+                currentPeriodOfUserChoice = curPeriodsOfOperations[^1];
+
+                if (curtypeOfPeriod == 0)
+                {
+                    allPeriods.CurrentItem = currentPeriodOfUserChoice;
+                }
+                else if (curtypeOfPeriod == 1)
+                {
+                    allYears.CurrentItem = currentPeriodOfUserChoice;
+                }
+
+                SetPeriodValues(currentPeriodOfUserChoice);
+
+            }
+        }
+
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             if (e.Item == null)
@@ -388,18 +464,80 @@ namespace Notes.Views.Budget
 
         private void MyListView0_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //CashFlowOperations operation = (CashFlowOperations)e.CurrentSelection.FirstOrDefault();
-
-            //if (operation != null)
-            //{
-            //    string operationPath = $"{nameof(CashFlowOperationForm)}?{nameof(CashFlowOperationForm.OperationId)}={operation.ID}";
-            //    await Shell.Current.GoToAsync(operationPath);
-
-            //    MyListView0.SelectedItem = null;
-            //    MyListView1.SelectedItem = null;
-            //    MyListView2.SelectedItem = null;
-            //}
         }
+
+        async Task SetVisabilityOfAddButton(int firstIndex, string buttonName)
+        {
+            buttonsVisible.TryGetValue(buttonName, out Button button);
+
+            if (firstIndex == 0 && !IsFilterFilled())
+            {
+                button.IsVisible = true;
+                await button.FadeTo(0.97, 250);
+            }
+            else
+            {
+                await button.FadeTo(0, 250);
+                //await Task.Delay(250);
+                if (!button.IsVisible)
+                    button.IsVisible = false;
+            }
+        }
+
+        async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e)
+        {
+            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+
+            if (e.FirstVisibleItemIndex == 0)
+            {
+                List1Up.IsVisible = false;
+                List1Down.IsVisible = false;
+            }
+            else if (e.LastVisibleItemIndex == list.Count - 1)
+            {
+                List1Up.IsVisible = true;
+                List1Down.IsVisible = false;
+            }
+            else
+            {
+                if (List1Up.IsVisible || List1Down.IsVisible)
+                {
+                }
+
+                List1Up.IsVisible = e.FirstVisibleItemIndex >= 3;
+                List1Down.IsVisible = true;
+            }
+
+            if (List1Up.IsVisible || List1Down.IsVisible)
+            {
+                await Task.Delay(4500);
+
+                List1Up.IsVisible = false;
+                List1Down.IsVisible = false;
+            }
+
+
+            //if (List1Up.IsVisible)
+            //{ 
+            //    await List1Up.FadeTo(0, 250);
+            //}
+            //else
+            //{
+            //    await List1Up.FadeTo(0.5, 0);
+            //}
+
+            //if (List1Down.IsVisible)
+            //{
+            //    await List1Down.FadeTo(0, 250);
+            //}
+            //else
+            //{
+            //    await List1Down.FadeTo(0.5, 0);
+            //}
+
+        }
+
+        #endregion
 
         #region FiltersOfOperations
         private async void DetailedTypeTap_Tapped(object sender, EventArgs e)
@@ -563,7 +701,8 @@ namespace Notes.Views.Budget
         }
         #endregion
 
-
+        #region ItemsGestureRecognizer
+        
         private void ToolbarItem_Clicked_1(object sender, EventArgs e)
         {
             //App.NotesDB.GetFromMySQL();
@@ -573,7 +712,6 @@ namespace Notes.Views.Budget
 
             //LoadAllData();
         }
-
 
         private void refreshMyListView0_Refreshing(object sender, EventArgs e)
         {
@@ -586,73 +724,6 @@ namespace Notes.Views.Budget
             PeriodsOfOperations period = (PeriodsOfOperations)(sender as CarouselView).CurrentItem;
 
             SetPeriodOfView(period);
-        }
-
-        public void SetPeriodOfView(PeriodsOfOperations period)
-        {
-            if (period != null)
-            {
-                SetPeriodValues(period);
-
-                SetTitleText(period);
-
-                LoadAllData();
-
-                SetFilterViewOnForm(!IsFilterFilled());
-            }
-
-            else
-            {
-                this.Title = "Фінанси";
-            }
-        }
-
-        public void SetTitleText(PeriodsOfOperations period)
-        {
-            string val = !foreignCurrency ? "грн" : "$";
-
-            if (IsFilterFilled())
-            {
-                double inAll = inAmount0 + inAmount1;
-                double outAll = outAmount0 + outAmount1;
-
-                string valueFormat = "#,0.00";
-
-                if (inAll>0 && outAll>0)
-                {
-                    this.Title = $"Прихід: {inAll.ToString(valueFormat)} Розхід: {outAll.ToString(valueFormat)} ({val})";
-                }
-                else if (inAll > 0)
-                {
-                    this.Title = $"Всього прихід: {inAll.ToString(valueFormat)} {val}";
-                }
-                else if (outAll > 0)
-                {
-                    this.Title = $"Всього розхід: {outAll.ToString(valueFormat)} {val}";
-                }                
-            }
-
-            else
-            {
-                if (period == null)
-                {
-                    this.Title = "Фінанси";
-                }
-                else if (typeOfPeriod != 2)
-                {                    
-                    this.Title = $"Фінанси ({period.PeriodName.ToLower()}) {val}";
-                }
-                else
-                {
-                    this.Title = "Фінанси (за весь період)";
-                }
-            }
-        }
-
-        public void SetPeriodValues(PeriodsOfOperations period)
-        {
-            periodStart = period.PeriodStart;
-            periodEnd = new DateTime(period.PeriodEnd.Year, period.PeriodEnd.Month, DateTime.DaysInMonth(period.PeriodEnd.Year, period.PeriodEnd.Month), 23, 59, 59);
         }
 
         private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
@@ -690,8 +761,6 @@ namespace Notes.Views.Budget
 
             if (resault != null && resault != "Відміна")
             {
-                //periodViewChoise.ToDictionary(x=>new Dictionary<int, string> { Keys });
-
                 for (int i = 0; i < periodViewChoise.Length; i++)
                 {
                     if (periodViewChoise[i] == resault)
@@ -708,18 +777,7 @@ namespace Notes.Views.Budget
                         }
                     }
                 }
-
-                //var resaultOfChoise = periodViewChoise.Select(x=>x.Contains(resault)).FirstOrDefault();
-                //if (data.TryGetValue(resault, out PeriodsOfOperations resultChoise))
-                //{
-                //    SetPeriodOfView(resultChoise);
-                //    allPeriods.CurrentItem = resultChoise;
-                //    (sender as Label).Text = resultChoise.PeriodName;
-                //}
             }
-
-            //typeOfPeriod = periodView.ItemsSource.IndexOf((sender as Picker).SelectedItem);
-
         }
 
         private void TapGestureRecognizer_Tapped_1(object sender, EventArgs e)
@@ -740,20 +798,20 @@ namespace Notes.Views.Budget
 
             if (typeOfPeriod == 0)
             {
-                period = allPeriods.CurrentItem as PeriodsOfOperations;                
+                period = allPeriods.CurrentItem as PeriodsOfOperations;
             }
             else if (typeOfPeriod == 1)
             {
-                period = allYears.CurrentItem as PeriodsOfOperations;                
+                period = allYears.CurrentItem as PeriodsOfOperations;
             }
 
             else
             {
-                period = null;                
+                period = null;
             }
 
             LoadAllData();
-            
+
             SetTitleText(period);
         }
 
@@ -796,36 +854,11 @@ namespace Notes.Views.Budget
 
         private async void MyListView1_Scrolled(object sender, ItemsViewScrolledEventArgs e)
         {
-            LastItem1 = e.FirstVisibleItemIndex;
+            //LastItem1 = e.FirstVisibleItemIndex;
 
-            AddItemButton.IsVisible = e.FirstVisibleItemIndex == 0 && !IsFilterFilled();
+            await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, "AddItemButton1");
 
-            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
-
-            if (e.FirstVisibleItemIndex == 0)
-            {
-                List1Up.IsVisible = false;
-                List1Down.IsVisible = false;
-            }
-            else if (e.LastVisibleItemIndex == list.Count - 1)
-            {
-                List1Up.IsVisible = true;
-                List1Down.IsVisible = false;
-            }
-            else
-            {
-                List1Up.IsVisible = true;
-                List1Down.IsVisible = true;
-            }
-
-            await Task.Delay(4000).ContinueWith(t =>
-            {
-                //List1UpVisibility = false;
-                //List1Down.IsVisible = false;
-            });
-
-            List1Up.IsVisible = false;
-            List1Down.IsVisible = false;
+            await SetVisabilityOfListPositionButtons(e);
         }
 
         private void List1Up_Clicked(object sender, EventArgs e)
@@ -854,12 +887,19 @@ namespace Notes.Views.Budget
                 await Shell.Current.GoToAsync(operationPath);
             }
         }
+
+        #endregion
+        
     }
 
+    #region OthersAddClasses
     public class PeriodsOfOperations
     {
         public string PeriodName { get; set; }
         public DateTime PeriodStart { get; set; }
         public DateTime PeriodEnd { get; set; }
     }
+
+    #endregion
+
 }
