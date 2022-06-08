@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
 using Notes.Models.Budget;
+using Notes.Data.Services;
 
 namespace Notes
 {
@@ -17,9 +18,8 @@ namespace Notes
     {
 
         static NotesDB notesDB;
-
-        static HttpClient monoClient = new HttpClient();
-        static HttpClient bankGovUAClient = new HttpClient();
+        
+        public static HttpClient bankGovUAClient = new HttpClient();
 
         public static NotesDB NotesDB
         {
@@ -45,9 +45,7 @@ namespace Notes
 
             //Для тесту пробую одержати курси валют з різних бвнків, потрібно буде потім це перекинути у правильний namespace...
 
-            MonoAPI();
-
-            BankGovUA();
+            //BankGovUA();
 
         }
 
@@ -61,43 +59,6 @@ namespace Notes
 
         protected override void OnResume()
         {
-        }
-
-        public async void MonoAPI()
-        {
-            monoClient.BaseAddress = new Uri("https://api.monobank.ua");
-            monoClient.DefaultRequestHeaders.Accept.Clear();
-            monoClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            string path = "/bank/currency";
-
-            HttpResponseMessage response = await monoClient.GetAsync(path);
-            if (response.IsSuccessStatusCode)
-            {
-                string jsonString = await response.Content.ReadAsStringAsync();
-
-                List<MonoCurrency> jsonData = JsonConvert.DeserializeObject<List<MonoCurrency>>(jsonString);
-
-                var myCurrencyList = await App.NotesDB.GetCurrenciesAsync();
-
-                var currenciesInMono = new List<MonoCurrency>();
-
-                foreach (MonoCurrency item in jsonData)
-                {
-                    if (myCurrencyList.Count(x => x.Code == item.currencyCodeA && item.currencyCodeB == 980) > 0)
-                    {
-                        var sec = TimeSpan.FromSeconds(item.date);
-                        var date = new DateTime(sec.Ticks);
-
-                        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                        dateTime = dateTime.AddSeconds(item.date).ToLocalTime();
-                        item.dateInFile = dateTime;
-                        currenciesInMono.Add(item);
-                    }
-                }
-
-            }
         }
 
         public async void BankGovUA()
@@ -129,17 +90,6 @@ namespace Notes
 
                 }
             }
-        }
-
-        public class MonoCurrency
-        {
-            public int currencyCodeA;
-            public int currencyCodeB;
-            public Int64 date;
-            public float rateSell;
-            public float rateBuy;
-            public float rateCross;
-            public DateTime dateInFile;
         }
 
         public class BankGovUACurrency

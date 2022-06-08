@@ -34,9 +34,9 @@
             <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
         </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Про програму" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
+    <FlyoutItem Title="Налаштування" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
-        <ShellContent Title="Про програму" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:AboutPage}"></ShellContent>
+        <ShellContent Title="Налаштування" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ProgramSettingsView}"></ShellContent>
     </FlyoutItem>
 
 </Shell>

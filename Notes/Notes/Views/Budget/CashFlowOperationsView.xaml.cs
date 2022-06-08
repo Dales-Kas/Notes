@@ -889,7 +889,11 @@ namespace Notes.Views.Budget
         }
 
         #endregion
-        
+
+        private async void TapGestureRecognizer_Tapped_4(object sender, EventArgs e)
+        {
+            var statement = await Data.Services.MonobankAPI.GetStatement(DateTime.Now);
+        }
     }
 
     #region OthersAddClasses

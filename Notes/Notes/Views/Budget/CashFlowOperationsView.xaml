@@ -43,7 +43,11 @@
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Image Grid.Column="1" Source="mono.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"/>
+                <Image Grid.Column="1" Source="mono.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_4"></TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>
                 <Label Grid.Column="2" x:Name="CardOut0" Text="-" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>

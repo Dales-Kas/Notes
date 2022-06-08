@@ -25,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ProgramSettingsView.xaml.cs">
+      <DependentUpon>ProgramSettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Budget\ClientsView.xaml.cs">
       <DependentUpon>ClientsView.xaml</DependentUpon>
     </Compile>
@@ -37,7 +40,7 @@
     <EmbeddedResource Update="AppShell.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\AboutPage.xaml">
+    <EmbeddedResource Update="Views\ProgramSettingsView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\Budget\CashAddForm.xaml">

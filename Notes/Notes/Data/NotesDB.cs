@@ -35,6 +35,8 @@ namespace Notes.Data
             db.CreateTableAsync<CashFlowOperations>().Wait();
             db.CreateTableAsync<Clients>().Wait();
             db.CreateTableAsync<MoneyStorages>().Wait();
+            //Settings:
+            db.CreateTableAsync<ProgramSettings>().Wait();
         }
 
         public void DropTable(string tableName, bool oneTable = true)
@@ -550,6 +552,32 @@ namespace Notes.Data
         {
             return db.Table<MoneyStorages>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
+        #endregion
+
+        #region ProgramSettings 
+
+        public async Task<ProgramSettings> GetProgramSettingsAsync()
+        {
+            var all = await db.Table<ProgramSettings>().ToListAsync();
+            ProgramSettings curSett = await db.Table<ProgramSettings>().FirstOrDefaultAsync();
+
+            if (curSett==null)
+            {
+                curSett = new ProgramSettings();
+
+                await db.InsertAsync(curSett);
+
+                return curSett;
+            }
+
+            return curSett;
+        }
+
+        public Task<int> SaveProgramSettingsAsync(ProgramSettings programSettings)
+        {            
+            return db.UpdateAsync(programSettings);            
+        }
+
         #endregion
 
         #region AllClass

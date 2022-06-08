@@ -14,11 +14,22 @@ using Notes.Models.Budget;
 namespace Notes.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AboutPage : ContentPage
+    public partial class ProgramSettingsView : ContentPage
     {
-        public AboutPage()
+        public ProgramSettings CurSettings { get; set; }
+
+        public ProgramSettingsView()
         {
             InitializeComponent();
+
+            OnFormOpen();
+        }
+
+        public async Task OnFormOpen()
+        {
+            CurSettings = await App.NotesDB.GetProgramSettingsAsync();
+
+            MonoToken.Text = CurSettings.MonoToken;
         }
 
         private void ImportJSON_Clicked(object sender, EventArgs e)
@@ -98,12 +109,12 @@ namespace Notes.Views
         {
             List<ImportData> jsonData = JsonConvert.DeserializeObject<List<ImportData>>(jsonString);
 
-            int iter = 0;            
+            int iter = 0;
 
             foreach (ImportData item in jsonData)
             {
                 App.NotesDB.DropTable(item.Name);
-                
+
                 if (item.Name == "Note")
                 {
                     SetTextOfLoading(ref iter, 0, item.Name, item.Note.Count);
@@ -289,7 +300,7 @@ namespace Notes.Views
 
             public List<Currencies> Currencies { get; set; }
 
-            public List<ExchangeRates> ExchangeRates { get; set; }            
+            public List<ExchangeRates> ExchangeRates { get; set; }
 
             public List<CashFlowDetailedType> CashFlowDetailedType { get; set; }
 
@@ -298,6 +309,15 @@ namespace Notes.Views
             public List<Clients> Clients { get; set; }
             public List<MoneyStorages> MoneyStorages { get; set; }
 
+        }
+
+        private void MonoToken_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (MonoToken.Text != null)
+            {
+                CurSettings.MonoToken = MonoToken.Text;
+                App.NotesDB.SaveProgramSettingsAsync(CurSettings);
+            }
         }
     }
 }

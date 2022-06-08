@@ -20,7 +20,7 @@ namespace Notes
 
             Routing.RegisterRoute(nameof(NotePage), typeof(NotePage));
             Routing.RegisterRoute(nameof(NoteAddingPage),typeof(NoteAddingPage));
-            Routing.RegisterRoute(nameof(AboutPage), typeof(AboutPage));
+            Routing.RegisterRoute(nameof(ProgramSettingsView), typeof(ProgramSettingsView));
             Routing.RegisterRoute(nameof(NoteCategoriesView), typeof(NoteCategoriesView));
             Routing.RegisterRoute(nameof(NoteCategoryForm), typeof(NoteCategoryForm));
             Routing.RegisterRoute(nameof(CarsView), typeof(CarsView));
