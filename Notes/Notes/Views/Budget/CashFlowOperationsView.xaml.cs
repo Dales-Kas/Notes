@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Notes.Models.Budget;
 using System.Globalization;
+using Xamarin.CommunityToolkit.Extensions;
 
 namespace Notes.Views.Budget
 {
@@ -75,6 +76,8 @@ namespace Notes.Views.Budget
 
         public bool IsEditable { get; set; }
 
+        private bool[] listIsScrolling = new bool[3] { false, false, false};
+
         Dictionary<string, Button> buttonsVisible = new Dictionary<string, Button>();
         
         public CashFlowOperationsView()
@@ -88,6 +91,10 @@ namespace Notes.Views.Budget
 
             IsBusy = false;
             refreshMyListView0.IsRefreshing = false;
+
+            MomoImage.IsVisible = true;
+            MonoIsLoading.IsVisible = false;
+
             SetFilterViewOnForm(true);
 
             IsEditable = false;
@@ -95,6 +102,8 @@ namespace Notes.Views.Budget
             BindingContext = this;
 
             buttonsVisible.Add("AddItemButton1", AddItemButton1);
+            buttonsVisible.Add("List0Up", List0Up);
+            buttonsVisible.Add("List0Down", List0Down);
             buttonsVisible.Add("List1Up", List1Up);
             buttonsVisible.Add("List1Down", List1Down);
 
@@ -484,57 +493,54 @@ namespace Notes.Views.Budget
             }
         }
 
-        async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e)
-        {
-            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+        async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e, int buttonName, List<CashFlowOperations> list)
+        {            
+            buttonsVisible.TryGetValue($"List{buttonName}Up", out Button buttonUp);
+            buttonsVisible.TryGetValue($"List{buttonName}Down", out Button buttonDown);
 
             if (e.FirstVisibleItemIndex == 0)
             {
-                List1Up.IsVisible = false;
-                List1Down.IsVisible = false;
+                //Ми на початку спику. Перехід тільки в кінець списку:
+
+                buttonUp.IsVisible = false;
+                buttonDown.IsVisible = false;
             }
             else if (e.LastVisibleItemIndex == list.Count - 1)
             {
-                List1Up.IsVisible = true;
-                List1Down.IsVisible = false;
+                //Ми в кінці списку. Перехід тільки на початок списку:
+
+                buttonUp.IsVisible = true;
+                buttonDown.IsVisible = false;
             }
             else
             {
-                if (List1Up.IsVisible || List1Down.IsVisible)
-                {
-                }
+                //Скролінг по списку...
 
-                List1Up.IsVisible = e.FirstVisibleItemIndex >= 3;
-                List1Down.IsVisible = true;
+                buttonUp.IsVisible = e.FirstVisibleItemIndex >= 3;
+                buttonDown.IsVisible = true;
             }
 
-            if (List1Up.IsVisible || List1Down.IsVisible)
+            if (!listIsScrolling[buttonName] & (buttonUp.IsVisible || buttonDown.IsVisible))
             {
+                //Під час скролінгу відобравжаю кнопки переходу, коли скролінг зупиняється - запускаю час на автозатухання кнопок:
+
+                listIsScrolling[buttonName] = true;
+
                 await Task.Delay(4500);
 
-                List1Up.IsVisible = false;
-                List1Down.IsVisible = false;
+                await buttonUp.FadeTo(0, 250);
+                await List1Down.FadeTo(0, 250);
+
+                buttonUp.IsVisible = false;
+                buttonDown.IsVisible = false;
+
+                listIsScrolling[buttonName] = false;
+
+                //Повертаю назад затухання, щоб при наступному скролінгу було видно кнопки..
+
+                await buttonUp.FadeTo(0.5, 0);
+                await buttonDown.FadeTo(0.5, 0);
             }
-
-
-            //if (List1Up.IsVisible)
-            //{ 
-            //    await List1Up.FadeTo(0, 250);
-            //}
-            //else
-            //{
-            //    await List1Up.FadeTo(0.5, 0);
-            //}
-
-            //if (List1Down.IsVisible)
-            //{
-            //    await List1Down.FadeTo(0, 250);
-            //}
-            //else
-            //{
-            //    await List1Down.FadeTo(0.5, 0);
-            //}
-
         }
 
         #endregion
@@ -852,13 +858,20 @@ namespace Notes.Views.Budget
 
         }
 
+        private async void MyListView0_Scrolled(object sender, ItemsViewScrolledEventArgs e)
+        {
+            List<CashFlowOperations> list = (MyListView0.ItemsSource as List<CashFlowOperations>);
+
+            await SetVisabilityOfListPositionButtons(e, 0, list);
+        }
+
         private async void MyListView1_Scrolled(object sender, ItemsViewScrolledEventArgs e)
         {
-            //LastItem1 = e.FirstVisibleItemIndex;
-
             await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, "AddItemButton1");
 
-            await SetVisabilityOfListPositionButtons(e);
+            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+
+            await SetVisabilityOfListPositionButtons(e,1, list);
         }
 
         private void List1Up_Clicked(object sender, EventArgs e)
@@ -887,13 +900,30 @@ namespace Notes.Views.Budget
                 await Shell.Current.GoToAsync(operationPath);
             }
         }
+        private async void TapGestureRecognizer_Tapped_4(object sender, EventArgs e)
+        {
+            MomoImage.IsVisible = false;
+            MonoIsLoading.IsVisible = true;
+
+            int i = await Data.Services.MonobankAPI.GetStatementAndSave(currentPeriodOfUserChoice.PeriodEnd);
+
+            await this.DisplayToastAsync(App.GetToastOptions($"Кількість нових стрічок імпортовано: {i}"));
+
+            MomoImage.IsVisible = true;
+            MonoIsLoading.IsVisible = false;
+
+            LoadAllData();
+        }
 
         #endregion
 
-        private async void TapGestureRecognizer_Tapped_4(object sender, EventArgs e)
+        private async void toDelete_Clicked(object sender, EventArgs e)
         {
-            var statement = await Data.Services.MonobankAPI.GetStatement(DateTime.Now);
+            //await App.NotesDB.DeleteCashFlowOperationAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
+            await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter); 
+            LoadAllData();
         }
+
     }
 
     #region OthersAddClasses

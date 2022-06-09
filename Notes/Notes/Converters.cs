@@ -287,4 +287,23 @@ namespace Notes
             return (bool)value;
         }
     }
+    
+    public static class ConvertValues
+    {
+        public static double GetUnixTime(DateTime date, bool endOfDay = false)
+        {
+            if (endOfDay)
+                return (date - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            else 
+                return (date - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+
+        }
+
+        public static DateTime GetDateFromUnixTime(double unixTimeStamp)
+        {
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTime;
+        }
+    }
 }

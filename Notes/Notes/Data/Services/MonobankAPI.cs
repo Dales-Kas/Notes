@@ -16,15 +16,26 @@ namespace Notes.Data.Services
 
         public static void SetMonoBaseSettings()
         {
-            HttpClient monoClient = new HttpClient();
+            monoClient = new HttpClient();
             monoClient.BaseAddress = new Uri("https://api.monobank.ua");
             SetDefaultRequestHeaders();
         }
 
         static void SetDefaultRequestHeaders()
-        {            
+        {
             monoClient.DefaultRequestHeaders.Accept.Clear();
             monoClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+        private async static Task<string> GetMonoToken()
+        {
+            var prSettings = await App.NotesDB.GetProgramSettingsAsync();
+
+            if (string.IsNullOrEmpty(prSettings.MonoToken))
+            {
+                //await DisplayAlert("Не заповнено token для Monobank!", "", "ОК");
+            }
+
+            return prSettings.MonoToken;
         }
 
         public static async Task GetMonoCurrencies()
@@ -62,17 +73,17 @@ namespace Notes.Data.Services
             }
         }
 
-        public async static Task<List<Statement>> GetStatement(DateTime date, int account=0)
+        public async static Task<List<Statement>> GetStatement(DateTime date, int account = 0)
         {
             //https://api.monobank.ua/personal/statement/{account}/{from}/{to}            
 
             SetMonoBaseSettings();
-            string token = await GetMonoToken();
-            monoClient.DefaultRequestHeaders.Add("X-Token", token);
 
-            double date_from = (new DateTime(date.Year, date.Month,1) - new DateTime(1970,1,1)).TotalSeconds;
-            double date_to = (new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)) - new DateTime(1970, 1, 1)).TotalSeconds;
-            
+            monoClient.DefaultRequestHeaders.Add("X-Token", await GetMonoToken());
+
+            int date_from = (int)ConvertValues.GetUnixTime(new DateTime(date.Year, date.Month, 1,0,0,0,0,DateTimeKind.Local));
+            int date_to = (int)ConvertValues.GetUnixTime(new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month),23,59,59,59,DateTimeKind.Local),true);
+
             string path = $"/personal/statement/{account}/{date_from}/{date_to}";
 
             HttpResponseMessage response = await monoClient.GetAsync(path);
@@ -82,22 +93,72 @@ namespace Notes.Data.Services
 
                 List<Statement> jsonData = JsonConvert.DeserializeObject<List<Statement>>(jsonString);
 
-                return jsonData;                
+                return jsonData;
             }
 
             return new List<Statement>();
         }
 
-        private async static Task<string> GetMonoToken()
+        public static async Task<int> GetStatementAndSave(DateTime date, int account = 0)
         {
-            var prSettings = await App.NotesDB.GetProgramSettingsAsync();
+            List<Statement> statements = await GetStatement(date, account);
 
-            if (string.IsNullOrEmpty(prSettings.MonoToken))
+            int i = 0;
+
+            foreach (Statement statement in statements)
             {
-                //await DisplayAlert("Не заповнено token для Monobank!", "", "ОК");
-            }
+                var operation = await App.NotesDB.GetCashFlowOperationsAsync(statement.id);
 
-            return prSettings.MonoToken;
+                if (operation != null)
+                {
+                    continue;
+                }
+                else
+                {
+                    double amount = (double)statement.amount / 100;
+
+                    amount = amount < 0 ? -amount : amount;
+
+                    DateTime operDate = ConvertValues.GetDateFromUnixTime(statement.time);
+
+                    operation = await App.NotesDB.GetCashFlowOperationsAsync(operDate, amount);
+
+                    if (operation == null)
+                    {
+                        i++;
+
+                        CashFlowOperations newOperation = new CashFlowOperations()
+                        {
+                            MonoId = statement.id,
+                            Date = operDate,
+                            OperationType = statement.amount > 0 ? Models.OperationType.InOperation : Models.OperationType.OutOperation,
+                            TypeID = 0,
+                            Client = Guid.Empty,
+                            StorageID = Guid.Empty,
+                            DetailedTypeID = Guid.Empty,
+                            CurrencyID = statement.currencyCode,
+                            Amount = amount,
+                            Description = statement.description,
+                            AmountСurrency = 0,
+                            ExchangeRate = 0,
+                            CurrencyExchangeRate = 0,
+                            IsIncludeCommission = true,
+                            IsСurrencyOperartion = false,
+                            IsFixedOperartion = false,
+                            AmountCommission = statement.commissionRate/100,
+                            AmountDelayCommission = 0,
+                            AmountBalanceAfterOperation = statement.balance/100,
+                            DontUseInCashFlow = false,
+                            AmountInSMS = amount,
+                            TextToIdentifyClient = statement.description,
+                            MCC = statement.mcc.ToString()
+                        };
+
+                        await App.NotesDB.SaveAsync((object)newOperation, typeof(CashFlowOperations).Name);
+                    }
+                }
+            }
+            return i;
         }
 
         #region AdditionalClassesToTakeDataFromAPI

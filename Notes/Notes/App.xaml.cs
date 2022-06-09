@@ -106,7 +106,7 @@ namespace Notes
         {
             var toastOptions = new ToastOptions()
             {
-                BackgroundColor = Color.FromHex("#2196F3").MultiplyAlpha(0.85),
+                BackgroundColor = Color.FromHex("#708090").MultiplyAlpha(0.85),
                 CornerRadius = 25,
                 Duration = TimeSpan.FromSeconds(1),
                 MessageOptions = new MessageOptions()

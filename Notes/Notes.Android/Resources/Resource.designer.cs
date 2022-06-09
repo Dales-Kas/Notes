@@ -22462,6 +22462,9 @@ namespace Notes.Droid
 			// aapt resource value: 0x7F0700CE
 			public const int USD = 2131165390;
 			
+			// aapt resource value: 0x7F0700CF
+			public const int waiting = 2131165391;
+			
 			static Drawable()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();

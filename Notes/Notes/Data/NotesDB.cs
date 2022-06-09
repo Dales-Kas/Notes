@@ -16,149 +16,49 @@ namespace Notes.Data
         readonly SQLiteAsyncConnection db;
         private readonly string strOk = "►";
         private readonly string strNOk = "○";
+        //Список усіх таблиць Бази Даних:
+        private Dictionary<string, Type> DataDictionary = new Dictionary<string, Type>()
+        {
+            //NOTES:
+            { "Note", typeof(Note)},
+            { "NoteFlags",typeof(NoteFlags)},
+            { "NoteCategory",typeof(NoteCategory)},
+            //CARS:
+            { "Cars",typeof(Cars)},
+            { "CarDescription",typeof(CarDescription)},
+            { "CarNotes",typeof(CarNotes)},
+            //BUDGET:
+            { "Currencies",typeof(Currencies)},
+            { "ExchangeRates",typeof(ExchangeRates)},
+            { "CashFlowDetailedType",typeof(CashFlowDetailedType)},
+            { "CashFlowOperations",typeof(CashFlowOperations)},
+            { "Clients",typeof(Clients)},
+            { "MoneyStorages",typeof(MoneyStorages)},
+            //Settings:
+            { "ProgramSettings",typeof(ProgramSettings)}
+        };
 
         public NotesDB(string connectionString)
         {
             db = new SQLiteAsyncConnection(connectionString);
-            //NOTES:
-            db.CreateTableAsync<Note>().Wait();
-            db.CreateTableAsync<NoteFlags>().Wait();
-            db.CreateTableAsync<NoteCategory>().Wait();
-            //CARS:
-            db.CreateTableAsync<Cars>().Wait();
-            db.CreateTableAsync<CarDescription>().Wait();
-            db.CreateTableAsync<CarNotes>().Wait();
-            //BUDGET:
-            db.CreateTableAsync<Currencies>().Wait();
-            db.CreateTableAsync<ExchangeRates>().Wait(); 
-            db.CreateTableAsync<CashFlowDetailedType>().Wait();
-            db.CreateTableAsync<CashFlowOperations>().Wait();
-            db.CreateTableAsync<Clients>().Wait();
-            db.CreateTableAsync<MoneyStorages>().Wait();
-            //Settings:
-            db.CreateTableAsync<ProgramSettings>().Wait();
+            
+            foreach (var item in DataDictionary)
+            {
+                db.CreateTableAsync(DataDictionary[item.Key]).Wait();
+            }
+
         }
 
-        public void DropTable(string tableName, bool oneTable = true)
+        public async Task DropTable(string tableName)
         {
-            if (oneTable)
-            {
-                switch (tableName)
-                {
-                    case "Note":
-                        {
-                            db.DropTableAsync<Note>().Wait();
-                            db.CreateTableAsync<Note>().Wait();
-                            break;
-                        }
+            DataDictionary.TryGetValue(tableName,out Type type);
+            await db.DropTableAsync(await db.GetMappingAsync(type));
+            await db.CreateTableAsync(type);           
+        }
 
-                    case "NoteFlags":
-                        {
-                            db.DropTableAsync<NoteFlags>().Wait();
-                            db.CreateTableAsync<NoteFlags>().Wait();
-                            break;
-                        }
-
-                    case "Cars":
-                        {
-                            db.DropTableAsync<Cars>().Wait();
-                            db.CreateTableAsync<Cars>().Wait();
-                            break;
-                        }
-                    case "CarNotes":
-                        {
-                            db.DropTableAsync<CarNotes>().Wait();
-                            db.CreateTableAsync<CarNotes>().Wait();
-                            break;
-                        }
-                    case "CarDescription":
-                        {
-                            db.DropTableAsync<CarDescription>().Wait();
-                            db.CreateTableAsync<CarDescription>().Wait();
-                            break;
-                        }
-
-                    case "Currencies":
-                        {
-                            db.DropTableAsync<Currencies>().Wait();
-                            db.CreateTableAsync<Currencies>().Wait();
-                            break;
-                        }
-                    case "ExchangeRates":
-                        {
-                            db.DropTableAsync<ExchangeRates>().Wait();
-                            db.CreateTableAsync<ExchangeRates>().Wait(); 
-                            break;
-                        }
-
-                    case "CashFlowDetailedType":
-                        {
-                            db.DropTableAsync<CashFlowDetailedType>().Wait();
-                            db.CreateTableAsync<CashFlowDetailedType>().Wait();
-                            break;
-                        }
-                    case "CashFlowOperations":
-                        {
-                            db.DropTableAsync<CashFlowOperations>().Wait();
-                            db.CreateTableAsync<CashFlowOperations>().Wait();
-                            break;
-                        }
-                    case "Clients":
-                        {
-                            db.DropTableAsync<Clients>().Wait();
-                            db.CreateTableAsync<Clients>().Wait();
-                            break;
-                        }
-                    case "MoneyStorages":
-                        {
-                            db.DropTableAsync<MoneyStorages>().Wait();
-                            db.CreateTableAsync<MoneyStorages>().Wait();
-                            break;
-                        }
-                }
-            }
-
-            else
-            {
-
-                switch (tableName)
-                {
-                    case "Note":
-                        {
-                            db.DropTableAsync<Note>().Wait();
-                            db.CreateTableAsync<Note>().Wait();
-                            db.DropTableAsync<NoteFlags>().Wait();
-                            db.CreateTableAsync<NoteFlags>().Wait();
-                            break;
-                        }
-
-                    case "Cars":
-                        {
-                            db.DropTableAsync<Cars>().Wait();
-                            db.CreateTableAsync<Cars>().Wait();
-                            db.DropTableAsync<CarNotes>().Wait();
-                            db.CreateTableAsync<CarNotes>().Wait();
-                            db.DropTableAsync<CarDescription>().Wait();
-                            db.CreateTableAsync<CarDescription>().Wait();
-                            break;
-                        }
-
-                    case "Budget":
-                        {
-                            db.DropTableAsync<Currencies>().Wait();
-                            db.CreateTableAsync<Currencies>().Wait();
-                            db.DropTableAsync<CashFlowDetailedType>().Wait();
-                            db.CreateTableAsync<CashFlowDetailedType>().Wait();
-                            db.DropTableAsync<CashFlowOperations>().Wait();
-                            db.CreateTableAsync<CashFlowOperations>().Wait();
-                            db.DropTableAsync<Clients>().Wait();
-                            db.CreateTableAsync<Clients>().Wait();
-                            db.DropTableAsync<MoneyStorages>().Wait();
-                            db.CreateTableAsync<MoneyStorages>().Wait();
-                            break;
-                        }
-                }
-            }
+        public Task<int> DeleteAsync(Object obj)
+        {
+            return db.DeleteAsync(obj);
         }
 
         #region NotesData
@@ -259,12 +159,7 @@ namespace Notes.Data
 
             return 0;
         }
-
-        public Task<int> DeleteNoteAsync(Note note)
-        {
-            return db.DeleteAsync(note);
-        }
-
+       
         #endregion
 
         #region NotesFlags
@@ -297,20 +192,14 @@ namespace Notes.Data
                 return db.InsertAsync(noteFlag);
             }
         }
-
-        public Task<int> DeleteNoteFlagAsync(NoteFlags noteFlag)
-        {
-            return db.DeleteAsync(noteFlag);
-        }
-
+        
         public async Task<int> DeleteNoteFlagAsync(Guid noteFlagGuid)
         {
             NoteFlags noteFlag = await GetNoteFlagAsync(noteFlagGuid);
-            await DeleteNoteFlagAsync(noteFlag);
-            return 1;
+            return await DeleteAsync(noteFlag);            
         }
 
-        public async void DeleteNoteFlagsAsync(Guid noteId)
+        public async Task DeleteNoteFlagsAsync(Guid noteId)
         {
             List<NoteFlags> curTable = await db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
             int i = 0;
@@ -318,11 +207,8 @@ namespace Notes.Data
             foreach (NoteFlags item in curTable)
             {
                 i++;
-                //i = i + 
-                var resault = await DeleteNoteFlagAsync(item);
+                var resault = await DeleteAsync(item);
             }
-
-            //return i;
         }
 
         public Task<List<NoteFlags>> GetNoteFlagsAsync(Guid noteId)
@@ -342,7 +228,7 @@ namespace Notes.Data
 
         public async void CreateNoteFlagsFromNote(Note note)
         {
-            DeleteNoteFlagsAsync(note.ID);
+            await DeleteNoteFlagsAsync(note.ID);
 
             if (!string.IsNullOrEmpty(note.Text))
             {
@@ -463,10 +349,10 @@ namespace Notes.Data
             }
         }
 
-        public Task<int> DeleteCarAsync(Cars car)
-        {
-            return db.DeleteAsync(car);
-        }
+        //public Task<int> DeleteCarAsync(Cars car)
+        //{
+        //    return db.DeleteAsync(car);
+        //}
 
 
         #endregion
@@ -526,6 +412,21 @@ namespace Notes.Data
             return db.Table<CashFlowOperations>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
+        public Task<CashFlowOperations> GetCashFlowOperationsAsync(DateTime date, double amount)
+        {
+            return db.Table<CashFlowOperations>().Where(i => i.Date == date && i.Amount == amount).FirstOrDefaultAsync();
+        }
+
+        public Task<CashFlowOperations> GetCashFlowOperationsAsync(string id)
+        {
+            return db.Table<CashFlowOperations>().Where(i => i.MonoId == id).FirstOrDefaultAsync();
+        }
+
+        //public Task<int> DeleteCashFlowOperationAsync(CashFlowOperations operation)
+        //{
+        //    return db.DeleteAsync(operation);
+        //}
+
         #endregion
 
         #region Clients
@@ -558,10 +459,9 @@ namespace Notes.Data
 
         public async Task<ProgramSettings> GetProgramSettingsAsync()
         {
-            var all = await db.Table<ProgramSettings>().ToListAsync();
             ProgramSettings curSett = await db.Table<ProgramSettings>().FirstOrDefaultAsync();
 
-            if (curSett==null)
+            if (curSett == null)
             {
                 curSett = new ProgramSettings();
 
@@ -574,8 +474,8 @@ namespace Notes.Data
         }
 
         public Task<int> SaveProgramSettingsAsync(ProgramSettings programSettings)
-        {            
-            return db.UpdateAsync(programSettings);            
+        {
+            return db.UpdateAsync(programSettings);
         }
 
         #endregion

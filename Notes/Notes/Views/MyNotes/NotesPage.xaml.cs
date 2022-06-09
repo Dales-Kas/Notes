@@ -178,7 +178,7 @@ namespace Notes.Views
                 if (id != Guid.Empty)
                 {
                     Note note = await App.NotesDB.GetNoteAsync(id);
-                    await App.NotesDB.DeleteNoteAsync(note);
+                    await App.NotesDB.DeleteAsync(note);
 
                     UpdateNotesList();
                 }

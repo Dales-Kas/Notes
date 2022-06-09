@@ -21,17 +21,60 @@
             <local:GetOperationTypeColor x:Key="operationColor" />
             <local:GetDetailedOperationTypeColor x:Key="det_operationColor" />
             <local:GetUnbool x:Key="boolValue" />
+            
             <Style x:Key="FrameDetailedTypeStyle" TargetType="Frame">
                 <Setter Property="BackgroundColor" Value="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>
                 <Setter Property="HeightRequest" Value="5"/>
                 <Setter Property="WidthRequest" Value="5"/>
                 <Setter Property="Margin" Value="7,7,7,0"/>
             </Style>
+            
+            <Style x:Key="StyleOfListUpButton" TargetType="Button">
+                <Setter Property="Text" Value="▲"/>
+                <Setter Property="IsVisible" Value="false"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="HeightRequest" Value="40"/>
+                <Setter Property="WidthRequest" Value="42"/>
+                <Setter Property="CornerRadius" Value="45"/>
+                <Setter Property="Opacity" Value="0.5"/>
+                <Setter Property="BackgroundColor" Value="LightGray"/>
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="AbsoluteLayout.LayoutFlags" Value="PositionProportional"/>
+                <Setter Property="AbsoluteLayout.LayoutBounds" Value="0.5, 0.11, AutoSize, AutoSize"/>
+                <Setter Property="xct:ShadowEffect.Color" Value="Gray"/>
+            </Style>
+
+            <Style x:Key="StyleOfListDownButton" TargetType="Button" BasedOn="{StaticResource StyleOfListUpButton}">
+                <Setter Property="Text" Value="▼"/>
+                <Setter Property="AbsoluteLayout.LayoutBounds" Value="0.5, 0.92, AutoSize, AutoSize"/>
+            </Style>
+
+            <Style x:Key="StyleOfAddButton" TargetType="Button">
+                <Setter Property="Text" Value="+"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="IsVisible" Value="True"/>
+                <Setter Property="HeightRequest" Value="50"/>
+                <Setter Property="WidthRequest" Value="50"/>
+                <Setter Property="CornerRadius" Value="25"/>
+                <Setter Property="Opacity" Value="0.97"/>
+                <Setter Property="FontSize" Value="Large"/>
+                <Setter Property="BackgroundColor" Value="#708090"/>
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="AbsoluteLayout.LayoutFlags" Value="PositionProportional"/>
+                <Setter Property="AbsoluteLayout.LayoutBounds" Value="1, 0.938, AutoSize, AutoSize"/>
+                <Setter Property="xct:ShadowEffect.Color" Value="Gray"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="VerticalOptions" Value="End"/>
+                <Setter Property="Margin" Value="10,0,10,10"/>
+                <Setter Property="BorderColor" Value="#708090"/>
+            </Style>
+            
         </ResourceDictionary>
     </TabbedPage.Resources>
 
     <ContentPage Title="Карточка" x:Name="cardContentPage">
-        <StackLayout Orientation="Vertical">
+        <AbsoluteLayout>
+            <StackLayout Orientation="Vertical" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="42*"></ColumnDefinition>
@@ -43,11 +86,12 @@
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <Image Grid.Column="1" Source="mono.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center">
+                <Image Grid.Column="1" IsVisible="false" x:Name="MomoImage" Source="mono.jpg" Aspect="AspectFit" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_4"></TapGestureRecognizer>
                     </Image.GestureRecognizers>
                 </Image>
+                <ActivityIndicator Grid.Column="1" x:Name="MonoIsLoading" IsVisible="true" IsRunning="True"/>
                 <Label Grid.Column="2" x:Name="CardOut0" Text="-" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>
@@ -61,7 +105,7 @@
                                                      Margin="10,0" 
                                                      SelectedItem="{Binding ID}"
                                                      SelectionChanged="MyListView0_SelectionChanged" 
-                                                     SelectionMode="Single">
+                                                     SelectionMode="Single" Scrolled="MyListView0_Scrolled">
                     <CollectionView.EmptyView>
                         <StackLayout>
                             <Label Text="Не знайдено даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
@@ -77,7 +121,7 @@
                                 </SwipeView.LeftItems>
                                 <SwipeView.RightItems>
                                     <SwipeItems>
-                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" CommandParameter="{Binding ID}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}"></SwipeItem>
+                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" CommandParameter="{Binding .}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}" Clicked="toDelete_Clicked"></SwipeItem>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
                                 <Grid>
@@ -240,6 +284,12 @@
                 <Button Grid.Row="0" Grid.Column="4" x:Name="btnEdit" ImageSource="unedit.png" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
             </Grid>
         </StackLayout>
+
+        <Button x:Name="List0Up" Clicked="List1Up_Clicked" Style="{StaticResource StyleOfListUpButton}"/>
+        <Button x:Name="List0Down" Clicked="List1Down_Clicked" Style="{StaticResource StyleOfListDownButton}"/>
+
+        </AbsoluteLayout>
+        
     </ContentPage>
     <ContentPage Title="Готівка">
         <AbsoluteLayout>
@@ -421,47 +471,9 @@
 
             </StackLayout>
 
-            <Button x:Name="List1Up" Text="▲" Clicked="List1Up_Clicked"
-                    FontAttributes="Bold"
-                    HeightRequest="40"
-                    WidthRequest="42"
-                    CornerRadius="45"
-                    Opacity="0.5"
-                    BackgroundColor="LightGray"
-                    TextColor="Black"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    AbsoluteLayout.LayoutBounds="0.5, 0.11, AutoSize, AutoSize" xct:ShadowEffect.Color="Gray"
-                            />
-            <Button x:Name="List1Down" Text="▼" Clicked="List1Down_Clicked"
-                    FontAttributes="Bold"
-                    HeightRequest="40"
-                    WidthRequest="42"
-                    CornerRadius="45"
-                    Opacity="0.5"
-                    
-                    BackgroundColor="LightGray"                    
-                    TextColor="Black"
-                    
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    AbsoluteLayout.LayoutBounds="0.5, 0.92, AutoSize, AutoSize" xct:ShadowEffect.Color="Black"
-                            />
-
-            <Button x:Name="AddItemButton1" Text="+" Clicked="AddItemButton_Clicked"
-                FontAttributes="Bold"
-                IsVisible="True"                    
-                    VerticalOptions="End"
-                    HeightRequest="50"
-                    WidthRequest="50"
-                    CornerRadius="25"
-                    Opacity="0.97"
-                    FontSize="Large"
-                    BackgroundColor="#708090"
-                    TextColor="White"
-                    Margin="10,0,10,10"
-                    BorderColor="#708090"
-                    HorizontalOptions="End"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    AbsoluteLayout.LayoutBounds="1, 0.938, AutoSize, AutoSize" xct:ShadowEffect.Color="Gray"/>
+            <Button x:Name="List1Up" Clicked="List1Up_Clicked" Style="{StaticResource StyleOfListUpButton}"/>
+            <Button x:Name="List1Down" Clicked="List1Down_Clicked" Style="{StaticResource StyleOfListDownButton}"/>
+            <Button x:Name="AddItemButton1" Text="+" Clicked="AddItemButton_Clicked" Style="{StaticResource StyleOfAddButton}"/>
 
         </AbsoluteLayout>
     </ContentPage>

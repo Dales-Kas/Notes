@@ -10,6 +10,8 @@ namespace Notes.Models.Budget
         [PrimaryKey, AutoIncrement]
         public Guid ID { get; set; }
 
+        public string MonoId { get; set; }
+
         public Guid ID_Parent { get; set; }
 
         public DateTime Date { get; set; }
