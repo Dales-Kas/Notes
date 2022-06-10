@@ -4,6 +4,7 @@ using System.Text;
 using System.Globalization;
 using Notes.Models.Budget;
 using Xamarin.Forms;
+using System.Threading.Tasks;
 
 namespace Notes
 {
@@ -45,7 +46,7 @@ namespace Notes
                 case "Clients": 
                     {
                         //Clients clients = (Clients)objFromBase;
-                        //Clients clients = (Clients)App.NotesDB.GetFromMySQL((Guid)value, typeof(Clients)).Result;
+                        //var clients = App.NotesDB.GetFromMySQL((Guid)value, typeof(Clients)).Result as Clients;
                         Clients clients = App.NotesDB.GetClientAsync((Guid)value).Result;
                             //((Guid)value, typeof(Clients)).Result;
 

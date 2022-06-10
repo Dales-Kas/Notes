@@ -61,6 +61,63 @@ namespace Notes.Data
             return db.DeleteAsync(obj);
         }
 
+        public Task<int> SaveAsync(object obj, bool insert = false)
+        {
+            int EmtyInt = 0;
+            Guid EmtyGuid = Guid.Empty;
+
+            string objectType = obj.GetType().Name;
+
+            bool flUpdate = false;
+
+            switch (objectType)
+            {
+                case "Cars":
+                    {
+                        flUpdate = (obj as Cars).ID != EmtyGuid;
+                        break;
+                    }
+                case "CarDescription":
+                    {
+                        flUpdate = ((CarDescription)obj).ID != EmtyInt;
+                        break;
+                    }
+
+                case "CarNotes":
+                    {
+                        flUpdate = ((CarNotes)obj).ID != EmtyInt;
+                        break;
+                    }
+                case "Currencies":
+                    {
+                        flUpdate = ((Currencies)obj).ID != EmtyInt;
+                        break;
+                    }
+
+                case "NoteCategory":
+                    {
+                        flUpdate = ((NoteCategory)obj).ID != EmtyInt;
+                        break;
+                    }
+                case "NoteFlags":
+                    {
+                        flUpdate = ((NoteFlags)obj).ID != EmtyGuid;
+                        break;
+                    }
+            }
+
+            if (flUpdate && !insert)
+            {
+                return db.UpdateAsync(obj);
+            }
+
+            else
+            {
+                return db.InsertAsync(obj);
+            }
+        }
+
+
         #region NotesData
 
         public Task<List<Note>> GetNotesAsync()
@@ -149,7 +206,7 @@ namespace Notes.Data
 
             if (!note.IsList)
             {
-                DeleteNoteFlagsAsync(note.ID);
+                await DeleteNoteFlagsAsync(note.ID);
             }
 
             if (saveNoteFlags)
@@ -172,26 +229,26 @@ namespace Notes.Data
             foreach (NoteFlags item in curTable)
             {
                 i++;
-                var resault = await SaveNoteFlagAsync(item);
+                var resault = await SaveAsync(item);
             }
             return i;
         }
 
-        public Task<int> SaveNoteFlagAsync(NoteFlags noteFlag, bool insert = false)
-        {
-            if (noteFlag.ID != Guid.Empty && !insert)
-            {
-                //#if DEBUG
-                //DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
-                //#endif
-                return db.UpdateAsync(noteFlag);
-            }
+        //public Task<int> SaveNoteFlagAsync(NoteFlags noteFlag, bool insert = false)
+        //{
+        //    if (noteFlag.ID != Guid.Empty && !insert)
+        //    {
+        //        //#if DEBUG
+        //        //DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
+        //        //#endif
+        //        return db.UpdateAsync(noteFlag);
+        //    }
 
-            else
-            {
-                return db.InsertAsync(noteFlag);
-            }
-        }
+        //    else
+        //    {
+        //        return db.InsertAsync(noteFlag);
+        //    }
+        //}
         
         public async Task<int> DeleteNoteFlagAsync(Guid noteFlagGuid)
         {
@@ -258,7 +315,7 @@ namespace Notes.Data
                         Text = curText,
                         Finished = isFinished
                     };
-                    await SaveNoteFlagAsync(flag);
+                    await SaveAsync(flag);
                 }
             }
         }
@@ -281,20 +338,7 @@ namespace Notes.Data
         {
             return db.Table<NoteCategory>().ToListAsync();
         }
-
-        public Task<int> SaveNoteCategoryAsync(NoteCategory noteCategory, bool insert = false)
-        {
-            if (noteCategory.ID != 0 && !insert)
-            {
-                return db.UpdateAsync(noteCategory);
-            }
-
-            else
-            {
-                return db.InsertAsync(noteCategory);
-            }
-        }
-
+        
         public string GetNoteCategoryName(int ID)
         {
             string categoryText;
@@ -335,26 +379,7 @@ namespace Notes.Data
         {
             return db.Table<CarNotes>().Where(i => i.CarID == carid).ToListAsync();
         }
-
-        public Task<int> SaveCarAsync(Cars car, bool insert = false)
-        {
-            if (car.ID != Guid.Empty && !insert)
-            {
-                return db.UpdateAsync(car);
-            }
-
-            else
-            {
-                return db.InsertAsync(car);
-            }
-        }
-
-        //public Task<int> DeleteCarAsync(Cars car)
-        //{
-        //    return db.DeleteAsync(car);
-        //}
-
-
+              
         #endregion
 
         #region Currencies
@@ -421,12 +446,7 @@ namespace Notes.Data
         {
             return db.Table<CashFlowOperations>().Where(i => i.MonoId == id).FirstOrDefaultAsync();
         }
-
-        //public Task<int> DeleteCashFlowOperationAsync(CashFlowOperations operation)
-        //{
-        //    return db.DeleteAsync(operation);
-        //}
-
+        
         #endregion
 
         #region Clients
@@ -481,70 +501,22 @@ namespace Notes.Data
         #endregion
 
         #region AllClass
-
-        public Task<int> SaveAsync(object car, string objectType, bool insert = false)
-        {
-            int EmtyInt = 0;
-            Guid EmtyGuid = Guid.Empty;
-
-            bool flUpdate = false;
-
-            switch (objectType)
-            {
-                case "Cars":
-                    {
-                        flUpdate = (car as Cars).ID != EmtyGuid;
-                        break;
-                    }
-                case "CarDescription":
-                    {
-                        flUpdate = ((CarDescription)car).ID != EmtyInt;
-                        break;
-                    }
-
-                case "CarNotes":
-                    {
-                        flUpdate = ((CarNotes)car).ID != EmtyInt;
-                        break;
-                    }
-                case "Currencies":
-                    {
-                        flUpdate = ((Currencies)car).ID != EmtyInt;
-                        break;
-                    }
-            }
-
-            if (flUpdate && !insert)
-            {
-                return db.UpdateAsync(car);
-            }
-
-            else
-            {
-                return db.InsertAsync(car);
-            }
-        }
-
-        //public Task<int> DeleteCarAsync(Cars car)
-        //{
-        //    return db.DeleteAsync(car);
-        //}
-
-        public async Task<Object> GetFromMySQL(Guid guid, Type type)
+              
+        public async Task<object> GetFromMySQL(Guid guid, Type type)
         {
             //Чогось через цей метод програма тормозить, поки не використовую... Треба розібратись
 
-            TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
-            try
-            {
-                var i = await db.GetAsync(guid, tableMapping);
-                return i;
-            }
-            catch (Exception e)
-            {
-                //string msg = e.Message;                
-                return null;
-            }
+            //TableMapping tableMapping = new TableMapping(type, CreateFlags.AutoIncPK);
+                var mapping = await db.GetMappingAsync(type);
+                return await db.GetAsync(guid,mapping);                
+            //try
+            //{
+            //}
+            //catch (Exception e)
+            //{
+            //    //string msg = e.Message;                
+            //    return null;
+            //}
 
         }
     }

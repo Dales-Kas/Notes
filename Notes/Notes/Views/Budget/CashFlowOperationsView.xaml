@@ -285,8 +285,8 @@
             </Grid>
         </StackLayout>
 
-        <Button x:Name="List0Up" Clicked="List1Up_Clicked" Style="{StaticResource StyleOfListUpButton}"/>
-        <Button x:Name="List0Down" Clicked="List1Down_Clicked" Style="{StaticResource StyleOfListDownButton}"/>
+        <Button x:Name="List0Up" Clicked="List0Up_Clicked" Style="{StaticResource StyleOfListUpButton}"/>
+        <Button x:Name="List0Down" Clicked="List0Down_Clicked" Style="{StaticResource StyleOfListDownButton}"/>
 
         </AbsoluteLayout>
         

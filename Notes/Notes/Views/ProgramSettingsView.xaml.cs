@@ -22,7 +22,7 @@ namespace Notes.Views
         {
             InitializeComponent();
 
-            OnFormOpen();
+            OnFormOpen().Wait();
         }
 
         public async Task OnFormOpen()
@@ -113,7 +113,7 @@ namespace Notes.Views
 
             foreach (ImportData item in jsonData)
             {
-                App.NotesDB.DropTable(item.Name);
+                await App.NotesDB.DropTable(item.Name);
 
                 if (item.Name == "Note")
                 {
@@ -137,7 +137,7 @@ namespace Notes.Views
 
                         try
                         {
-                            await App.NotesDB.SaveNoteFlagAsync(noteFlag);
+                            await App.NotesDB.SaveAsync(noteFlag);
                         }
                         catch (Exception ex)
                         {
@@ -153,7 +153,8 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter);
 
-                        await App.NotesDB.SaveCarAsync(car, true);
+                        //await App.NotesDB.SaveCarAsync(car, true);
+                        await App.NotesDB.SaveAsync(car);
                     }
                 }
                 else
@@ -169,7 +170,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
                     else if (item.Name == "CarNotes")
@@ -181,7 +182,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
                     else if (item.Name == "Currencies")
@@ -193,7 +194,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 
@@ -205,7 +206,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 
@@ -217,7 +218,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 
@@ -229,7 +230,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 
@@ -241,7 +242,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 
@@ -253,7 +254,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync((object)i, item.Name);
+                            await App.NotesDB.SaveAsync(i);
                         }
                     }
 

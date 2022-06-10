@@ -154,7 +154,7 @@ namespace Notes.Data.Services
                             MCC = statement.mcc.ToString()
                         };
 
-                        await App.NotesDB.SaveAsync((object)newOperation, typeof(CashFlowOperations).Name);
+                        await App.NotesDB.SaveAsync(newOperation);
                     }
                 }
             }

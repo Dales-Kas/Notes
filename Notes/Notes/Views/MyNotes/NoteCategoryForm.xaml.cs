@@ -40,7 +40,8 @@ namespace Notes.Views
             
             if (category!=null)
             {
-                await App.NotesDB.SaveNoteCategoryAsync(category);
+                //await App.NotesDB.SaveNoteCategoryAsync(category);
+                await App.NotesDB.SaveAsync(category);
                 await Shell.Current.GoToAsync("..");
             }
 

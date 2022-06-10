@@ -111,7 +111,7 @@ namespace Notes.Views.Budget
 
         #region GetDataFromBase
 
-        public async void LoadAllData(bool getAllPeriods = false, bool setTypeOfPeriod = true)
+        public async Task LoadAllData(bool getAllPeriods = false, bool setTypeOfPeriod = true)
         {
             int badgeFilterNum = 0;
 
@@ -887,6 +887,19 @@ namespace Notes.Views.Budget
             MyListView1.ScrollTo(count, animate: false);
         }
 
+        private void List0Up_Clicked(object sender, EventArgs e)
+        {
+            MyListView0.ScrollTo(0, animate: false);
+        }
+
+        private void List0Down_Clicked(object sender, EventArgs e)
+        {
+            List<CashFlowOperations> list = (MyListView0.ItemsSource as List<CashFlowOperations>);
+
+            var count = list[list.Count - 1];
+            MyListView0.ScrollTo(count, animate: false);
+        }
+
         private async void AddItemButton_Clicked(object sender, EventArgs e)
         {
             string inName = "Надходження коштів";
@@ -923,7 +936,6 @@ namespace Notes.Views.Budget
             await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter); 
             LoadAllData();
         }
-
     }
 
     #region OthersAddClasses

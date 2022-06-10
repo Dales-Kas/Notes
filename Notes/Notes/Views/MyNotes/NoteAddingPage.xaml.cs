@@ -159,7 +159,7 @@ namespace Notes.Views
         {
             if (curNoteFlag != null)
             {
-                await App.NotesDB.SaveNoteFlagAsync(curNoteFlag);
+                await App.NotesDB.SaveAsync(curNoteFlag);
             }
             if (!dontSaveNote)
             {
@@ -316,13 +316,13 @@ namespace Notes.Views
 
         }
 
-        private void deleteBtn_Clicked(object sender, EventArgs e)
+        private async void deleteBtn_Clicked(object sender, EventArgs e)
         {
             Note note = (Note)BindingContext;
 
             if (note != null)
             {
-                App.NotesDB.DeleteNoteFlagsAsync(note.ID);
+                await App.NotesDB.DeleteNoteFlagsAsync(note.ID);
                 LoadAllNoteFlags();
             }
         }
@@ -337,7 +337,7 @@ namespace Notes.Views
             if (noteFlag != null)
             {
                 //curNoteFlag.Finished = noteFlag.Finished;
-                await App.NotesDB.SaveNoteFlagAsync(noteFlag);
+                await App.NotesDB.SaveAsync(noteFlag);
                 SetListOfFlagsStatus();
             }
 
@@ -455,7 +455,7 @@ namespace Notes.Views
                     Text = "",
                     Finished = false
                 };
-                await App.NotesDB.SaveNoteFlagAsync(flag);
+                await App.NotesDB.SaveAsync(flag);
             }
 
             LoadAllNoteFlags();
@@ -471,7 +471,7 @@ namespace Notes.Views
             //}
             foreach (NoteFlags item in collectionView1.ItemsSource)
             {
-                await App.NotesDB.SaveNoteFlagAsync(item);
+                await App.NotesDB.SaveAsync(item);
             }
 
         }
