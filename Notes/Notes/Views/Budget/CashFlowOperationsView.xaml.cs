@@ -613,6 +613,10 @@ namespace Notes.Views.Budget
 
                 btnBalance.IsVisible = true;
                 await btnBalance.FadeTo(0.9, 500);
+                while (true)
+                {
+
+                }
 
             }
             else
