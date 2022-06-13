@@ -17,41 +17,68 @@ namespace Notes.Data
         private readonly string strOk = "►";
         private readonly string strNOk = "○";
         //Список усіх таблиць Бази Даних:
-        private Dictionary<string, Type> DataDictionary = new Dictionary<string, Type>()
-        {
-            //NOTES:
-            { "Note", typeof(Note)},
-            { "NoteFlags",typeof(NoteFlags)},
-            { "NoteCategory",typeof(NoteCategory)},
-            //CARS:
-            { "Cars",typeof(Cars)},
-            { "CarDescription",typeof(CarDescription)},
-            { "CarNotes",typeof(CarNotes)},
-            //BUDGET:
-            { "Currencies",typeof(Currencies)},
-            { "ExchangeRates",typeof(ExchangeRates)},
-            { "CashFlowDetailedType",typeof(CashFlowDetailedType)},
-            { "CashFlowOperations",typeof(CashFlowOperations)},
-            { "Clients",typeof(Clients)},
-            { "MoneyStorages",typeof(MoneyStorages)},
-            //Settings:
-            { "ProgramSettings",typeof(ProgramSettings)}
-        };
+        private readonly Dictionary<string, Type> dataDictionary = new Dictionary<string, Type>(); 
+            
+            ////NOTES:
+            //{ "Note", typeof(Note)},
+            //{ "NoteFlags",typeof(NoteFlags)},
+            //{ "NoteCategory",typeof(NoteCategory)},
+            ////CARS:
+            //{ "Cars",typeof(Cars)},
+            //{ "CarDescription",typeof(CarDescription)},
+            //{ "CarNotes",typeof(CarNotes)},
+            ////BUDGET:
+            //{ "Currencies",typeof(Currencies)},
+            //{ "ExchangeRates",typeof(ExchangeRates)},
+            //{ "CashFlowDetailedType",typeof(CashFlowDetailedType)},
+            //{ "CashFlowOperations",typeof(CashFlowOperations)},
+            //{ "Clients",typeof(Clients)},
+            //{ "MoneyStorages",typeof(MoneyStorages)},
+            //{ "ClientIdentificationTexts",typeof(ClientIdentificationTexts)},
+            ////Settings:
+            //{ "ProgramSettings",typeof(ProgramSettings)}     
 
         public NotesDB(string connectionString)
         {
             db = new SQLiteAsyncConnection(connectionString);
-            
-            foreach (var item in DataDictionary)
-            {
-                db.CreateTableAsync(DataDictionary[item.Key]).Wait();
-            }
 
+            dataDictionary.Clear(); 
+            foreach (Type item in GetAllTablesName())
+            {
+                dataDictionary.Add(item.Name, item);
+                db.CreateTableAsync(dataDictionary[item.Name]).Wait();
+            }
         }
+
+        public List<Type> GetAllTablesName() 
+        {
+            return new List<Type>() { 
+
+            //NOTES:
+            { typeof(Note)},
+            { typeof(NoteFlags)},
+            { typeof(NoteCategory)},
+            //CARS:
+            { typeof(Cars)},
+            { typeof(CarDescription)},
+            { typeof(CarNotes)},
+            //BUDGET:
+            { typeof(Currencies)},
+            { typeof(ExchangeRates)},
+            { typeof(CashFlowDetailedType)},
+            { typeof(CashFlowOperations)},
+            { typeof(Clients)},
+            { typeof(MoneyStorages)},
+            { typeof(ClientIdentificationTexts)},
+            { typeof(MCCCodes)},
+            //Settings:
+            { typeof(ProgramSettings)}
+            };
+        } 
 
         public async Task DropTable(string tableName)
         {
-            DataDictionary.TryGetValue(tableName,out Type type);
+            dataDictionary.TryGetValue(tableName,out Type type);
             await db.DropTableAsync(await db.GetMappingAsync(type));
             await db.CreateTableAsync(type);           
         }
@@ -104,6 +131,12 @@ namespace Notes.Data
                         flUpdate = ((NoteFlags)obj).ID != EmtyGuid;
                         break;
                     }
+                case "CashFlowOperations":
+                    {
+                        flUpdate = ((CashFlowOperations)obj).ID != EmtyGuid;
+                        break;
+                    }
+
             }
 
             if (flUpdate && !insert)

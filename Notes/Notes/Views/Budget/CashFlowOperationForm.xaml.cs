@@ -31,6 +31,8 @@ namespace Notes.Views.Budget
 
         private async void Button_Clicked(object sender, EventArgs e)
         {
+            await App.NotesDB.SaveAsync(BindingContext as CashFlowOperations);
+
             await Shell.Current.GoToAsync("..");
         }
     }

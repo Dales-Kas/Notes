@@ -7,11 +7,12 @@
              mc:Ignorable="d"
              x:Class="Notes.Views.NotePage"
              Title="Нотатки"
+             x:Name="thisPage"
               CurrentPageChanged="CarouselPage_CurrentPageChanged">
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Text="Редагувати" IconImageSource="unedit.png" Clicked="ToolbarItem_Clicked" Order="Default"></ToolbarItem>
+    </TabbedPage.ToolbarItems>
     <ContentPage BackgroundColor="WhiteSmoke" Title="Актуальні" x:Name="Notes1">
-        <ContentPage.ToolbarItems>
-            <!--<ToolbarItem Text="Add" Clicked="AddButton_Clicked"></ToolbarItem>-->
-        </ContentPage.ToolbarItems>
         <ContentPage.Content>
             <StackLayout>
                 <SearchBar x:Name="searchBar"
@@ -26,7 +27,7 @@
                         <CollectionView x:Name="collectionView" Margin="0,0" SelectionMode="Single" SelectionChanged="OnSelectionChanged" ItemsUpdatingScrollMode="KeepLastItemInView" android:ListView.IsFastScrollEnabled="true">
                             <CollectionView.ItemsLayout>
                                 <!--<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" SnapPointsAlignment="Center" SnapPointsType="Mandatory"></LinearItemsLayout>-->
-                                <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="5" VerticalItemSpacing="5" />
+                                <GridItemsLayout x:Uid="GridLayout" Orientation="Vertical" Span="2" HorizontalItemSpacing="5" VerticalItemSpacing="5" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
@@ -36,30 +37,28 @@
                                             <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped" CommandParameter="{x:Reference collectionViewitem}"/>
                                             <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped_1" CommandParameter="{x:Reference collectionViewitem}"/>
                                         </SwipeView.GestureRecognizers>
-                                        <SwipeView.TopItems>
+                                        <SwipeView.RightItems>
                                             <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded" CollectionChanged="SwipeItems_CollectionChanged">
                                                 <SwipeItem x:Name="toDelete" 
                                                            Text="Видалити" 
                                                            IconImageSource="delete.png" 
                                                            BackgroundColor="#FC8989"                                                            
                                                            Invoked="toDelete_Invoked"
-                                                           DescendantAdded="toDelete_DescendantAdded"                                                           
+                                                           DescendantAdded="toDelete_DescendantAdded"
+                                                           IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}"
                                                            CommandParameter="{Binding ID}">
                                                 </SwipeItem>
-                                            </SwipeItems>
-                                        </SwipeView.TopItems>
-                                        <SwipeView.BottomItems>
-                                            <SwipeItems SwipeBehaviorOnInvoked="RemainOpen" Mode="Reveal" DescendantAdded="SwipeItems_DescendantAdded">
                                                 <SwipeItem x:Name="toArchiv1" 
                                                            Text="В архів" 
                                                            IconImageSource="arhive1.png"
                                                            BackgroundColor="#FFB55A" 
                                                            Invoked="toArchiv1_Invoked" 
+                                                           IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}"
                                                            CommandParameter="{Binding ID}">
                                                 </SwipeItem>
                                             </SwipeItems>
-                                        </SwipeView.BottomItems>
-
+                                        </SwipeView.RightItems>
+                                        
 
                                         <StackLayout x:Name="collectionViewitem"  Orientation="Vertical" VerticalOptions="Start" BackgroundColor="WhiteSmoke">
                                             <Frame BackgroundColor="{Binding NoteColorBackGround}" BorderColor="{Binding NoteColorText}" HasShadow="True" CornerRadius="15">
@@ -121,9 +120,6 @@
         </ContentPage.Content>
     </ContentPage>
     <ContentPage Title="Архів" BackgroundColor="WhiteSmoke" x:Name="Notes2">
-        <ContentPage.ToolbarItems>
-            <ToolbarItem Text="Архів" Order="Primary"></ToolbarItem>
-        </ContentPage.ToolbarItems>
         <StackLayout Orientation="Vertical">
 
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">

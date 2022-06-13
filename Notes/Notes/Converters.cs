@@ -169,6 +169,24 @@ namespace Notes
         }
     }
 
+    public class GetUnusedOperationColor : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value == true)
+            {
+                return "#FFFFF0";
+            }
+
+            return null;            
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return "";
+        }
+    }
+
     public class GetGroupTypeColor : IValueConverter
     {
         public string DefaultColor { get; set; }
@@ -266,6 +284,11 @@ namespace Notes
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter==null)
+            {
+                return null;
+            }
+
             DateTime DateOfValue = (DateTime)parameter;
 
             var incomingTimeSpan = (TimeSpan)value;

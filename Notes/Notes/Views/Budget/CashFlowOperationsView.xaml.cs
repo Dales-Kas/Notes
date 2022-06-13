@@ -76,10 +76,12 @@ namespace Notes.Views.Budget
 
         public bool IsEditable { get; set; }
 
-        private bool[] listIsScrolling = new bool[3] { false, false, false};
+        private bool[] listIsScrolling = new bool[3] { false, false, false };
 
         Dictionary<string, Button> buttonsVisible = new Dictionary<string, Button>();
-        
+
+        Dictionary<string, object> elementsVisible = new Dictionary<string, object>();
+
         public CashFlowOperationsView()
         {
             InitializeComponent();
@@ -87,26 +89,32 @@ namespace Notes.Views.Budget
             periodStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             periodEnd = new DateTime(periodStart.Year, periodStart.Month, DateTime.DaysInMonth(periodStart.Year, periodStart.Month), 23, 59, 59);
 
-            LoadAllData(true);
-
-            IsBusy = false;
-            refreshMyListView0.IsRefreshing = false;
-
-            MomoImage.IsVisible = true;
-            MonoIsLoading.IsVisible = false;
-
-            SetFilterViewOnForm(true);
-
-            IsEditable = false;
-
-            BindingContext = this;
-
             buttonsVisible.Add("AddItemButton1", AddItemButton1);
             buttonsVisible.Add("List0Up", List0Up);
             buttonsVisible.Add("List0Down", List0Down);
             buttonsVisible.Add("List1Up", List1Up);
             buttonsVisible.Add("List1Down", List1Down);
 
+            elementsVisible.Add("Balance0", Balance0);
+            elementsVisible.Add("Balance1", Balance1);
+
+            OnPageLoad();
+        }
+
+        async Task OnPageLoad()
+        {
+            await LoadAllData(true);
+
+            MomoImage.IsVisible = true;
+            MonoIsLoading.IsVisible = false;
+
+            MonoEmptyText.Text = "Не знайдено даних...";
+
+            SetFilterViewOnForm(true);
+
+            IsEditable = false;
+
+            BindingContext = this;
         }
 
         #region GetDataFromBase
@@ -116,6 +124,95 @@ namespace Notes.Views.Budget
             int badgeFilterNum = 0;
 
             Items = await App.NotesDB.GetCashFlowOperationsAsync();
+
+            //Визначаю залишки...
+            double BalanceAmount0 = 0;
+            double BalanceAmount1 = 0;
+
+            foreach (var item in Items)
+            {
+                //if (item.DontUseInCashFlow)
+                //{
+                //    continue;
+                //}
+                //else 
+                if (item.Date > periodEnd) { }
+
+                else if (item.TypeID == 0)
+                {
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        BalanceAmount0 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0)  + item.AmountDelayCommission);
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        BalanceAmount0 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
+                    }
+                }
+                else if (item.TypeID == 1)
+                {
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        BalanceAmount1 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        BalanceAmount1 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
+                    }
+                }
+                else if (item.TypeID == 2)
+                {
+                    //if (item.OperationType == Models.OperationType.InOperation)
+                    //{
+                    //    inAmount1 += curValue;
+                    //}
+                    //else if (item.OperationType == Models.OperationType.OutOperation)
+                    //{
+                    //    outAmount1 += curValue;
+                    //}
+                }
+            }
+
+            //Items.AsParallel().ForAll(item =>
+            //{
+            //    //double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;                
+
+            //    if (item.DontUseInCashFlow) { }
+            //    else if (item.Date > periodEnd) { }
+            //    else if (item.TypeID == 0)
+            //    {
+            //        if (item.OperationType == Models.OperationType.InOperation)
+            //        {
+            //            BalanceAmount0 += item.Amount;
+            //        }
+            //        else if (item.OperationType == Models.OperationType.OutOperation)
+            //        {
+            //            BalanceAmount0 -= item.Amount;
+            //        }
+            //    }
+            //    else if (item.TypeID == 1)
+            //    {
+            //        if (item.OperationType == Models.OperationType.InOperation)
+            //        {
+            //            BalanceAmount1 += item.Amount;
+            //        }
+            //        else if (item.OperationType == Models.OperationType.OutOperation)
+            //        {
+            //            BalanceAmount1 -= item.Amount;
+            //        }
+            //    }
+            //    else if (item.TypeID == 2)
+            //    {
+            //        //if (item.OperationType == Models.OperationType.InOperation)
+            //        //{
+            //        //    inAmount1 += curValue;
+            //        //}
+            //        //else if (item.OperationType == Models.OperationType.OutOperation)
+            //        //{
+            //        //    outAmount1 += curValue;
+            //        //}
+            //    }
+            //});            
 
             //Get all mounth from Items:
             if (getAllPeriods)
@@ -162,58 +259,60 @@ namespace Notes.Views.Budget
                 badgeFilterNum++;
             }
 
-            //GetInOutValues(ref inAmount0, ref outAmount0, 0);
-            //GetInOutValues(ref inAmount1, ref outAmount1, 1);
-            //GetInOutValues(ref inAmount2, ref outAmount2, 2);
+            var filteredItemsList = filteredItems.ToList();
+
+            GetInOutValues(ref inAmount0, ref outAmount0, 0, filteredItemsList);
+            GetInOutValues(ref inAmount1, ref outAmount1, 1, filteredItemsList);
+            GetInOutValues(ref inAmount2, ref outAmount2, 2, filteredItemsList);
 
             //Final values on top of Lists:
 
-            inAmount0 = 0;
-            outAmount0 = 0;
-            inAmount1 = 0;
-            outAmount1 = 0;
-            inAmount2 = 0;
-            outAmount2 = 0;
+            //inAmount0 = 0;
+            //outAmount0 = 0;
+            //inAmount1 = 0;
+            //outAmount1 = 0;
+            //inAmount2 = 0;
+            //outAmount2 = 0;
 
-            filteredItems.AsParallel().ForAll(item =>
-            {
-                double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;
+            //filteredItems.AsParallel().ForAll(item =>
+            //{
+            //    double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;
 
-                if (item.DontUseInCashFlow) { }
-                else if (item.TypeID == 0)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        inAmount0 += curValue;
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        outAmount0 += curValue;
-                    }
-                }
-                else if (item.TypeID == 1)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        inAmount1 += curValue;
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        outAmount1 += curValue;
-                    }
-                }
-                else if (item.TypeID == 2)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        inAmount1 += curValue;
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        outAmount1 += curValue;
-                    }
-                }
-            });
+            //    if (item.DontUseInCashFlow) { }
+            //    else if (item.TypeID == 0)
+            //    {
+            //        if (item.OperationType == Models.OperationType.InOperation)
+            //        {
+            //            inAmount0 += curValue;
+            //        }
+            //        else if (item.OperationType == Models.OperationType.OutOperation)
+            //        {
+            //            outAmount0 += curValue;
+            //        }
+            //    }
+            //    else if (item.TypeID == 1)
+            //    {
+            //        if (item.OperationType == Models.OperationType.InOperation)
+            //        {
+            //            inAmount1 += curValue;
+            //        }
+            //        else if (item.OperationType == Models.OperationType.OutOperation)
+            //        {
+            //            outAmount1 += curValue;
+            //        }
+            //    }
+            //    else if (item.TypeID == 2)
+            //    {
+            //        if (item.OperationType == Models.OperationType.InOperation)
+            //        {
+            //            inAmount1 += curValue;
+            //        }
+            //        else if (item.OperationType == Models.OperationType.OutOperation)
+            //        {
+            //            outAmount1 += curValue;
+            //        }
+            //    }
+            //});
 
             MyListView0.ItemsSource = filteredItems.Where(x => x.TypeID == 0).OrderByDescending(x => x.Date).ToList();
             MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).OrderByDescending(x => x.Date).ToList();
@@ -233,6 +332,9 @@ namespace Notes.Views.Budget
             CardIn2.Text = inAmount2 != 0 ? inAmount2.ToString(amountFormat) : amountFormat0;
             CardOut2.Text = outAmount2 != 0 ? outAmount2.ToString(amountFormat) : amountFormat0;
 
+            BalanceAmountLbl0.Text = BalanceAmount0 != 0 ? BalanceAmount0.ToString(amountFormat) : amountFormat0;
+            BalanceAmountLbl1.Text = BalanceAmount1 != 0 ? BalanceAmount1.ToString(amountFormat) : amountFormat0;
+
             SetTitleText(currentPeriodOfUserChoice);
 
             // badgeFilter.Text = badgeFilterNum.ToString();
@@ -241,7 +343,7 @@ namespace Notes.Views.Budget
         public void GetAndSetAllPeriods(bool setTypeOfPeriod = true)
         {
             //Get all periods:
-            
+
             if (setTypeOfPeriod)
             {
                 PeriodsOfOperations.Clear();
@@ -257,11 +359,29 @@ namespace Notes.Views.Budget
                         }
                         ).OrderBy(x => x.PeriodStart).ToList();
 
+                DateTime lastdate = PeriodsOfOperations[^1].PeriodStart;
+                DateTime curdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                if (lastdate < curdate)
+                {
+                    lastdate = lastdate.AddMonths(1);
+
+                    while (lastdate <= curdate)
+                    {
+                        PeriodsOfOperations.Add(new PeriodsOfOperations()
+                        {
+                            PeriodName = lastdate.ToString("MMMM yyyy").ToUpper(),
+                            PeriodStart = lastdate,
+                            PeriodEnd = new DateTime(lastdate.Year, lastdate.Month, DateTime.DaysInMonth(lastdate.Year, lastdate.Month))
+                        });
+
+                        lastdate = lastdate.AddMonths(1);
+                    }
+                };
+
                 YearsOfOperations.Clear();
 
-                YearsOfOperations = Items
-                        .GroupBy(p => new DateTime(p.Date.Year, 1, 1))
-                        //.Select(g => new { Date = g.Key }).ToList();
+                YearsOfOperations = PeriodsOfOperations
+                        .GroupBy(p => new DateTime(p.PeriodStart.Year, 1, 1))
                         .Select(period => new PeriodsOfOperations()
                         {
                             PeriodName = period.Key.ToString("yyyy").ToUpper(),
@@ -302,70 +422,71 @@ namespace Notes.Views.Budget
                 periodViewChoise[0] = "Дані за місяць";
                 periodViewChoise[1] = "Дані за рік";
                 periodViewChoise[2] = "Усі дані";
-                
-                periodView.Text = periodViewChoise[0];
+
+                periodView.Text = periodViewChoise[0].Replace("місяць", "");
             }
         }
 
-        private void GetInOutValues(ref double inValue, ref double outValue, int typeID)
+        private void GetInOutValues(ref double inValue, ref double outValue, int typeID, List<CashFlowOperations> filteredItems)
         {
             inValue = 0;
             outValue = 0;
 
-            double inValue1 = 0;
-            double outValue1 = 0;
+            //double inValue1 = 0;
+            //double outValue1 = 0;
 
-            Items.AsParallel().ForAll(item =>
-            {
-
-                if (item.DontUseInCashFlow || item.TypeID != typeID) { }
-
-                else if (item.OperationType == Models.OperationType.InOperation)
-                {
-                    inValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
-                }
-
-                else if (item.OperationType == Models.OperationType.OutOperation)
-                {
-                    outValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
-                }
-            });
-
-            inValue = inValue1;
-            outValue = outValue1;
-
-            //foreach (var item in Items)
+            //Items.AsParallel().ForAll(item =>
             //{
-            //    if (item.DontUseInCashFlow || item.TypeID != typeID)
-            //    {
-            //        continue;
-            //    }
 
-            //    if (item.OperationType == Models.OperationType.InOperation)
+            //    if (item.DontUseInCashFlow || item.TypeID != typeID) { }
+
+            //    else if (item.OperationType == Models.OperationType.InOperation)
             //    {
-            //        inValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+            //        inValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
             //    }
 
             //    else if (item.OperationType == Models.OperationType.OutOperation)
             //    {
-            //        outValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+            //        outValue1 += foreignCurrency ? item.AmountСurrency : item.Amount;
             //    }
-            //}
+            //});
+
+            //inValue = inValue1;
+            //outValue = outValue1;
+            foreach (var item in filteredItems)
+            {
+                if (item.DontUseInCashFlow || item.TypeID != typeID)
+                {
+                    continue;
+                }
+
+                if (item.OperationType == Models.OperationType.InOperation)
+                {
+                    inValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+                }
+
+                else if (item.OperationType == Models.OperationType.OutOperation)
+                {
+                    outValue += foreignCurrency ? item.AmountСurrency : item.Amount;
+                }
+            }
         }
 
         #endregion
-  
+
         #region FormItemsVisability
 
-        public void SetPeriodOfView(PeriodsOfOperations period)
+        public async void SetPeriodOfView(PeriodsOfOperations period)
         {
             if (period != null)
             {
                 SetPeriodValues(period);
 
-                SetTitleText(period);
+                currentPeriodOfUserChoice = period;
 
-                LoadAllData();
+                //SetTitleText(period);
+
+                await LoadAllData();
 
                 SetFilterViewOnForm(!IsFilterFilled());
             }
@@ -455,7 +576,7 @@ namespace Notes.Views.Budget
             ((ListView)sender).SelectedItem = null;
         }
 
-        private void ToolbarItem_Clicked(object sender, EventArgs e)
+        private async void ToolbarItem_Clicked(object sender, EventArgs e)
         {
             IsEditable = !IsEditable;
 
@@ -468,33 +589,55 @@ namespace Notes.Views.Budget
                 (sender as Button).ImageSource = "unedit.png";
             }
 
-            LoadAllData();
+            await LoadAllData();
         }
 
         private void MyListView0_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
 
-        async Task SetVisabilityOfAddButton(int firstIndex, string buttonName)
+        async Task SetVisabilityOfAddButton(int firstIndex, int buttonName)
         {
-            buttonsVisible.TryGetValue(buttonName, out Button button);
+            buttonsVisible.TryGetValue($"AddItemButton{buttonName}", out Button button);
+            elementsVisible.TryGetValue($"Balance{buttonName}", out object btnBalanceObj);
+
+            var btnBalance = (Frame)btnBalanceObj;
 
             if (firstIndex == 0 && !IsFilterFilled())
             {
-                button.IsVisible = true;
-                await button.FadeTo(0.97, 250);
+                if (buttonName != 0)
+                {
+                    button.IsVisible = true;
+                    await button.FadeTo(0.97, 250);
+                }
+
+                btnBalance.IsVisible = true;
+                await btnBalance.FadeTo(0.9, 500);
+
             }
             else
             {
-                await button.FadeTo(0, 250);
-                //await Task.Delay(250);
-                if (!button.IsVisible)
-                    button.IsVisible = false;
+                if (buttonName != 0)
+                {
+                    await button.FadeTo(0, 250);
+                    //await Task.Delay(250);
+                    if (!button.IsVisible)
+                        button.IsVisible = false;
+
+                }
+
+                await btnBalance.FadeTo(0, 500);
+                if (!btnBalance.IsVisible)
+                {
+                    btnBalance.IsVisible = false;
+                    await btnBalance.FadeTo(0.9, 0);
+                }
+
             }
         }
 
         async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e, int buttonName, List<CashFlowOperations> list)
-        {            
+        {
             buttonsVisible.TryGetValue($"List{buttonName}Up", out Button buttonUp);
             buttonsVisible.TryGetValue($"List{buttonName}Down", out Button buttonDown);
 
@@ -529,7 +672,7 @@ namespace Notes.Views.Budget
                 await Task.Delay(4500);
 
                 await buttonUp.FadeTo(0, 250);
-                await List1Down.FadeTo(0, 250);
+                await buttonDown.FadeTo(0, 250);
 
                 buttonUp.IsVisible = false;
                 buttonDown.IsVisible = false;
@@ -561,7 +704,7 @@ namespace Notes.Views.Budget
 
             SetFilterViewOnForm(!IsFilterFilled());
 
-            LoadAllData();
+            await LoadAllData();
         }
 
         private async void ClientTap_Tapped(object sender, EventArgs e)
@@ -579,10 +722,10 @@ namespace Notes.Views.Budget
 
             SetFilterViewOnForm(!IsFilterFilled());
 
-            LoadAllData();
+            await LoadAllData();
         }
 
-        private void DateTap_Tapped(object sender, EventArgs e)
+        private async void DateTap_Tapped(object sender, EventArgs e)
         {
             if (dateFilter != DateTime.MinValue)
             {
@@ -596,26 +739,26 @@ namespace Notes.Views.Budget
 
             SetFilterViewOnForm(!IsFilterFilled());
 
-            LoadAllData();
+            await LoadAllData();
         }
-        private void InTap_Tapped(object sender, EventArgs e)
+        private async void InTap_Tapped(object sender, EventArgs e)
         {
             inOperationFilter = !inOperationFilter;
             outOperationFilter = false;
 
             SetFilterViewOnForm(!IsFilterFilled());
 
-            LoadAllData();
+            await LoadAllData();
         }
 
-        private void OutTap_Tapped(object sender, EventArgs e)
+        private async void OutTap_Tapped(object sender, EventArgs e)
         {
             outOperationFilter = !outOperationFilter;
             inOperationFilter = false;
 
             SetFilterViewOnForm(!IsFilterFilled());
 
-            LoadAllData();
+            await LoadAllData();
         }
 
         private void TapGestureRecognizer_ClientFilter(object sender, EventArgs e)
@@ -684,7 +827,7 @@ namespace Notes.Views.Budget
                 lblOutOperationFilter.Text = outOperationFilter ? "Тільки вихідні операції" : "";
                 lblOutOperationFilter.IsVisible = outOperationFilter;
 
-                SetTitleText(null);
+                //SetTitleText(null);
             }
 
             filterGroup.IsVisible = !resetFilter;
@@ -708,7 +851,7 @@ namespace Notes.Views.Budget
         #endregion
 
         #region ItemsGestureRecognizer
-        
+
         private void ToolbarItem_Clicked_1(object sender, EventArgs e)
         {
             //App.NotesDB.GetFromMySQL();
@@ -719,9 +862,9 @@ namespace Notes.Views.Budget
             //LoadAllData();
         }
 
-        private void refreshMyListView0_Refreshing(object sender, EventArgs e)
+        private async void refreshMyListView0_Refreshing(object sender, EventArgs e)
         {
-            LoadAllData();
+            await LoadAllData();
             (sender as RefreshView).IsRefreshing = false;
         }
 
@@ -729,11 +872,20 @@ namespace Notes.Views.Budget
         {
             PeriodsOfOperations period = (PeriodsOfOperations)(sender as CarouselView).CurrentItem;
 
+            if (period == currentPeriodOfUserChoice)
+            {
+                //Вибрано період, що зараз і так відображається...
+                return;
+            }
+
             SetPeriodOfView(period);
         }
 
         private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
+            //Поки щось не працює...
+            //return;
+
             Dictionary<string, PeriodsOfOperations> data = new Dictionary<string, PeriodsOfOperations>();
 
             string[] periodsString = new string[PeriodsOfOperations.Count];
@@ -754,8 +906,11 @@ namespace Notes.Views.Budget
             {
                 if (data.TryGetValue(resault, out PeriodsOfOperations resultChoise))
                 {
+                    var index = (allPeriods.ItemsSource as List<PeriodsOfOperations>).FirstOrDefault(x=>x.PeriodName == resault);
+
+                    allPeriods.ScrollTo(index, animate:false);
+                    //allPeriods.CurrentItem = resultChoise;
                     SetPeriodOfView(resultChoise);
-                    allPeriods.CurrentItem = resultChoise;
                     //((Label)sender).Text = resultChoise.PeriodName;
                 }
             }
@@ -775,9 +930,9 @@ namespace Notes.Views.Budget
                         {
                             typeOfPeriod = i;
 
-                            ((Label)sender).Text = resault;
+                            ((Label)sender).Text = resault.Replace("місяць", "").Replace("рік", "");
 
-                            LoadAllData(true, false);
+                            await LoadAllData(true, false);
 
                             SetFilterViewOnForm(!IsFilterFilled());
                         }
@@ -786,7 +941,7 @@ namespace Notes.Views.Budget
             }
         }
 
-        private void TapGestureRecognizer_Tapped_1(object sender, EventArgs e)
+        private async void TapGestureRecognizer_Tapped_1(object sender, EventArgs e)
         {
             foreignCurrency = !foreignCurrency;
 
@@ -816,9 +971,9 @@ namespace Notes.Views.Budget
                 period = null;
             }
 
-            LoadAllData();
+            await LoadAllData();
 
-            SetTitleText(period);
+            //SetTitleText(period);
         }
 
         private void lblClientFilter_BindingContextChanged(object sender, EventArgs e)
@@ -831,11 +986,11 @@ namespace Notes.Views.Budget
 
         }
 
-        private void TapGestureRecognizer_Tapped_2(object sender, EventArgs e)
+        private async void TapGestureRecognizer_Tapped_2(object sender, EventArgs e)
         {
             SetFilterViewOnForm(true);
 
-            LoadAllData();
+            await LoadAllData();
         }
 
         private async void TapGestureRecognizer_Tapped_3(object sender, EventArgs e)
@@ -860,6 +1015,8 @@ namespace Notes.Views.Budget
 
         private async void MyListView0_Scrolled(object sender, ItemsViewScrolledEventArgs e)
         {
+            await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, 0);
+
             List<CashFlowOperations> list = (MyListView0.ItemsSource as List<CashFlowOperations>);
 
             await SetVisabilityOfListPositionButtons(e, 0, list);
@@ -867,11 +1024,11 @@ namespace Notes.Views.Budget
 
         private async void MyListView1_Scrolled(object sender, ItemsViewScrolledEventArgs e)
         {
-            await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, "AddItemButton1");
+            await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, 1);
 
             List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
 
-            await SetVisabilityOfListPositionButtons(e,1, list);
+            await SetVisabilityOfListPositionButtons(e, 1, list);
         }
 
         private void List1Up_Clicked(object sender, EventArgs e)
@@ -925,7 +1082,7 @@ namespace Notes.Views.Budget
             MomoImage.IsVisible = true;
             MonoIsLoading.IsVisible = false;
 
-            LoadAllData();
+            await LoadAllData();
         }
 
         #endregion
@@ -933,8 +1090,8 @@ namespace Notes.Views.Budget
         private async void toDelete_Clicked(object sender, EventArgs e)
         {
             //await App.NotesDB.DeleteCashFlowOperationAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
-            await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter); 
-            LoadAllData();
+            await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
+            await LoadAllData();
         }
     }
 

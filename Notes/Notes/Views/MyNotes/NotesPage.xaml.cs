@@ -19,6 +19,8 @@ namespace Notes.Views
     {
         public List<Note> allNotes = null;
 
+        public bool IsEditable { get; set; }
+
         public NotePage()
         {
             InitializeComponent();
@@ -26,13 +28,13 @@ namespace Notes.Views
 
         protected override void OnAppearing()
         {
-            Thread.Sleep(500);
+            //Thread.Sleep(500);
             UpdateNotesList();
 
             base.OnAppearing();
         }
 
-        public async void UpdateNotesList()
+        public async Task UpdateNotesList()
         {
             //List<Note> 
             allNotes = await App.NotesDB.GetNotesAsync();
@@ -43,7 +45,7 @@ namespace Notes.Views
 
         private async void AddButton_Clicked(object sender, EventArgs e)
         {            
-            await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true}");
+            await Shell.Current.GoToAsync($"{nameof(NoteAddingPage)}?{nameof(NoteAddingPage.IsNewForm)}={true}");            
         }
 
         private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -279,6 +281,30 @@ namespace Notes.Views
             {
                 Title = "Архівні нотатки";                
             }
+        }
+
+        private async void ToolbarItem_Clicked(object sender, EventArgs e)
+        {
+            IsEditable = !IsEditable;
+
+            if (IsEditable)
+            {
+                //GridLayout.Span = 1;
+                (collectionView.ItemsLayout as GridItemsLayout).Span = 1;
+                (collectionView.ItemsLayout as GridItemsLayout).HorizontalItemSpacing = 10;
+                (collectionView.ItemsLayout as GridItemsLayout).VerticalItemSpacing = 10;
+                (sender as ToolbarItem).IconImageSource = "edit.png";
+            }
+            else
+            {
+                (collectionView.ItemsLayout as GridItemsLayout).Span = 2;
+                (collectionView.ItemsLayout as GridItemsLayout).HorizontalItemSpacing = 5;
+                (collectionView.ItemsLayout as GridItemsLayout).VerticalItemSpacing = 5;
+                (sender as ToolbarItem).IconImageSource = "unedit.png";
+            }
+
+            await UpdateNotesList();
+
         }
     }
 }

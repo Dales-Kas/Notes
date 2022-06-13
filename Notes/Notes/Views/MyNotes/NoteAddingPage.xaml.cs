@@ -104,7 +104,7 @@ namespace Notes.Views
 
         #region PageSaveLoad
 
-        private async void LoadNote(string value)
+        private async Task LoadNote(string value)
         {
             if (value == null)
             {
@@ -130,7 +130,7 @@ namespace Notes.Views
             catch { }
         }
 
-        private async void LoadAllNoteFlags()
+        private async Task LoadAllNoteFlags()
         {
             Note note = (Note)BindingContext;
 
@@ -409,7 +409,7 @@ namespace Notes.Views
             curNoteFlag = (NoteFlags)e.CurrentSelection.FirstOrDefault();
         }
 
-        private async void SetListOfFlagsStatus(Note note = null)
+        private async Task SetListOfFlagsStatus(Note note = null)
         {
             if (note == null)
             {

@@ -22,7 +22,7 @@ namespace Notes.Views
         {
             InitializeComponent();
 
-            OnFormOpen().Wait();
+            OnFormOpen();
         }
 
         public async Task OnFormOpen()
@@ -154,7 +154,7 @@ namespace Notes.Views
                         SetTextOfLoading(ref iter);
 
                         //await App.NotesDB.SaveCarAsync(car, true);
-                        await App.NotesDB.SaveAsync(car);
+                        await App.NotesDB.SaveAsync(car,true);
                     }
                 }
                 else
@@ -170,7 +170,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
                     else if (item.Name == "CarNotes")
@@ -182,7 +182,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
                     else if (item.Name == "Currencies")
@@ -194,7 +194,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -206,7 +206,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -218,7 +218,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -230,7 +230,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -242,7 +242,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -254,7 +254,7 @@ namespace Notes.Views
                         {
                             SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i);
+                            await App.NotesDB.SaveAsync(i, true);
                         }
                     }
 
@@ -291,6 +291,7 @@ namespace Notes.Views
         public class ImportData
         {
             public string Name { get; set; }
+
             //NOTES:
             public List<Note> Note { get; set; }
             public List<NoteFlags> NoteFlags { get; set; }
@@ -298,7 +299,7 @@ namespace Notes.Views
             public List<Cars> Cars { get; set; }
             public List<CarDescription> CarDescription { get; set; }
             public List<CarNotes> CarNotes { get; set; }
-
+            //Budget:
             public List<Currencies> Currencies { get; set; }
 
             public List<ExchangeRates> ExchangeRates { get; set; }
@@ -310,6 +311,9 @@ namespace Notes.Views
             public List<Clients> Clients { get; set; }
             public List<MoneyStorages> MoneyStorages { get; set; }
 
+            public List<ClientIdentificationTexts> ClientIdentificationTexts { get; set; }
+
+            public List<MCCCodes> MCCCodes { get; set; }
         }
 
         private void MonoToken_TextChanged(object sender, TextChangedEventArgs e)
