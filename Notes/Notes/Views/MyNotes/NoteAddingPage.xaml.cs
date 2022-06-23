@@ -143,7 +143,7 @@ namespace Notes.Views
                 collectionView1.ScrollTo(allNotesflags[(allNotesflags.Count - 1)]);
             }
 
-            SetListOfFlagsStatus();
+            await SetListOfFlagsStatus();
         }
 
         private async Task<int> SaveNote(bool closeForm = true)
@@ -221,13 +221,13 @@ namespace Notes.Views
                         App.NotesDB.CreateNoteFlagsFromNote(note);
                     }
 
-                    LoadAllNoteFlags();
+                    await LoadAllNoteFlags();
                 }
                 SetElementsVisability();
             }
         }
 
-        public void SetElementsVisability()
+        public async Task SetElementsVisability()
         {
             Note note = (Note)BindingContext;
 
@@ -257,14 +257,14 @@ namespace Notes.Views
                 gridAddtools.IsVisible = false;
             }
 
-            SetListOfFlagsStatus(note);
+            await SetListOfFlagsStatus(note);
         }
 
-        private void toolbarItem1_Clicked(object sender, EventArgs e)
+        private async void toolbarItem1_Clicked(object sender, EventArgs e)
         {
             addToolsView = !addToolsView;
 
-            SetElementsVisability();
+            await SetElementsVisability();
         }
 
         private void Button_Clicked(object sender, EventArgs e)

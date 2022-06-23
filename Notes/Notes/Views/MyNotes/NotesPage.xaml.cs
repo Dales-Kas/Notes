@@ -26,12 +26,12 @@ namespace Notes.Views
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
+        protected async override void OnAppearing()
         {
-            //Thread.Sleep(500);
-            UpdateNotesList();
-
+            //Thread.Sleep(500);           
             base.OnAppearing();
+
+            await UpdateNotesList();
         }
 
         public async Task UpdateNotesList()
@@ -124,8 +124,8 @@ namespace Notes.Views
                 searchBar.Text = searchText;
             }
 
-            var filterList = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == false).OrderByDescending(x => x.Date).ToList();
-            var filterList1 = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == true).OrderByDescending(x => x.Date).ToList();
+            var filterList = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == false).OrderByDescending(x => x.Date);
+            var filterList1 = allNotes.Where(x => (x.Text.ToLower().Contains(searchText) || x.Descripton.ToLower().Contains(searchText)) && x.IsArchived == true).OrderByDescending(x => x.Date);
 
             collectionView.ItemsSource = filterList;
             collectionView1.ItemsSource = filterList1;
@@ -148,7 +148,7 @@ namespace Notes.Views
                 note.IsArchived = !note.IsArchived;
                 await App.NotesDB.SaveNoteAsync(note);
 
-                UpdateNotesList();
+                await UpdateNotesList();
             }
         }
 
@@ -182,7 +182,7 @@ namespace Notes.Views
                     Note note = await App.NotesDB.GetNoteAsync(id);
                     await App.NotesDB.DeleteAsync(note);
 
-                    UpdateNotesList();
+                    await UpdateNotesList();
                 }
             }
         }
@@ -197,13 +197,13 @@ namespace Notes.Views
                 note.IsArchived = !note.IsArchived;
                 await App.NotesDB.SaveNoteAsync(note);
 
-                UpdateNotesList();
+                await UpdateNotesList();
             }
         }
 
         protected override void OnBindingContextChanged()
         {
-            UpdateNotesList();
+            //UpdateNotesList();
 
             base.OnBindingContextChanged();
         }
@@ -211,14 +211,14 @@ namespace Notes.Views
         protected override bool OnBackButtonPressed()
         {
 
-            UpdateNotesList();
+            //UpdateNotesList();
 
             return base.OnBackButtonPressed();
         }
 
         private async void RefreshView_Refreshing(object sender, EventArgs e)
         {
-            UpdateNotesList();
+            await UpdateNotesList();
             ((RefreshView)sender).IsRefreshing = false;
 
             await this.DisplayToastAsync(App.GetToastOptions("Список оновлено..."));

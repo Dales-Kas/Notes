@@ -17,7 +17,7 @@ namespace Notes.Views.Budget
 
         public List<Currencies> listOfCurrencies = null;
 
-        public List<ExchangeRates> Items { get; set; }
+        public List<ExchangeRatesToShow> Items { get; set; }
 
         public ExchangeRatesList()
         {
@@ -28,16 +28,18 @@ namespace Notes.Views.Budget
 
         public async void LoadList()
         {
-            Items = await App.NotesDB.GetExchangeRatesAsync();
+            var ItemsCur = await App.NotesDB.GetExchangeRatesAsync();
 
             if (selectedCurrency!=0)
             {
-                int selectedCurrencyCode = listOfCurrencies[selectedCurrency-1].Code;                
+                int selectedCurrencyCode = listOfCurrencies[selectedCurrency-1].Code;
 
-                Items = Items.Where(x=>x.CurrencyID == selectedCurrencyCode).ToList();
+                ItemsCur = ItemsCur.Where(x=>x.CurrencyID == selectedCurrencyCode).ToList();
             }
-            
-            MyListView.ItemsSource = Items.OrderByDescending(x => x.Period);
+
+            Items = ItemsCur.Select(x=>new ExchangeRatesToShow(x)).OrderByDescending(x => x.Period).ToList();
+
+            MyListView.ItemsSource = Items;
         }
 
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)

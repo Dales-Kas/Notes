@@ -128,6 +128,7 @@ namespace Notes.Views.Budget
             //Визначаю залишки...
             double BalanceAmount0 = 0;
             double BalanceAmount1 = 0;
+            double BalanceAmount2 = 0;
 
             foreach (var item in Items)
             {
@@ -137,6 +138,8 @@ namespace Notes.Views.Budget
                 //}
                 //else 
                 if (item.Date > periodEnd) { }
+
+                else if (item.IsPlan) { }
 
                 else if (item.TypeID == 0)
                 {
@@ -162,14 +165,14 @@ namespace Notes.Views.Budget
                 }
                 else if (item.TypeID == 2)
                 {
-                    //if (item.OperationType == Models.OperationType.InOperation)
-                    //{
-                    //    inAmount1 += curValue;
-                    //}
-                    //else if (item.OperationType == Models.OperationType.OutOperation)
-                    //{
-                    //    outAmount1 += curValue;
-                    //}
+                    if (item.OperationType == Models.OperationType.InOperation)
+                    {
+                        BalanceAmount2 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
+                    }
+                    else if (item.OperationType == Models.OperationType.OutOperation)
+                    {
+                        BalanceAmount2 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
+                    }
                 }
             }
 
@@ -334,6 +337,7 @@ namespace Notes.Views.Budget
 
             BalanceAmountLbl0.Text = BalanceAmount0 != 0 ? BalanceAmount0.ToString(amountFormat) : amountFormat0;
             BalanceAmountLbl1.Text = BalanceAmount1 != 0 ? BalanceAmount1.ToString(amountFormat) : amountFormat0;
+            BalanceAmountLbl2.Text = BalanceAmount2 != 0 ? BalanceAmount2.ToString(amountFormat) : amountFormat0;            
 
             SetTitleText(currentPeriodOfUserChoice);
 
@@ -582,11 +586,11 @@ namespace Notes.Views.Budget
 
             if (IsEditable)
             {
-                (sender as Button).ImageSource = "edit.png";
+                (btnEdit as Image).Source = "unedit1.png";
             }
             else
             {
-                (sender as Button).ImageSource = "unedit.png";
+                (btnEdit as Image).Source = "edit1.png";
             }
 
             await LoadAllData();
@@ -608,14 +612,14 @@ namespace Notes.Views.Budget
                 if (buttonName != 0)
                 {
                     button.IsVisible = true;
-                    await button.FadeTo(0.97, 250);
+                    await button.FadeTo(0.97, 500, Easing.SpringIn);
                 }
 
                 btnBalance.IsVisible = true;
-                await btnBalance.FadeTo(0.9, 500);
+                await btnBalance.FadeTo(0.9, 500, Easing.SpringIn);
                 //while (true)
                 //{
-
+                //btnBalance.LayoutBounds
                 //}
 
             }
@@ -623,14 +627,13 @@ namespace Notes.Views.Budget
             {
                 if (buttonName != 0)
                 {
-                    await button.FadeTo(0, 250);
-                    //await Task.Delay(250);
+                    await button.FadeTo(0, 1000, Easing.SpringOut);
                     if (!button.IsVisible)
                         button.IsVisible = false;
 
                 }
 
-                await btnBalance.FadeTo(0, 500);
+                await btnBalance.FadeTo(0, 900, Easing.SpringOut);
                 if (!btnBalance.IsVisible)
                 {
                     btnBalance.IsVisible = false;
@@ -1096,6 +1099,16 @@ namespace Notes.Views.Budget
             //await App.NotesDB.DeleteCashFlowOperationAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
             await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
             await LoadAllData();
+        }
+
+        private void searchBar0_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private async void ToolbarItem_Clicked_2(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync(nameof(PrintForm),true);
         }
     }
 

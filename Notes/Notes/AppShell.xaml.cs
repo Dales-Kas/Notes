@@ -31,7 +31,8 @@ namespace Notes
             Routing.RegisterRoute(nameof(CashFlowOperationForm), typeof(CashFlowOperationForm));
             Routing.RegisterRoute(nameof(ExchangeRatesList), typeof(ExchangeRatesList));
             Routing.RegisterRoute(nameof(CashFlowDetailedTypeForm), typeof(CashFlowDetailedTypeForm));
-            Routing.RegisterRoute(nameof(CashAddForm), typeof(CashAddForm));            
+            Routing.RegisterRoute(nameof(CashAddForm), typeof(CashAddForm));
+            Routing.RegisterRoute(nameof(PrintForm), typeof(PrintForm));
         }
         private void btnAbout_Clicked(object sender, EventArgs e)
         {

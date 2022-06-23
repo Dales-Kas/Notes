@@ -201,13 +201,14 @@ namespace Notes.Views
                     else if (item.Name == "ExchangeRates")
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.ExchangeRates.Count);
+                        
+                        await App.NotesDB.InsertAllExchangeRatesAsync(item.ExchangeRates);
+                        //foreach (var i in item.ExchangeRates)
+                        //{
+                        //    SetTextOfLoading(ref iter);
 
-                        foreach (var i in item.ExchangeRates)
-                        {
-                            SetTextOfLoading(ref iter);
-
-                            await App.NotesDB.SaveAsync(i, true);
-                        }
+                        //    await App.NotesDB.SaveAsync(i, true);
+                        //}
                     }
 
                     else if (item.Name == "CashFlowDetailedType")
@@ -226,24 +227,26 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.CashFlowOperations.Count);
 
-                        foreach (var i in item.CashFlowOperations)
-                        {
-                            SetTextOfLoading(ref iter);
+                        await App.NotesDB.InsertAllOperationsAsync(item.CashFlowOperations);
+                        //foreach (var i in item.CashFlowOperations)
+                        //{
+                        //    SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i, true);
-                        }
+                        //    await App.NotesDB.SaveAsync(i, true);
+                        //}
                     }
 
                     else if (item.Name == "Clients")
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.Clients.Count);
 
-                        foreach (var i in item.Clients)
-                        {
-                            SetTextOfLoading(ref iter);
+                        await App.NotesDB.InsertAllClientsAsync(item.Clients);
+                        //foreach (var i in item.Clients)
+                        //{
+                        //    SetTextOfLoading(ref iter);
 
-                            await App.NotesDB.SaveAsync(i, true);
-                        }
+                        //    await App.NotesDB.SaveAsync(i, true);
+                        //}
                     }
 
                     else if (item.Name == "MoneyStorages")
@@ -256,6 +259,31 @@ namespace Notes.Views
 
                             await App.NotesDB.SaveAsync(i, true);
                         }
+                    }
+
+                    else if (item.Name == "MCCCodes")
+                    {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.MCCCodes.Count);
+
+                        foreach (var i in item.MCCCodes)
+                        {
+                            SetTextOfLoading(ref iter);
+
+                            await App.NotesDB.SaveAsync(i, true);
+                        }
+                    }
+
+                    else if (item.Name == "ClientIdentificationTexts")
+                    {
+                        SetTextOfLoading(ref iter, 0, item.Name, item.ClientIdentificationTexts.Count);
+
+                        await App.NotesDB.InsertAllClientIdentificationTextsAsync(item.ClientIdentificationTexts);
+                        //foreach (var i in item.ClientIdentificationTexts)
+                        //{
+                        //    SetTextOfLoading(ref iter);
+
+                        //    await App.NotesDB.SaveAsync(i, true);
+                        //}
                     }
 
                     //foreach (var i in DataTable)
@@ -281,7 +309,7 @@ namespace Notes.Views
                 case 1:
                     {
                         i++;
-                        lblLoadingInt.Text = "/" + i.ToString();
+                        lblLoadingInt.Text = $"/{i}";
                         break;
                     }
             }

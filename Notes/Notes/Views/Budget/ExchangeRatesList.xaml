@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Notes.Views.Budget.ExchangeRatesList"
-             xmlns:local="clr-namespace:Notes">
+             xmlns:local="clr-namespace:Notes"
+             Title="Курси валют">
     <ContentPage.Resources>
         <ResourceDictionary>
             <local:GetRefNameFromGuid x:Key="currencyID" TypeOfObject ="Currencies" IsGuid ="False"/>
@@ -10,12 +11,12 @@
     </ContentPage.Resources>
     <StackLayout>
         <Grid BackgroundColor="#708090" MinimumHeightRequest="20">
-            <Label Text="Валюта" Margin="10,0" FontAttributes="Bold" FontSize="Large"></Label>
-            <Label Grid.Column="1" Text="Дата" FontAttributes="Bold" FontSize="Large"></Label>
-            <Label Grid.Column="2" Text="Курс" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
-            <Label Grid.Column="3" Text="Крат-сть" Margin="10,0" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+            <Label Text="Валюта" FontAttributes="Bold" FontSize="Large" Margin="25,0,0,0"></Label>
+            <Label Grid.Column="1" Text="Дата" FontAttributes="Bold" FontSize="Large" Margin="10,0"></Label>
+            <Label Grid.Column="2" Text="Курс" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End" Margin="25,0"></Label>
+            <!--<Label Grid.Column="3" Text="Крат-сть" Margin="10,0" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>-->
         </Grid>
-        <RefreshView Refreshing="RefreshView_Refreshing" Margin="10,0,10,0">
+        <RefreshView Refreshing="RefreshView_Refreshing" Margin="10,0">
         <CollectionView x:Name="MyListView"
             ItemsSource="{Binding Items}" ItemSizingStrategy="MeasureAllItems" ItemsUpdatingScrollMode="KeepScrollOffset" SelectionMode="Single">
             <!--<CollectionView.Header>
@@ -48,16 +49,16 @@
                             <RowDefinition Height="1"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15*"/>
+                            <ColumnDefinition Width="25*"/>
                             <ColumnDefinition Width="30*"/>
-                            <ColumnDefinition Width="35*"/>
-                            <ColumnDefinition Width="20*"/>
+                            <ColumnDefinition Width="45*"/>
+                            <!--<ColumnDefinition Width="20*"/>-->
                         </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" FontSize="Large" TextColor="#015722" HorizontalTextAlignment="Center"/>
-                        <Label Grid.Column="1" Text="{Binding Period}" FontSize="Large" HorizontalTextAlignment="Center"/>
-                        <Label Grid.Column="2" Text="{Binding Rate}" FontSize="Large" HorizontalTextAlignment="End" FontAttributes="Bold"/>
-                        <Label Grid.Column="3" Text="{Binding Multiply}" FontSize="Large" HorizontalTextAlignment="End"/>
-                        <Ellipse Grid.Row="1" Grid.ColumnSpan="4" BackgroundColor="LightGray" HeightRequest="1"></Ellipse>
+                            <Label Grid.Column="1" Text="{Binding Period}" FontSize="Large" HorizontalTextAlignment="Center" HorizontalOptions="Center"/>
+                            <Label Grid.Column="2" Text="{Binding RateToDisplay}" FontSize="Large" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <!--<Label Grid.Column="3" Text="{Binding Multiply}" FontSize="Large" HorizontalTextAlignment="End"/>-->
+                        <Ellipse Grid.Row="1" Grid.ColumnSpan="3" BackgroundColor="LightGray" HeightRequest="1"></Ellipse>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

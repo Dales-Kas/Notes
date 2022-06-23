@@ -38,7 +38,16 @@ namespace Notes.Data.Services
             return prSettings.MonoToken;
         }
 
-        public static async Task GetMonoCurrencies()
+        public static async Task<double> GetMonoCurrencyExchRate(int currency1, int currency2, DateTime date)
+        {
+            var listFromBank = await GetMonoCurrencies();
+
+            Currency curExch  = listFromBank.Where(x => x.currencyCodeA == currency1 && x.currencyCodeB == currency2).FirstOrDefault();
+
+            return curExch==null ? 0 : Math.Round((double)curExch.rateSell,2);
+        }
+
+        public static async Task<List<Currency>> GetMonoCurrencies()
         {
             SetMonoBaseSettings();
 
@@ -70,7 +79,10 @@ namespace Notes.Data.Services
                     }
                 }
 
+                return currenciesInMono;
             }
+
+            return new List<Currency>();
         }
 
         public async static Task<List<Statement>> GetStatement(DateTime date, int account = 0)
@@ -154,13 +166,39 @@ namespace Notes.Data.Services
                             MCC = statement.mcc.ToString()
                         };
 
+                        newOperation.ExchangeRate = await App.NotesDB.GetSetExchangeRateAsync(840, new DateTime(operDate.Year,operDate.Month,operDate.Day));
+                        newOperation.AmountСurrency = newOperation.ExchangeRate==0 ? 0 : newOperation.Amount / newOperation.ExchangeRate;
+
+                        if (!string.IsNullOrEmpty(newOperation.MCC))
+                        {
+                            var MCCCode = await App.NotesDB.GetDetailedTypeIDByMCCAsync(newOperation.MCC);
+
+                            if (MCCCode != null)
+                                newOperation.DetailedTypeID = MCCCode.DetailedTypeID;
+                        }
+
+                        if (!string.IsNullOrEmpty(newOperation.TextToIdentifyClient))
+                        {
+                            var ClientDescr = await App.NotesDB.GetClientIdentificationTextsAsync(newOperation.TextToIdentifyClient);
+
+                            if (ClientDescr != null)
+                                newOperation.Client = ClientDescr.Client;
+                        }
+
+                        if (newOperation.DetailedTypeID == Guid.Empty && newOperation.Client != Guid.Empty)
+                        {
+                            var client = await App.NotesDB.GetClientAsync(newOperation.Client);
+                            if (client != null)
+                                newOperation.DetailedTypeID = client.DefaultCashFlowDetailedType;
+                            }
+
                         await App.NotesDB.SaveAsync(newOperation);
                     }
                 }
             }
             return i;
         }
-
+        
         #region AdditionalClassesToTakeDataFromAPI
         public class Statement
         {

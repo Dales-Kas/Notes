@@ -17,26 +17,30 @@
     <FlyoutItem Title="Нотатки" Icon="ic_action_assignment.png" Shell.TabBarIsVisible="True"
                 FlyoutDisplayOptions="AsSingleItem">
         <Tab Title="Нотатки" FlyoutDisplayOptions="AsSingleItem">
-            <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}"></ShellContent>
+            <ShellContent FlyoutItemIsVisible="True" Title="Нотатки" Icon="ic_action_assignment.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NotePage}" xct:SemanticEffect.HeadingLevel="Level9"></ShellContent>
         </Tab>
     </FlyoutItem>
     <FlyoutItem Title="Фінанси" Icon="ic_action_info.png" FlyoutDisplayOptions="AsSingleItem" >
         <ShellContent Title="Фінанси" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowOperationsView}" xct:VisualFeedbackEffect.FeedbackColor="Bisque"></ShellContent>
     </FlyoutItem>
-    <FlyoutItem Title="Довідники" Icon="ic_action_info.png" Shell.TabBarIsVisible="True"
+    <FlyoutItem Title="Довідники" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
         <Tab>
-            <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:NoteCategoriesView}"/>
-            <ShellContent Title="Авто" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
-            <ShellContent Title="Валюти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
-            <ShellContent Title="Курси валют" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ExchangeRatesList}"></ShellContent>
-            <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
-            <ShellContent Title="Контрагенти" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
+            <ShellContent Title="Категорії нотаток" Icon="ic_action_info.png" ContentTemplate="{DataTemplate views:NoteCategoriesView}"/>
+            <ShellContent Title="Авто" Icon="ic_action_info.png" ContentTemplate="{DataTemplate viewsCar:CarsView}"></ShellContent>
+            <ShellContent Title="Валюти" Icon="ic_action_info.png" ContentTemplate="{DataTemplate viewsBudget:CurrenciesView}"></ShellContent>
+            <ShellContent Title="Курси валют" Icon="ic_action_info.png" ContentTemplate="{DataTemplate viewsBudget:ExchangeRatesList}"></ShellContent>
+            <ShellContent Title="Статті руху коштів" Icon="ic_action_info.png" ContentTemplate="{DataTemplate viewsBudget:CashFlowDetailedTypeView}"></ShellContent>
+            <ShellContent Title="Контрагенти" Icon="ic_action_info.png" ContentTemplate="{DataTemplate viewsBudget:ClientsView}"></ShellContent>
         </Tab>
     </FlyoutItem>
     <FlyoutItem Title="Налаштування" Icon="ic_action_info.png" Shell.TabBarIsVisible="False"
                 FlyoutDisplayOptions="AsSingleItem">
         <ShellContent Title="Налаштування" Icon="ic_action_info.png" IsTabStop="True" ContentTemplate="{DataTemplate views:ProgramSettingsView}"></ShellContent>
     </FlyoutItem>
+
+    <Shell.FlyoutFooter>
+        <views:FooterContentView/>    
+    </Shell.FlyoutFooter>
 
 </Shell>

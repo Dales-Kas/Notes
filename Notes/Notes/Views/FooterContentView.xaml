@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             HeightRequest="170"
+             x:Class="Notes.Views.FooterContentView"
+             xmlns:local="clr-namespace:Notes">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <local:GetRefNameFromGuid x:Key="currencyID" TypeOfObject ="Currencies" IsGuid ="False"/>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    <ContentView.Content>
+        <StackLayout>
+            <!--<Ellipse HeightRequest="2" BackgroundColor="LightGray"></Ellipse>-->
+            <StackLayout Orientation="Horizontal" Margin="0" Padding="0" Spacing="0" BackgroundColor="LightGray">
+                <Label Margin="10,0" Text="Курси валют на" VerticalOptions="Center" HorizontalOptions="Start"/>
+                <DatePicker Date="{Binding Date, Mode=TwoWay}" DateSelected="DatePicker_DateSelected" HorizontalOptions="Start" FontSize="Default"/>
+                <Label Margin="10,0" Text=":" VerticalOptions="Center" HorizontalOptions="Start"/>
+                <Button Text="..." HorizontalOptions="EndAndExpand" Clicked="Button_Clicked" BackgroundColor="LightGray"/>
+            </StackLayout>
+            <!--<Ellipse HeightRequest="2" BackgroundColor="LightGray"></Ellipse>-->
+            <!--<Grid BackgroundColor="#708090" MinimumHeightRequest="20">
+                <Label Text="Валюта" Margin="10,0" FontAttributes="Bold" FontSize="Medium"></Label>
+                <Label Grid.Column="1" Text="Курс" FontAttributes="Bold" FontSize="Medium" HorizontalTextAlignment="End"></Label>
+                <Label Grid.Column="2" Text="Кратність" Margin="10,0" FontAttributes="Bold" FontSize="Medium" HorizontalTextAlignment="End"></Label>
+        </Grid>-->
+        <RefreshView Refreshing="RefreshView_Refreshing" Margin="10">
+            <CollectionView x:Name="MyListView" Margin="10"
+            ItemsSource="{Binding Items}" ItemSizingStrategy="MeasureAllItems" ItemsUpdatingScrollMode="KeepScrollOffset" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="5" VerticalItemSpacing="5" />
+                    </CollectionView.ItemsLayout>
+                    <!--<CollectionView.Header>
+                <Grid>
+                    <Label Text="Валюта" FontAttributes="Bold" FontSize="Large"></Label>
+                    <Label Grid.Column="1" Text="Дата" FontAttributes="Bold" FontSize="Large"></Label>
+                    <Label Grid.Column="2" Text="Курс" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+                    <Label Grid.Column="3" Text="Кратність" FontAttributes="Bold" FontSize="Large" HorizontalTextAlignment="End"></Label>
+                </Grid>
+            </CollectionView.Header>-->
+
+                <CollectionView.EmptyView>
+                    <StackLayout Margin="10" VerticalOptions="Center">
+                        <Label Text="Немає даних для відображення..." HorizontalOptions="Center"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+                <!--<CollectionView.Footer>
+                <Grid>
+                    <Label Text="Валюта"></Label>
+                    <Label Grid.Column="1" Text="Дата"></Label>
+                    <Label Grid.Column="2" Text="Курс"></Label>
+                    <Label Grid.Column="3" Text="Кратність"></Label>
+                </Grid>
+            </CollectionView.Footer>-->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="35*"/>
+                                    <ColumnDefinition Width="65 *"/>
+                                </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" FontSize="Large" TextColor="#015722" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Column="1" Text="{Binding RateToDisplay}" FontSize="Medium" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                            <Ellipse Grid.Row="1" Grid.ColumnSpan="2" BackgroundColor="LightGray" HeightRequest="1"></Ellipse>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

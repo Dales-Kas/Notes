@@ -22,7 +22,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
-                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="1"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="70*"/>
@@ -35,7 +35,7 @@
                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding Code}" 
                    Style="{DynamicResource ListItemDetailTextStyle}" HorizontalTextAlignment="End" TextColor="#001B73" FontAttributes="Bold"/>
                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding CharCode}" HorizontalTextAlignment="End" TextColor="#430000"/>
-                    <Ellipse Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="Gray"></Ellipse>
+                    <Ellipse Grid.Row="2" Grid.ColumnSpan="2" HeightRequest="1" BackgroundColor="LightGray"></Ellipse>
                 </Grid>
             </DataTemplate>
         </CollectionView.ItemTemplate>

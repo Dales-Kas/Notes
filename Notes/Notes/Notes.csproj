@@ -17,16 +17,19 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Apis" Version="1.57.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
-    <PackageReference Include="Syncfusion.Xamarin.SfTreeView" Version="20.1.0.52" />
+    <PackageReference Include="Syncfusion.Xamarin.SfTreeView" Version="20.1.0.61" />
     <PackageReference Include="Xamarin.Auth" Version="1.7.0" />
     <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.2" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.2" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2478" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\FooterContentView.xaml.cs">
+      <DependentUpon>FooterContentView.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ProgramSettingsView.xaml.cs">
       <DependentUpon>ProgramSettingsView.xaml</DependentUpon>
     </Compile>
@@ -40,6 +43,9 @@
 
   <ItemGroup>
     <EmbeddedResource Update="AppShell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Budget\PrintForm.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\ProgramSettingsView.xaml">

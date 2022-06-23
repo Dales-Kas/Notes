@@ -150,6 +150,29 @@ namespace Notes.Data
             }
         }
 
+        public Task<int> InsertAllOperationsAsync(List<object> list,Type type)
+        {
+            return db.InsertAllAsync(list, type, true);
+        }
+
+        public Task<int> InsertAllOperationsAsync(List<CashFlowOperations> list) 
+        {
+            return db.InsertAllAsync(list,true);
+        }
+
+        public Task<int> InsertAllExchangeRatesAsync(List<ExchangeRates> list)
+        {
+            return db.InsertAllAsync(list, true);
+        }
+
+        public Task<int> InsertAllClientsAsync(List<Clients> list)
+        {
+            return db.InsertAllAsync(list, true);
+        }
+        public Task<int> InsertAllClientIdentificationTextsAsync(List<ClientIdentificationTexts> list)
+        {
+            return db.InsertAllAsync(list, true);
+        }
 
         #region NotesData
 
@@ -438,6 +461,24 @@ namespace Notes.Data
             return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID && i.Period == date).FirstOrDefaultAsync();
         }
 
+        public async Task<double> GetSetExchangeRateAsync(int currencyID, DateTime date)
+        {
+            ExchangeRates curExchRate = await GetExchangeRatesAsync(currencyID, date);
+
+            if (curExchRate == null)
+            {
+                var curExchRateAmount = await Services.MonobankAPI.GetMonoCurrencyExchRate(currencyID, 980, date);
+
+                if (curExchRateAmount!=0)
+                {
+                    await SaveAsync(new ExchangeRates() { CurrencyID = currencyID, Rate = curExchRateAmount, Multiply = 1, Period = new DateTime(date.Year,date.Month,date.Day)},true);
+                }                
+                return curExchRateAmount;
+            }
+
+            return curExchRate.Multiply == 0 ? 0 : curExchRate.Rate / curExchRate.Multiply;
+        }
+
         public Task<List<ExchangeRates>> GetExchangeRatesAsync(int currencyID)
         {
             return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID).ToListAsync();
@@ -506,6 +547,20 @@ namespace Notes.Data
         {
             return db.Table<MoneyStorages>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
+        #endregion
+
+        #region MCC
+
+        public Task<MCCCodes> GetDetailedTypeIDByMCCAsync(string mcc)
+        {
+            return db.Table<MCCCodes>().Where(x=>x.MCC==mcc).FirstOrDefaultAsync();
+        }
+
+        public Task<ClientIdentificationTexts> GetClientIdentificationTextsAsync(string text)
+        {
+            return db.Table<ClientIdentificationTexts>().Where(x => x.Description == text).FirstOrDefaultAsync();
+        }
+
         #endregion
 
         #region ProgramSettings 

@@ -7,6 +7,7 @@
             Title ="Фінанси"
             x:Name="thisPage" xct:StatusBarEffect.Color="#708090" SelectedTabColor="NavajoWhite" UnselectedTabColor="LightGray" xct:StatusBarEffect.Style="DarkContent">
     <TabbedPage.ToolbarItems>
+        <ToolbarItem Order="Secondary" Text="Друк" IconImageSource="print.png" Clicked="ToolbarItem_Clicked_2"/>
         <!--<ToolbarItem Text="" IconImageSource="refresh1.png" Clicked="ToolbarItem_Clicked">
         </ToolbarItem>-->
         <!--<ToolbarItem x:Name="tbFilter" Text="" IconImageSource="filter1.png" Clicked="ToolbarItem_Clicked_1">
@@ -118,6 +119,13 @@
                             <Label x:Name="MonoEmptyText" Text="Триває завантаження даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
                         </StackLayout>
                     </CollectionView.EmptyView>
+
+                        <!--<CollectionView.Header>
+                            <SearchBar x:Name="searchBar0_"
+                       TextChanged="searchBar0_TextChanged"
+                       Placeholder="Пошук"
+                       HorizontalOptions="FillAndExpand"/>
+                        </CollectionView.Header>-->
                     
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
@@ -243,21 +251,27 @@
             </ScrollView>
             <Grid BackgroundColor="#708090" HeightRequest="60">
                 <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="10*"/>
-                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="12*"/>
+                        <ColumnDefinition Width="33*"/>
                         <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="30*"/>
-                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="12*"/>
                 </Grid.ColumnDefinitions>
                 <!--<xct:BadgeView Grid.Column="0" x:Name="badgeFilter" Text="0" Grid.Row="0" BadgePosition="TopRight" BackgroundColor="Black" TextColor="White" CornerRadius="10" FontSize="Micro" IsClippedToBounds="False">
                     <Image Source="Filter.png" Aspect="AspectFit"/>
                 </xct:BadgeView>-->
-                <Image Grid.Row="0" Grid.Column="0" x:Name="currencyBtn" Source="UAH.png" Margin="5">
+
+
+                    <Image Grid.Row="0" Grid.Column="0" x:Name="currencyBtn" Source="UAH.png" Margin="10,5,0,5">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                     </Image.GestureRecognizers>
                 </Image>
-                <Label Grid.Row="0" Grid.Column="1" Text=""/>
+                <SearchBar Grid.Row="0" Grid.Column="1"  x:Name="searchBar0" Margin="0"
+                       TextChanged="searchBar0_TextChanged"
+                       Placeholder="Пошук"
+                       HorizontalOptions="FillAndExpand"/>
+                <!--<Label Grid.Row="0" Grid.Column="1" Text=""/>-->
                 <Frame Grid.Row="0" Grid.Column="2" BorderColor="White" BackgroundColor="#708090" CornerRadius="3" HasShadow="True" Margin="0" Padding="3" VerticalOptions="Center">
                     <Label x:Name="periodView" Text="" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="WhiteSmoke" BackgroundColor="#708090" FontAttributes="Bold" VerticalOptions="Center" FontSize="Medium">
                         <Label.GestureRecognizers>
@@ -289,8 +303,12 @@
                         </CarouselView.ItemTemplate>
                     </CarouselView>
                 </StackLayout>
-                <Button Grid.Row="0" Grid.Column="4" x:Name="btnEdit" ImageSource="unedit.png" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
-            </Grid>
+                    <Image Grid.Row="0" Grid.Column="4" x:Name="btnEdit" Source="edit1.png" Margin="0,5,10,5">
+                        <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ToolbarItem_Clicked"></TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
         </StackLayout>
 
             <Button x:Name="List0Up" Clicked="List0Up_Clicked" Style="{StaticResource StyleOfListUpButton}"/>
@@ -427,13 +445,13 @@
                 </ScrollView>
                 <Grid BackgroundColor="#708090" HeightRequest="60">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="10*"/>
-                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="12*"/>
+                        <ColumnDefinition Width="33*"/>
                         <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="30*"/>
-                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="12*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
+                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="10,5,0,5">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                         </Image.GestureRecognizers>
@@ -482,7 +500,11 @@
                             </CarouselView.ItemTemplate>
                         </CarouselView>
                     </StackLayout>
-                    <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
+                    <Image Grid.Row="0" Grid.Column="4" Source="{Binding Source={x:Reference btnEdit}, Path=Source}" Margin="0,5,10,5">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ToolbarItem_Clicked"></TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
                 </Grid>
 
             </StackLayout>
@@ -610,13 +632,13 @@
                 </ScrollView>
                 <Grid BackgroundColor="#708090" HeightRequest="60">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="10*"/>
-                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="12*"/>
+                        <ColumnDefinition Width="33*"/>
                         <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="30*"/>
-                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="12*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="5">
+                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Source={x:Reference currencyBtn}, Path=Source,Mode=TwoWay}" Margin="10,5,0,5">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"></TapGestureRecognizer>
                         </Image.GestureRecognizers>
@@ -665,7 +687,11 @@
                             </CarouselView.ItemTemplate>
                         </CarouselView>
                     </StackLayout>
-                    <Button Grid.Row="0" Grid.Column="4" ImageSource="{Binding Source={x:Reference btnEdit}, Path=ImageSource}" Margin="1" Scale="1" Clicked="ToolbarItem_Clicked" BackgroundColor="#708090"></Button>
+                    <Image Grid.Row="0" Grid.Column="4" Source="{Binding Source={x:Reference btnEdit}, Path=Source}" Margin="0,5,10,5">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ToolbarItem_Clicked"></TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
                 </Grid>
             </StackLayout>
             <Button x:Name="AddItemButton2" Text="+"
@@ -685,6 +711,12 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     AbsoluteLayout.LayoutBounds="1, 0.938, AutoSize, AutoSize"
                             xct:ShadowEffect.Color="Gray" xct:TouchEffect.HoveredBackgroundColor="Beige"/>
+            <Frame x:Name="Balance2" BackgroundColor="#708090" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="-0.075,0.915,0.45,0.05" Opacity="0.9" CornerRadius="25" Margin="0" Padding="0">
+                <Grid>
+                    <Label Text="Залишок:" Margin="25,0,0,0" HorizontalTextAlignment="Start" VerticalOptions="Center" TextColor="White"></Label>
+                    <Label  Grid.Column="1" Margin="0,0,10,0" x:Name="BalanceAmountLbl2" Text="-" HorizontalTextAlignment="End" VerticalOptions="Center" TextColor="Wheat"></Label>
+                </Grid>
+            </Frame>
         </AbsoluteLayout>
     </ContentPage>
     <ContentPage Title="" IconImageSource="statistic.png">

@@ -25,7 +25,8 @@
                 <ActivityIndicator  IsVisible="true" IsRunning="True"/>
                 <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
                     <Label x:Name="lblLoadingText" Text="..." HorizontalOptions="Center"/>
-                    <Label x:Name="lblLoadingInt" Text="." HorizontalOptions="End" TextColor="Brown"/>
+                    <Label x:Name="lblLoadingInt" Text="/" HorizontalOptions="End" TextColor="Brown"/>
+                    <!--<Editor x:Name="lblLoadingInt" Text="" HorizontalOptions="EndAndExpand" TextColor="Brown"/>-->
                 </StackLayout>
             </StackLayout>
             <Button Text="Import JSON" x:Name="ImportJSON" Clicked="ImportJSON_Clicked"></Button>

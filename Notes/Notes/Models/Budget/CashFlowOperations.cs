@@ -43,6 +43,8 @@ namespace Notes.Models.Budget
 
         public bool IsFixedOperartion { get; set; }
 
+        public bool IsPlan { get; set; }
+
         public double AmountCommission { get; set; }
         public double AmountDelayCommission { get; set; }
 

@@ -11,5 +11,7 @@ namespace Notes.Models
         public int ID { get; set; } 
 
         public string MonoToken { get; set; }
+
+        public Guid CashStorageID { get; set; }  
     }
 }
