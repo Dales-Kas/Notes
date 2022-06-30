@@ -24,16 +24,16 @@ namespace Notes.Views.Budget
             LoadList();
         }
 
-        public async void LoadList()
+        public async Task LoadList()
         {
-            Items = await App.NotesDB.GetCashFlowDetailedTypeAsync();
+            Items = await App.NotesDB.SelectAllFrom<CashFlowDetailedType>();
 
             if (!string.IsNullOrEmpty(searchText))
             {
-                Items = Items.Where(x=>x.Name.ToLower().Contains(searchText.ToLower())).ToList();
+                Items = Items.Where(x=>x.Name.ToLower().Contains(searchText.ToLower())).OrderBy(x => x.Name).ToList();
             }
 
-            MyListView.ItemsSource = Items.OrderBy(x => x.Name);
+            MyListView.ItemsSource = Items;
         }
 
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)

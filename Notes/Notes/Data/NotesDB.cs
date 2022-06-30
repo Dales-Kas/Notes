@@ -14,35 +14,37 @@ namespace Notes.Data
     public class NotesDB
     {
         readonly SQLiteAsyncConnection db;
+        readonly SQLiteConnection db_add;
         private readonly string strOk = "►";
         private readonly string strNOk = "○";
         //Список усіх таблиць Бази Даних:
-        private readonly Dictionary<string, Type> dataDictionary = new Dictionary<string, Type>(); 
-            
-            ////NOTES:
-            //{ "Note", typeof(Note)},
-            //{ "NoteFlags",typeof(NoteFlags)},
-            //{ "NoteCategory",typeof(NoteCategory)},
-            ////CARS:
-            //{ "Cars",typeof(Cars)},
-            //{ "CarDescription",typeof(CarDescription)},
-            //{ "CarNotes",typeof(CarNotes)},
-            ////BUDGET:
-            //{ "Currencies",typeof(Currencies)},
-            //{ "ExchangeRates",typeof(ExchangeRates)},
-            //{ "CashFlowDetailedType",typeof(CashFlowDetailedType)},
-            //{ "CashFlowOperations",typeof(CashFlowOperations)},
-            //{ "Clients",typeof(Clients)},
-            //{ "MoneyStorages",typeof(MoneyStorages)},
-            //{ "ClientIdentificationTexts",typeof(ClientIdentificationTexts)},
-            ////Settings:
-            //{ "ProgramSettings",typeof(ProgramSettings)}     
+        private readonly Dictionary<string, Type> dataDictionary = new Dictionary<string, Type>();
+
+        ////NOTES:
+        //{ "Note", typeof(Note)},
+        //{ "NoteFlags",typeof(NoteFlags)},
+        //{ "NoteCategory",typeof(NoteCategory)},
+        ////CARS:
+        //{ "Cars",typeof(Cars)},
+        //{ "CarDescription",typeof(CarDescription)},
+        //{ "CarNotes",typeof(CarNotes)},
+        ////BUDGET:
+        //{ "Currencies",typeof(Currencies)},
+        //{ "ExchangeRates",typeof(ExchangeRates)},
+        //{ "CashFlowDetailedType",typeof(CashFlowDetailedType)},
+        //{ "CashFlowOperations",typeof(CashFlowOperations)},
+        //{ "Clients",typeof(Clients)},
+        //{ "MoneyStorages",typeof(MoneyStorages)},
+        //{ "ClientIdentificationTexts",typeof(ClientIdentificationTexts)},
+        ////Settings:
+        //{ "ProgramSettings",typeof(ProgramSettings)}     
 
         public NotesDB(string connectionString)
         {
             db = new SQLiteAsyncConnection(connectionString);
+            db_add = new SQLiteConnection(connectionString);
 
-            dataDictionary.Clear(); 
+            dataDictionary.Clear();
             foreach (Type item in GetAllTablesName())
             {
                 dataDictionary.Add(item.Name, item);
@@ -50,7 +52,7 @@ namespace Notes.Data
             }
         }
 
-        public List<Type> GetAllTablesName() 
+        public List<Type> GetAllTablesName()
         {
             return new List<Type>() { 
 
@@ -74,13 +76,13 @@ namespace Notes.Data
             //Settings:
             { typeof(ProgramSettings)}
             };
-        } 
+        }
 
         public async Task DropTable(string tableName)
         {
-            dataDictionary.TryGetValue(tableName,out Type type);
+            dataDictionary.TryGetValue(tableName, out Type type);
             await db.DropTableAsync(await db.GetMappingAsync(type));
-            await db.CreateTableAsync(type);           
+            await db.CreateTableAsync(type);
         }
 
         public Task<int> DeleteAsync(Object obj)
@@ -150,46 +152,82 @@ namespace Notes.Data
             }
         }
 
-        public Task<int> InsertAllOperationsAsync(List<object> list,Type type)
+        public async Task<List<T>> SelectAllFrom<T>(Guid guid = default(Guid), int id = 0, string name = "id") where T : new()
         {
-            return db.InsertAllAsync(list, type, true);
+            var mapping = await db.GetMappingAsync<T>();
+
+            string query = String.Format("select * from {0}", mapping.TableName);
+
+            if (guid != Guid.Empty || id > 0)
+            {
+                query += $" where {name} = ?";
+
+                if (id > 0)
+                    return await db.QueryAsync<T>(query, id);
+                else
+                    return await db.QueryAsync<T>(query, guid);
+                    
+            }
+
+            return await db.QueryAsync<T>(query);           
         }
 
-        public Task<int> InsertAllOperationsAsync(List<CashFlowOperations> list) 
+        public async Task<T> SelectFrom<T>(Guid guid = default(Guid), int id = 0, string strid = "", string name = "id") where T : new()
         {
-            return db.InsertAllAsync(list,true);
+            var mapping = await db.GetMappingAsync<T>();
+            string query = $"select * from {mapping.TableName}";
+
+            List<T> resault;
+
+            if (guid != Guid.Empty || id > 0 || !string.IsNullOrEmpty(strid))
+            {
+                query += $" where {name} = ?";
+
+                if (id > 0)
+                    resault = await db.QueryAsync<T>(query, id);
+                else if (!string.IsNullOrEmpty(strid))
+                    resault = await db.QueryAsync<T>(query, strid);
+                else
+                    resault = await db.QueryAsync<T>(query, guid);
+            }
+            else 
+            {
+                resault = await db.QueryAsync<T>(query);
+            }
+            
+            return resault.Count > 0 ? resault[0] : default(T);
         }
 
-        public Task<int> InsertAllExchangeRatesAsync(List<ExchangeRates> list)
-        {
-            return db.InsertAllAsync(list, true);
+        public T GetFrom<T>(Guid guid = default(Guid), int id = 0, string name = "id") where T : new()
+        {            
+            var mapping = db_add.GetMapping<T>();
+            string query = $"select * from {mapping.TableName}";
+
+            List<T> resault;
+
+            if (guid != Guid.Empty || id > 0)
+            {
+                query += $" where {name} = ?";
+
+                if (id > 0)
+                    resault = db_add.Query<T>(query, id);
+                else
+                    resault = db_add.Query<T>(query, guid);
+            }
+            else
+            {
+                resault = db_add.Query<T>(query);
+            }
+
+            return resault.Count > 0 ? resault[0] : default(T);
         }
 
-        public Task<int> InsertAllClientsAsync(List<Clients> list)
+        public Task<int> InsertAllFrom<T>(List<T> list)
         {
             return db.InsertAllAsync(list, true);
-        }
-        public Task<int> InsertAllClientIdentificationTextsAsync(List<ClientIdentificationTexts> list)
-        {
-            return db.InsertAllAsync(list, true);
-        }
+        }       
 
         #region NotesData
-
-        public Task<List<Note>> GetNotesAsync()
-        {
-            return db.Table<Note>().ToListAsync();
-        }
-
-        public Task<Note> GetNoteAsync(Guid id)
-        {
-            return db.Table<Note>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
-
-        public Task<Note> GetNoteAsync(int id)
-        {
-            return db.Table<Note>().Take(id).FirstOrDefaultAsync();
-        }
 
         public async Task<int> SaveNoteAsync(Note note, bool insert = false, bool createTextFromFlags = true, bool saveNoteFlags = true)
         {
@@ -207,7 +245,7 @@ namespace Notes.Data
             {
                 note.Text = "";
                 int i = 0;
-                List<NoteFlags> allNotesflags = await GetNoteFlagsAsync(note.ID);
+                List<NoteFlags> allNotesflags = await SelectAllFrom<NoteFlags>(note.ID, name: "NoteID");//GetNoteFlagsAsync(note.ID);
 
                 foreach (NoteFlags item in allNotesflags)
                 {
@@ -279,7 +317,8 @@ namespace Notes.Data
 
         public async Task<int> SaveNoteFlagsAsync(Guid noteId)
         {
-            List<NoteFlags> curTable = await db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
+            //List<NoteFlags> curTable = await db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
+            List<NoteFlags> curTable = await SelectAllFrom<NoteFlags>(noteId,name:"NoteID");
             int i = 0;
 
             foreach (NoteFlags item in curTable)
@@ -289,26 +328,10 @@ namespace Notes.Data
             }
             return i;
         }
-
-        //public Task<int> SaveNoteFlagAsync(NoteFlags noteFlag, bool insert = false)
-        //{
-        //    if (noteFlag.ID != Guid.Empty && !insert)
-        //    {
-        //        //#if DEBUG
-        //        //DisplayAlert(App.GetToastOptions($"стрічка {noteFlag.ID} оновлена..."));
-        //        //#endif
-        //        return db.UpdateAsync(noteFlag);
-        //    }
-
-        //    else
-        //    {
-        //        return db.InsertAsync(noteFlag);
-        //    }
-        //}
-        
+ 
         public async Task<int> DeleteNoteFlagAsync(Guid noteFlagGuid)
         {
-            NoteFlags noteFlag = await GetNoteFlagAsync(noteFlagGuid);
+            NoteFlags noteFlag = await SelectFrom<NoteFlags>(noteFlagGuid, name: "ID");//GetNoteFlagAsync(noteFlagGuid);
             return await DeleteAsync(noteFlag);            
         }
 
@@ -322,21 +345,6 @@ namespace Notes.Data
                 i++;
                 var resault = await DeleteAsync(item);
             }
-        }
-
-        public Task<List<NoteFlags>> GetNoteFlagsAsync(Guid noteId)
-        {
-            return db.Table<NoteFlags>().Where(x => x.NoteID == noteId).ToListAsync();
-        }
-
-        public Task<NoteFlags> GetNoteFlagAsync(Guid noteFlagId)
-        {
-            return db.Table<NoteFlags>().Where(x => x.ID == noteFlagId).FirstOrDefaultAsync();
-        }
-
-        public Task<NoteFlags> GetNoteFlagAsync(Guid id, Guid noteId)
-        {
-            return db.Table<NoteFlags>().Where(i => i.ID == id && i.NoteID == noteId).FirstOrDefaultAsync();
         }
 
         public async void CreateNoteFlagsFromNote(Note note)
@@ -379,27 +387,12 @@ namespace Notes.Data
         #endregion
 
         #region NoteCategory
-
-        public Task<NoteCategory> GetNoteCategoryAsync(int id)
-        {
-            return db.Table<NoteCategory>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
-
-        public NoteCategory GetNoteCategory(int id)
-        {
-            return db.Table<NoteCategory>().Where(i => i.ID == id).FirstOrDefaultAsync().Result;
-        }
-
-        public Task<List<NoteCategory>> GetNotesCategoriesAsync()
-        {
-            return db.Table<NoteCategory>().ToListAsync();
-        }
-        
+                        
         public string GetNoteCategoryName(int ID)
         {
             string categoryText;
 
-            NoteCategory noteCategory = GetNoteCategoryAsync(ID).Result;
+            NoteCategory noteCategory = GetFrom<NoteCategory>(id: ID, name: "ID");//GetNoteCategoryAsync(ID).Result;
 
             if (noteCategory != null)
             {
@@ -414,48 +407,14 @@ namespace Notes.Data
         }
         #endregion
 
-        #region Cars
-
-        public Task<List<Cars>> GetCarsAsync()
-        {
-            return db.Table<Cars>().ToListAsync();
-        }
-
-        public Task<Cars> GetCarAsync(Guid id)
-        {
-            return db.Table<Cars>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
-
-        public Task<List<CarDescription>> GetCarDescriptionAsync(Guid carid)
-        {
-            return db.Table<CarDescription>().Where(i => i.CarID == carid).ToListAsync();
-        }
-
-        public Task<List<CarNotes>> GetCarNotesAsync(Guid carid)
-        {
-            return db.Table<CarNotes>().Where(i => i.CarID == carid).ToListAsync();
-        }
-              
+        #region Cars             
         #endregion
 
         #region Currencies
-
-        public Task<List<Currencies>> GetCurrenciesAsync()
-        {
-            return db.Table<Currencies>().ToListAsync();
-        }
-        public Task<Currencies> GetCurrenciesAsync(int id)
-        {
-            return db.Table<Currencies>().Where(i => i.Code == id).FirstOrDefaultAsync();
-        }
         #endregion
 
         #region ExchangeRates
 
-        public Task<List<ExchangeRates>> GetExchangeRatesAsync()
-        {
-            return db.Table<ExchangeRates>().ToListAsync();
-        }
         public Task<ExchangeRates> GetExchangeRatesAsync(int currencyID, DateTime date)
         {
             return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID && i.Period == date).FirstOrDefaultAsync();
@@ -479,88 +438,25 @@ namespace Notes.Data
             return curExchRate.Multiply == 0 ? 0 : curExchRate.Rate / curExchRate.Multiply;
         }
 
-        public Task<List<ExchangeRates>> GetExchangeRatesAsync(int currencyID)
-        {
-            return db.Table<ExchangeRates>().Where(i => i.CurrencyID == currencyID).ToListAsync();
-        }
         #endregion
 
         #region CashFlowDetailedType
-
-        public Task<List<CashFlowDetailedType>> GetCashFlowDetailedTypeAsync()
-        {
-            return db.Table<CashFlowDetailedType>().ToListAsync();
-        }
-
-        public Task<CashFlowDetailedType> GetCashFlowDetailedTypeAsync(Guid id)
-        {
-            return db.Table<CashFlowDetailedType>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
-
         #endregion
 
-        #region CashFlowOperations
-
-        public Task<List<CashFlowOperations>> GetCashFlowOperationsAsync()
-        {
-            return db.Table<CashFlowOperations>().ToListAsync();
-        }
-
-        public Task<CashFlowOperations> GetCashFlowOperationsAsync(Guid id)
-        {
-            return db.Table<CashFlowOperations>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
-
+        #region CashFlowOperations        
         public Task<CashFlowOperations> GetCashFlowOperationsAsync(DateTime date, double amount)
         {
             return db.Table<CashFlowOperations>().Where(i => i.Date == date && i.Amount == amount).FirstOrDefaultAsync();
-        }
-
-        public Task<CashFlowOperations> GetCashFlowOperationsAsync(string id)
-        {
-            return db.Table<CashFlowOperations>().Where(i => i.MonoId == id).FirstOrDefaultAsync();
-        }
-        
+        }        
         #endregion
 
         #region Clients
-
-        public Task<List<Clients>> GetClientsAsync()
-        {
-            return db.Table<Clients>().ToListAsync();
-        }
-
-        public Task<Clients> GetClientAsync(Guid id)
-        {
-            return db.Table<Clients>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
         #endregion
 
         #region MoneyStorages
-
-        public Task<List<MoneyStorages>> GetMoneyStoragesAsync()
-        {
-            return db.Table<MoneyStorages>().ToListAsync();
-        }
-
-        public Task<MoneyStorages> GetMoneyStoragesAsync(Guid id)
-        {
-            return db.Table<MoneyStorages>().Where(i => i.ID == id).FirstOrDefaultAsync();
-        }
         #endregion
 
         #region MCC
-
-        public Task<MCCCodes> GetDetailedTypeIDByMCCAsync(string mcc)
-        {
-            return db.Table<MCCCodes>().Where(x=>x.MCC==mcc).FirstOrDefaultAsync();
-        }
-
-        public Task<ClientIdentificationTexts> GetClientIdentificationTextsAsync(string text)
-        {
-            return db.Table<ClientIdentificationTexts>().Where(x => x.Description == text).FirstOrDefaultAsync();
-        }
-
         #endregion
 
         #region ProgramSettings 

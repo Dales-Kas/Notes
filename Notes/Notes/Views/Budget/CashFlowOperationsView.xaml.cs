@@ -120,10 +120,12 @@ namespace Notes.Views.Budget
         #region GetDataFromBase
 
         public async Task LoadAllData(bool getAllPeriods = false, bool setTypeOfPeriod = true)
-        {
+        {            
+            AninateList(false);
+            
             int badgeFilterNum = 0;
 
-            Items = await App.NotesDB.GetCashFlowOperationsAsync();
+            Items = await App.NotesDB.SelectAllFrom<CashFlowOperations>();//App.NotesDB.GetCashFlowOperationsAsync();
 
             //Визначаю залишки...
             double BalanceAmount0 = 0;
@@ -341,7 +343,45 @@ namespace Notes.Views.Budget
 
             SetTitleText(currentPeriodOfUserChoice);
 
+            AninateList(true);
+            
             // badgeFilter.Text = badgeFilterNum.ToString();
+        }
+
+        private async Task AninateList(bool inAnimation)
+        {
+            await Task.Run(()=>
+            {
+                double opacity;
+                Easing easing;
+
+                if (inAnimation)
+                {
+                    opacity = 1;
+                    easing = Easing.SinIn;
+                }
+                else
+                {
+                    opacity = 0;
+                    easing = Easing.SinOut;
+                }
+
+                MyListView0.FadeTo(opacity, 500, easing);
+                MyListView1.FadeTo(opacity, 500, easing);
+                MyListView2.FadeTo(opacity, 500, easing);
+                BalanceAmountLbl0.FadeTo(opacity, 500, easing);
+                BalanceAmountLbl1.FadeTo(opacity, 500, easing);
+                BalanceAmountLbl2.FadeTo(opacity, 500, easing);
+                CardIn0.FadeTo(opacity, 500, easing);
+                CardOut0.FadeTo(opacity, 500, easing);
+                CardIn1.FadeTo(opacity, 500, easing);
+                CardOut1.FadeTo(opacity, 500, easing);
+                CardIn2.FadeTo(opacity, 500, easing);
+                CardOut2.FadeTo(opacity, 500, easing);
+                MomoImage.FadeTo(opacity, 500, easing);
+                CashImage.FadeTo(opacity, 500, easing);
+
+            });
         }
 
         public void GetAndSetAllPeriods(bool setTypeOfPeriod = true)
@@ -706,7 +746,7 @@ namespace Notes.Views.Budget
             else
             {
                 Guid guid = (Guid)(e as TappedEventArgs).Parameter;
-                detailedTypeFilter = await App.NotesDB.GetCashFlowDetailedTypeAsync(guid);
+                detailedTypeFilter = await App.NotesDB.SelectFrom<CashFlowDetailedType>(guid,name: "ID");
             }
 
             SetFilterViewOnForm(!IsFilterFilled());
@@ -724,7 +764,7 @@ namespace Notes.Views.Budget
             else
             {
                 Guid guid = (Guid)(e as TappedEventArgs).Parameter;
-                clientFilter = await App.NotesDB.GetClientAsync(guid);
+                clientFilter = await App.NotesDB.SelectFrom<Clients>(guid, name:"ID");
             }
 
             SetFilterViewOnForm(!IsFilterFilled());

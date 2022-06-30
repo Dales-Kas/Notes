@@ -61,7 +61,7 @@ namespace Notes.Data.Services
                 List<Currency> jsonData = JsonConvert.DeserializeObject<List<Currency>>(jsonString);
 
                 //Список усіх валют в програмі:
-                List<Currencies> myCurrencyList = await App.NotesDB.GetCurrenciesAsync();
+                List<Currencies> myCurrencyList = await App.NotesDB.SelectAllFrom<Currencies>();
 
                 var currenciesInMono = new List<Currency>();
 
@@ -119,7 +119,7 @@ namespace Notes.Data.Services
 
             foreach (Statement statement in statements)
             {
-                var operation = await App.NotesDB.GetCashFlowOperationsAsync(statement.id);
+                var operation = await App.NotesDB.SelectFrom<CashFlowOperations>(strid:statement.id,name: "MonoId");
 
                 if (operation != null)
                 {
@@ -171,7 +171,7 @@ namespace Notes.Data.Services
 
                         if (!string.IsNullOrEmpty(newOperation.MCC))
                         {
-                            var MCCCode = await App.NotesDB.GetDetailedTypeIDByMCCAsync(newOperation.MCC);
+                            var MCCCode = await App.NotesDB.SelectFrom<MCCCodes>(strid: newOperation.MCC, name: "MCC");
 
                             if (MCCCode != null)
                                 newOperation.DetailedTypeID = MCCCode.DetailedTypeID;
@@ -179,7 +179,7 @@ namespace Notes.Data.Services
 
                         if (!string.IsNullOrEmpty(newOperation.TextToIdentifyClient))
                         {
-                            var ClientDescr = await App.NotesDB.GetClientIdentificationTextsAsync(newOperation.TextToIdentifyClient);
+                            var ClientDescr = await App.NotesDB.SelectFrom<ClientIdentificationTexts>(strid: newOperation.TextToIdentifyClient, name: "Description");
 
                             if (ClientDescr != null)
                                 newOperation.Client = ClientDescr.Client;
@@ -187,7 +187,7 @@ namespace Notes.Data.Services
 
                         if (newOperation.DetailedTypeID == Guid.Empty && newOperation.Client != Guid.Empty)
                         {
-                            var client = await App.NotesDB.GetClientAsync(newOperation.Client);
+                            var client = await App.NotesDB.SelectFrom<Clients>(newOperation.Client,name:"ID");
                             if (client != null)
                                 newOperation.DetailedTypeID = client.DefaultCashFlowDetailedType;
                             }

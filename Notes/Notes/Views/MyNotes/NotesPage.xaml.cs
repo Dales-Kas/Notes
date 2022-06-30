@@ -37,7 +37,7 @@ namespace Notes.Views
         public async Task UpdateNotesList()
         {
             //List<Note> 
-            allNotes = await App.NotesDB.GetNotesAsync();
+            allNotes = await App.NotesDB.SelectAllFrom<Note>();
             collectionView.ItemsSource = allNotes.Where(x => x.IsArchived == false).OrderByDescending(x => x.Date);
             collectionView1.ItemsSource = allNotes.Where(x => x.IsArchived == true).OrderByDescending(x => x.Date);
         }
@@ -144,7 +144,7 @@ namespace Notes.Views
 
             if (id != Guid.Empty)
             {
-                Note note = await App.NotesDB.GetNoteAsync(id);
+                Note note = await App.NotesDB.SelectFrom<Note>(id,name: "ID"); //GetNoteAsync(id);
                 note.IsArchived = !note.IsArchived;
                 await App.NotesDB.SaveNoteAsync(note);
 
@@ -179,7 +179,7 @@ namespace Notes.Views
 
                 if (id != Guid.Empty)
                 {
-                    Note note = await App.NotesDB.GetNoteAsync(id);
+                    Note note = await App.NotesDB.SelectFrom<Note>(id, name: "ID");//GetNoteAsync(id);
                     await App.NotesDB.DeleteAsync(note);
 
                     await UpdateNotesList();
@@ -193,7 +193,7 @@ namespace Notes.Views
 
             if (id != Guid.Empty)
             {
-                Note note = await App.NotesDB.GetNoteAsync(id);
+                Note note = await App.NotesDB.SelectFrom<Note>(id, name: "ID");//GetNoteAsync(id);
                 note.IsArchived = !note.IsArchived;
                 await App.NotesDB.SaveNoteAsync(note);
 

@@ -342,7 +342,7 @@
                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="InTap_Tapped"/>
                         </Label.GestureRecognizers>
                     </Label>
-                    <Image Grid.Column="1" Source="cash.jpg" Aspect="AspectFit" HeightRequest="60" WidthRequest="50" HorizontalOptions="Center"/>
+                    <Image Grid.Column="1" Source="cash.jpg" x:Name="CashImage" Aspect="AspectFit" HeightRequest="60" WidthRequest="50" HorizontalOptions="Center"/>
                     <Label Grid.Column="2" x:Name="CardOut1" Text="Рохід" VerticalOptions="Center" HorizontalOptions="Center" TextColor="Red" FontSize="28" FontAttributes="Bold">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="OutTap_Tapped"/>

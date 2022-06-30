@@ -27,7 +27,7 @@ namespace Notes.Views
 
         public async void LoadList()
         {
-            var ItemsTemp = await App.NotesDB.GetExchangeRatesAsync();
+            var ItemsTemp = await App.NotesDB.SelectAllFrom<ExchangeRates>();
 
             Items = ItemsTemp
                 .Where(x => x.Period == new DateTime(Date.Year, Date.Month, Date.Day))

@@ -28,7 +28,7 @@ namespace Notes.Views.Budget
 
         public async void LoadList()
         {
-            var ItemsCur = await App.NotesDB.GetExchangeRatesAsync();
+            var ItemsCur = await App.NotesDB.SelectAllFrom<ExchangeRates>();
 
             if (selectedCurrency!=0)
             {
@@ -61,7 +61,7 @@ namespace Notes.Views.Budget
 
         private async void SetCurrenciesListToPick(bool setSelectedItem = false)
         {
-            listOfCurrencies = await App.NotesDB.GetCurrenciesAsync();
+            listOfCurrencies = await App.NotesDB.SelectAllFrom<Currencies>();
             
             string[] vs = new string[listOfCurrencies.Count+1];
 

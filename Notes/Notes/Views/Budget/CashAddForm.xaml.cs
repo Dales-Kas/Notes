@@ -31,7 +31,7 @@ namespace Notes.Views.Budget
             Title = isOut ? "Розхід коштів" : "Надходження коштів";
             btnAdd.BackgroundColor = isOut ? Color.Red : Color.Black;
 
-            var Items = await App.NotesDB.GetCashFlowOperationsAsync();
+            var Items = await App.NotesDB.SelectAllFrom<CashFlowOperations>();
 
             if (isOut)
             {
@@ -69,7 +69,7 @@ namespace Notes.Views.Budget
             int i = 0;
             foreach (var item in ItemsTop)
             {
-                item.Client = await App.NotesDB.GetClientAsync(item.ClientID);
+                item.Client = await App.NotesDB.SelectFrom<Clients>(item.ClientID,name:"ID");
                 buttons[i].Text = item.Client!=null ? item.Client.Name : item.ClientID.ToString();
                 i++;
             }

@@ -41,21 +41,21 @@ namespace Notes.Views
                     int.TryParse(value, out int newId);
                     note.Category = newId;
 
-                    SetCategoryName(newId);
+                    //SetCategoryName(newId);
                 }
             }
 
             get
             {
-                return SetCategoryName(currentNote.Category);
+                return "";// SetCategoryName(currentNote.Category).Result;
             }
         }
 
-        private string SetCategoryName(int curCategoryID)
+        private async Task<string> SetCategoryName(int curCategoryID)
         {
             NoteCategory.Text = "";
 
-            NoteCategory noteCategory = App.NotesDB.GetNoteCategoryAsync(curCategoryID).Result;
+            NoteCategory noteCategory = await App.NotesDB.SelectFrom<NoteCategory>(id:curCategoryID,name:"ID");//GetNoteCategoryAsync(curCategoryID);
 
             if (noteCategory != null)
             {
@@ -71,7 +71,12 @@ namespace Notes.Views
 
         public string NoteCategoryDescr
         {
-            get { return App.NotesDB.GetNoteCategory(((Note)BindingContext).Category).Name; }
+            //get { return App.NotesDB.GetNoteCategory(((Note)BindingContext).Category).Name; }
+            get 
+            {
+                int catid = ((Note)BindingContext).Category;
+                return App.NotesDB.GetFrom<NoteCategory>(id: catid, name: "ID").Name; 
+            }
             set { NoteCategoryDescr = value; }
         }
 
@@ -116,7 +121,7 @@ namespace Notes.Views
 
                 Guid id = Guid.Parse(value);
 
-                Note note = await App.NotesDB.GetNoteAsync(id);
+                Note note = await App.NotesDB.SelectFrom<Note>(id);//App.NotesDB.GetNoteAsync(id);
 
                 BindingContext = note;
 
@@ -134,7 +139,7 @@ namespace Notes.Views
         {
             Note note = (Note)BindingContext;
 
-            allNotesflags = await App.NotesDB.GetNoteFlagsAsync(note.ID);
+            allNotesflags = await App.NotesDB.SelectAllFrom<NoteFlags>(note.ID, name: "NoteID");//App.NotesDB.GetNoteFlagsAsync(note.ID);
 
             collectionView1.ItemsSource = allNotesflags;
 
@@ -419,7 +424,7 @@ namespace Notes.Views
             if (note.IsList)
             {
                 int isFinished = 0;
-                allNotesflags = await App.NotesDB.GetNoteFlagsAsync(note.ID);
+                allNotesflags = await App.NotesDB.SelectAllFrom<NoteFlags>(note.ID, name: "NoteID");//await App.NotesDB.GetNoteFlagsAsync(note.ID);
                 int all = allNotesflags.Count;
 
                 foreach (NoteFlags item in allNotesflags)

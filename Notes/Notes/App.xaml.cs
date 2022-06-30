@@ -68,7 +68,7 @@ namespace Notes
             bankGovUAClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 
-            var myCurrencyList = await App.NotesDB.GetCurrenciesAsync();
+            var myCurrencyList = await App.NotesDB.SelectAllFrom<Currencies>();
 
             string curDate = DateTime.Now.ToString("yyyMMdd");
 

@@ -47,7 +47,7 @@ namespace Notes
                     {
                         //Clients clients = (Clients)objFromBase;
                         //var clients = App.NotesDB.GetFromMySQL((Guid)value, typeof(Clients)).Result as Clients;
-                        Clients clients = App.NotesDB.GetClientAsync((Guid)value).Result;
+                        Clients clients = App.NotesDB.GetFrom<Clients>((Guid)value, name:"ID");
                             //((Guid)value, typeof(Clients)).Result;
 
                         if (clients != null)
@@ -59,9 +59,7 @@ namespace Notes
                     }
                 case "CashFlowDetailedType":
                     {
-                        //CashFlowDetailedType type = (CashFlowDetailedType)objFromBase;
-                        //CashFlowDetailedType type = (CashFlowDetailedType)App.NotesDB.GetFromMySQL((Guid)value, typeof(CashFlowDetailedType)).Result;
-                        CashFlowDetailedType type = App.NotesDB.GetCashFlowDetailedTypeAsync((Guid)value).Result;
+                        CashFlowDetailedType type = App.NotesDB.GetFrom<CashFlowDetailedType>((Guid)value,name: "ID");
 
                         if (type != null)
                         {
@@ -71,7 +69,7 @@ namespace Notes
                     }
                 case "Currencies":
                     {
-                        Currencies type = App.NotesDB.GetCurrenciesAsync((int)value).Result;
+                        Currencies type = App.NotesDB.GetFrom<Currencies>(id: (int)value, name: "Code");
                         
                         if (type != null)
                         {
@@ -82,7 +80,7 @@ namespace Notes
 
                 case "MoneyStorages":
                     {
-                        MoneyStorages type = App.NotesDB.GetMoneyStoragesAsync((Guid)value).Result;
+                        MoneyStorages type = App.NotesDB.GetFrom<MoneyStorages>((Guid)value,name:"ID");
                         //MoneyStorages type = (MoneyStorages)App.NotesDB.GetFromMySQL((Guid)value, typeof(MoneyStorages)).Result;
 
                         if (type != null)
@@ -153,7 +151,8 @@ namespace Notes
                 return defaultColor;
             }
 
-            CashFlowDetailedType type = App.NotesDB.GetCashFlowDetailedTypeAsync((Guid)value).Result;
+            //CashFlowDetailedType type = App.NotesDB.GetCashFlowDetailedTypeAsync((Guid)value).Result;
+            CashFlowDetailedType type = App.NotesDB.GetFrom<CashFlowDetailedType>((Guid)value, name: "ID");
 
             if (type != null)
             {

@@ -38,14 +38,13 @@ namespace Notes.Views.Car
             {
                 Guid id = Guid.Parse(value);
 
-                Cars car = await App.NotesDB.GetCarAsync(id);
+                Cars car = await App.NotesDB.SelectFrom<Cars>(id, name: "ID");
 
                 MainInfo.BindingContext = car;
 
-                CarDescriptionList.ItemsSource = await App.NotesDB.GetCarDescriptionAsync(id);
+                CarDescriptionList.ItemsSource = await App.NotesDB.SelectAllFrom<CarDescription>(id,name: "CarID");
 
-                CarNotesList.ItemsSource = await App.NotesDB.GetCarNotesAsync(id);
-                //CarNotesInfo.BindingContext = ListCarNotes;
+                CarNotesList.ItemsSource = await App.NotesDB.SelectAllFrom<CarNotes>(id, name: "CarID");                
 
             }
             catch { }
@@ -58,7 +57,8 @@ namespace Notes.Views.Car
 
         private async void RefreshView_Refreshing(object sender, EventArgs e)
         {
-            ListCarDescription = await App.NotesDB.GetCarDescriptionAsync(((Cars)MainInfo.BindingContext).ID);
+            //ListCarDescription = await App.NotesDB.GetCarDescriptionAsync(((Cars)MainInfo.BindingContext).ID);
+            ListCarDescription = await App.NotesDB.SelectAllFrom<CarDescription>(((Cars)MainInfo.BindingContext).ID, name: "CarID");
             CarDescriptionList.BindingContext = ListCarDescription;
             ((RefreshView)sender).IsRefreshing = false;
         }

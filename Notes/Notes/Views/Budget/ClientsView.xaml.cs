@@ -22,8 +22,13 @@ namespace Notes.Views.Budget
         public ClientsView()
         {
             InitializeComponent();
-            
-            List<Clients> ItemsClients = App.NotesDB.GetClientsAsync().Result.OrderBy(x=>x.Name).ToList();
+
+            OnFormLoad();
+        }
+
+        private async Task OnFormLoad()
+        {
+            var ItemsClients = (await App.NotesDB.SelectAllFrom<Clients>()).OrderBy(x => x.Name);
 
             Items = new List<ClientsToShow>();
 
@@ -42,13 +47,13 @@ namespace Notes.Views.Budget
 
                 if (newClient.IsGroup)
                 {
-                    newClient.FullName = "_" + newClient.Name; 
+                    newClient.FullName = "_" + newClient.Name;
                 }
                 else
                 {
                     newClient.FullName = newClient.Name;
                 }
-                
+
                 Items.Add(newClient);
             }
 
@@ -56,10 +61,11 @@ namespace Notes.Views.Budget
 
             ParentsItems = ItemsClients.ToList();
             ParentsItems.Clear();
-            
+
             LoadClientsList();
 
             //backParentButton.BindingContext = this;
+
         }
 
         public async void LoadClientsList(bool addClient = true)
@@ -77,7 +83,7 @@ namespace Notes.Views.Budget
             {
                 if (addClient)
                 {
-                    Clients client = await App.NotesDB.GetClientAsync(CurrentParentGuid);
+                    Clients client = await App.NotesDB.SelectFrom<Clients>(CurrentParentGuid,name:"ID");
                     ParentsItems.Add(client);
                     backParentButton.IsVisible = true;
                     backParentButton.Text = client.Name;
