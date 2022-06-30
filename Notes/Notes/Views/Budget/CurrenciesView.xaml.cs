@@ -19,17 +19,12 @@ namespace Notes.Views.Budget
         {
             InitializeComponent();
 
-            Items = App.NotesDB.GetCurrenciesAsync().Result;
-            //    new ObservableCollection<string>
-            //{
-            //    "Item 1",
-            //    "Item 2",
-            //    "Item 3",
-            //    "Item 4",
-            //    "Item 5"
-            //};
+            LoadAllData();
+        }
 
-            MyListView.ItemsSource = Items;
+        private async Task LoadAllData()
+        {
+            MyListView.ItemsSource = await App.NotesDB.SelectAllAsyncFrom<Currencies,int>();
         }
 
         async void Handle_ItemTapped(object sender, ItemTappedEventArgs e)

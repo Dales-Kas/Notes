@@ -19,7 +19,7 @@ namespace Notes.Views.Budget
             set
             {
                 Guid.TryParse(value, out Guid Id);
-                CashFlowOperations operation = App.NotesDB.GetCashFlowOperationsAsync(Id).Result;
+                CashFlowOperations operation = App.NotesDB.SelectFrom<CashFlowOperations,Guid>(Id);
                 BindingContext = operation;                
             }
         }

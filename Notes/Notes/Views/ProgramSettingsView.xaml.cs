@@ -202,7 +202,7 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.ExchangeRates.Count);
                         
-                        await App.NotesDB.InsertAllExchangeRatesAsync(item.ExchangeRates);
+                        await App.NotesDB.InsertAllFrom<ExchangeRates>(item.ExchangeRates);
                         //foreach (var i in item.ExchangeRates)
                         //{
                         //    SetTextOfLoading(ref iter);
@@ -227,7 +227,10 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.CashFlowOperations.Count);
 
-                        await App.NotesDB.InsertAllOperationsAsync(item.CashFlowOperations);
+                        //await App.NotesDB.InsertAllOperationsAsync(item.CashFlowOperations);
+
+                        await App.NotesDB.InsertAllFrom<CashFlowOperations>(item.CashFlowOperations);
+
                         //foreach (var i in item.CashFlowOperations)
                         //{
                         //    SetTextOfLoading(ref iter);
@@ -240,7 +243,7 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.Clients.Count);
 
-                        await App.NotesDB.InsertAllClientsAsync(item.Clients);
+                        await App.NotesDB.InsertAllFrom<Clients>(item.Clients);
                         //foreach (var i in item.Clients)
                         //{
                         //    SetTextOfLoading(ref iter);
@@ -277,7 +280,7 @@ namespace Notes.Views
                     {
                         SetTextOfLoading(ref iter, 0, item.Name, item.ClientIdentificationTexts.Count);
 
-                        await App.NotesDB.InsertAllClientIdentificationTextsAsync(item.ClientIdentificationTexts);
+                        await App.NotesDB.InsertAllFrom<ClientIdentificationTexts>(item.ClientIdentificationTexts);
                         //foreach (var i in item.ClientIdentificationTexts)
                         //{
                         //    SetTextOfLoading(ref iter);

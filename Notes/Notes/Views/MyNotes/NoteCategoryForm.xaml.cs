@@ -19,7 +19,7 @@ namespace Notes.Views
             set
             {
                 int.TryParse(value,out int Id);
-                NoteCategory category = App.NotesDB.GetNoteCategory(Id);
+                NoteCategory category = App.NotesDB.SelectFrom<NoteCategory,int>(Id);
                 BindingContext = category;
             }
         }

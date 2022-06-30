@@ -34,7 +34,7 @@ namespace Notes.Views
         }
         public async void LoadList()
         {
-            Items = await App.NotesDB.GetNotesCategoriesAsync();
+            Items = await App.NotesDB.SelectAllAsyncFrom<NoteCategory,int>();
             MyListView.ItemsSource = Items;
         }
 

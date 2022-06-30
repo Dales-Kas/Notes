@@ -18,16 +18,13 @@ namespace Notes.Views.Car
         public CarsView()
         {
             InitializeComponent();
+            
+            LoadAllData();
+        }
 
-            Items = App.NotesDB.GetCarsAsync().Result;
-            //Items = new ObservableCollection<string>
-            //{
-            //    "Item 1",
-            //    "Item 2",
-            //    "Item 3",
-            //    "Item 4",
-            //    "Item 5"
-            //};
+        private async Task LoadAllData()
+        {
+            Items = await App.NotesDB.SelectAllAsyncFrom<Cars,Guid>();            
 
             MyListView.ItemsSource = Items;
         }
