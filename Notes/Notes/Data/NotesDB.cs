@@ -395,11 +395,6 @@ namespace Notes.Data
         }
         #endregion
 
-        #region Cars             
-        #endregion
-
-        #region Currencies
-        #endregion
 
         #region ExchangeRates
 
@@ -428,26 +423,92 @@ namespace Notes.Data
 
         #endregion
 
-        #region CashFlowDetailedType
-        #endregion
-
         #region CashFlowOperations        
         public Task<CashFlowOperations> GetCashFlowOperationsAsync(DateTime date, double amount)
         {
             return db.Table<CashFlowOperations>().Where(i => i.Date == date && i.Amount == amount).FirstOrDefaultAsync();
         }        
+
+        public async Task<List<CashFlowOperations>> GetAllCashOperations(DateTime periodStart, DateTime periodEnd, CashFlowDetailedType detailedTypeFilter, Clients clientFilter, DateTime dateFilter, bool inOperationFilter, bool outOperationFilter)
+        {
+            var mapping = await db.GetMappingAsync<CashFlowOperations>();
+            string query = $"select * from {mapping.TableName}";
+
+            query += " where Date >= ? and Date <= ?";
+
+            DateTime dateFilterMin = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day);
+            DateTime dateFilterMax = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day, 23, 59, 59);
+
+            query += " and case when ? then Date >= ? and Date <= ? else true end";
+
+            Guid typeID = Guid.NewGuid();
+
+            if (detailedTypeFilter != null)
+            {
+                typeID = detailedTypeFilter.ID;     
+            }
+            
+            query += " and case when ? then DetailedTypeID = ? else true end";
+
+            Guid clientID = Guid.NewGuid();
+
+            if (clientFilter != null)
+            {
+                clientID = clientFilter.ID;                
+            }
+
+            query += " and case when ? then Client = ? else true end";
+            
+            query += " and case when ? then OperationType = ? else true end";
+
+            query += " and case when ? then OperationType = ? else true end";
+
+            query += " ORDER BY Date desc";
+
+            return await db.QueryAsync<CashFlowOperations>(query, periodStart, periodEnd, dateFilter > DateTime.MinValue, dateFilterMin, dateFilterMax, detailedTypeFilter != null, typeID, clientFilter != null, clientID, inOperationFilter, Models.OperationType.InOperation, outOperationFilter, Models.OperationType.OutOperation);
+        }
+        
+        public async Task<List<Balance>> GetBalance(DateTime dateEnd)
+        {
+            var mapping = await db.GetMappingAsync<CashFlowOperations>();
+            
+            string amounttext = "item.Amount + item.AmountDelayCommission + case when item.IsIncludeCommission then 0 else item.AmountCommission end";
+
+            string amountcondition =
+                @$"sum(case when Not item.IsPlan then 
+                   case when item.OperationType = 0 then 1                    
+                        when item.OperationType = 1 then -1
+                        else 0
+                   end *
+                   case when item.TypeID = %TypeID% then {amounttext}                        
+                   else 0
+                   end
+                else 0 
+                end)";
+
+            //string amounttext = "item.Amount";
+
+            string query = 
+                $@"SELECT
+                    {amountcondition.Replace("%TypeID%", "0")} as Balance0,
+                    {amountcondition.Replace("%TypeID%", "1")} as Balance1,
+                    {amountcondition.Replace("%TypeID%", "2")} as Balance2
+                FROM {mapping.TableName} as item
+                WHERE 
+                    item.Date <= ?";         
+
+            return await db.QueryAsync<Balance>(query, dateEnd);            
+        }
+
+        public class Balance
+        {
+            public double Balance0 { get; set; }
+            public double Balance1 { get; set; }
+            public double Balance2 { get; set; }
+        }
         #endregion
 
-        #region Clients
-        #endregion
-
-        #region MoneyStorages
-        #endregion
-
-        #region MCC
-        #endregion
-
-        #region ProgramSettings 
+      #region ProgramSettings 
 
         public async Task<ProgramSettings> GetProgramSettingsAsync()
         {
