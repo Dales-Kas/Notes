@@ -127,201 +127,55 @@ namespace Notes.Views.Budget
 
             Items = await App.NotesDB.SelectAllAsyncFrom<CashFlowOperations,Guid>();//App.NotesDB.GetCashFlowOperationsAsync();
 
+            List<CashFlowOperations> filteredItems = await App.NotesDB.GetAllCashOperations(periodStart, periodEnd, detailedTypeFilter, clientFilter, dateFilter, inOperationFilter, outOperationFilter);
+
+            var balances = await App.NotesDB.GetBalance(periodEnd);
+
+            AninateList(true);
+            
             //Визначаю залишки...
             double BalanceAmount0 = 0;
             double BalanceAmount1 = 0;
             double BalanceAmount2 = 0;
 
-            foreach (var item in Items)
+            if (balances.Count>0)
             {
-                //if (item.DontUseInCashFlow)
-                //{
-                //    continue;
-                //}
-                //else 
-                if (item.Date > periodEnd) { }
-
-                else if (item.IsPlan) { }
-
-                else if (item.TypeID == 0)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        BalanceAmount0 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0)  + item.AmountDelayCommission);
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        BalanceAmount0 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
-                    }
-                }
-                else if (item.TypeID == 1)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        BalanceAmount1 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        BalanceAmount1 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
-                    }
-                }
-                else if (item.TypeID == 2)
-                {
-                    if (item.OperationType == Models.OperationType.InOperation)
-                    {
-                        BalanceAmount2 += (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
-                    }
-                    else if (item.OperationType == Models.OperationType.OutOperation)
-                    {
-                        BalanceAmount2 -= (item.Amount + (!item.IsIncludeCommission ? item.AmountCommission : 0) + item.AmountDelayCommission);
-                    }
-                }
+                BalanceAmount0 = balances[0].Balance0;
+                BalanceAmount1 = balances[0].Balance1;
+                BalanceAmount2 = balances[0].Balance2;
             }
-
-            //Items.AsParallel().ForAll(item =>
-            //{
-            //    //double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;                
-
-            //    if (item.DontUseInCashFlow) { }
-            //    else if (item.Date > periodEnd) { }
-            //    else if (item.TypeID == 0)
-            //    {
-            //        if (item.OperationType == Models.OperationType.InOperation)
-            //        {
-            //            BalanceAmount0 += item.Amount;
-            //        }
-            //        else if (item.OperationType == Models.OperationType.OutOperation)
-            //        {
-            //            BalanceAmount0 -= item.Amount;
-            //        }
-            //    }
-            //    else if (item.TypeID == 1)
-            //    {
-            //        if (item.OperationType == Models.OperationType.InOperation)
-            //        {
-            //            BalanceAmount1 += item.Amount;
-            //        }
-            //        else if (item.OperationType == Models.OperationType.OutOperation)
-            //        {
-            //            BalanceAmount1 -= item.Amount;
-            //        }
-            //    }
-            //    else if (item.TypeID == 2)
-            //    {
-            //        //if (item.OperationType == Models.OperationType.InOperation)
-            //        //{
-            //        //    inAmount1 += curValue;
-            //        //}
-            //        //else if (item.OperationType == Models.OperationType.OutOperation)
-            //        //{
-            //        //    outAmount1 += curValue;
-            //        //}
-            //    }
-            //});            
 
             //Get all mounth from Items:
             if (getAllPeriods)
-            //if (PeriodsOfOperations.Count==0 || YearsOfOperations.Count==0)
             {
                 GetAndSetAllPeriods(setTypeOfPeriod);
             }
 
-            var filteredItems = Items.Where(x => x.Date >= periodStart && x.Date <= periodEnd);
-
-            if (detailedTypeFilter != null)
-            {
-                filteredItems = filteredItems.Where(x => x.DetailedTypeID == detailedTypeFilter.ID);
-                badgeFilterNum++;
-            }
+            if (detailedTypeFilter != null)            
+                badgeFilterNum++;            
 
             if (clientFilter != null)
-            {
-                filteredItems = filteredItems.Where(x => x.Client == clientFilter.ID);
                 badgeFilterNum++;
-            }
+            
 
             if (dateFilter > DateTime.MinValue)
-            {
-                DateTime dateFilterMin = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day);
-                DateTime dateFilterMax = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day, 23, 59, 59);
-
-                filteredItems = filteredItems.Where(x => x.Date >= dateFilterMin && x.Date <= dateFilterMax);
-
                 badgeFilterNum++;
-            }
-
+            
             if (inOperationFilter)
-            {
-                filteredItems = filteredItems.Where(x => x.OperationType == Models.OperationType.InOperation);
-
                 badgeFilterNum++;
-            }
-
+            
             if (outOperationFilter)
-            {
-                filteredItems = filteredItems.Where(x => x.OperationType == Models.OperationType.OutOperation);
-
                 badgeFilterNum++;
-            }
-
-            var filteredItemsList = filteredItems.ToList();
-
-            GetInOutValues(ref inAmount0, ref outAmount0, 0, filteredItemsList);
-            GetInOutValues(ref inAmount1, ref outAmount1, 1, filteredItemsList);
-            GetInOutValues(ref inAmount2, ref outAmount2, 2, filteredItemsList);
-
+            
             //Final values on top of Lists:
 
-            //inAmount0 = 0;
-            //outAmount0 = 0;
-            //inAmount1 = 0;
-            //outAmount1 = 0;
-            //inAmount2 = 0;
-            //outAmount2 = 0;
+            GetInOutValues(ref inAmount0, ref outAmount0, 0, filteredItems);
+            GetInOutValues(ref inAmount1, ref outAmount1, 1, filteredItems);
+            GetInOutValues(ref inAmount2, ref outAmount2, 2, filteredItems);            
 
-            //filteredItems.AsParallel().ForAll(item =>
-            //{
-            //    double curValue = foreignCurrency ? item.AmountСurrency : item.Amount;
-
-            //    if (item.DontUseInCashFlow) { }
-            //    else if (item.TypeID == 0)
-            //    {
-            //        if (item.OperationType == Models.OperationType.InOperation)
-            //        {
-            //            inAmount0 += curValue;
-            //        }
-            //        else if (item.OperationType == Models.OperationType.OutOperation)
-            //        {
-            //            outAmount0 += curValue;
-            //        }
-            //    }
-            //    else if (item.TypeID == 1)
-            //    {
-            //        if (item.OperationType == Models.OperationType.InOperation)
-            //        {
-            //            inAmount1 += curValue;
-            //        }
-            //        else if (item.OperationType == Models.OperationType.OutOperation)
-            //        {
-            //            outAmount1 += curValue;
-            //        }
-            //    }
-            //    else if (item.TypeID == 2)
-            //    {
-            //        if (item.OperationType == Models.OperationType.InOperation)
-            //        {
-            //            inAmount1 += curValue;
-            //        }
-            //        else if (item.OperationType == Models.OperationType.OutOperation)
-            //        {
-            //            outAmount1 += curValue;
-            //        }
-            //    }
-            //});
-
-            MyListView0.ItemsSource = filteredItems.Where(x => x.TypeID == 0).OrderByDescending(x => x.Date).ToList();
-            MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).OrderByDescending(x => x.Date).ToList();
-            MyListView2.ItemsSource = filteredItems.Where(x => x.TypeID == 2).OrderByDescending(x => x.Date).ToList();
+            MyListView0.ItemsSource = filteredItems.Where(x => x.TypeID == 0).ToList();
+            MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).ToList();
+            MyListView2.ItemsSource = filteredItems.Where(x => x.TypeID == 2).ToList();
 
             //Set current items:
 
@@ -343,7 +197,7 @@ namespace Notes.Views.Budget
 
             SetTitleText(currentPeriodOfUserChoice);
 
-            AninateList(true);
+            //AninateList(true);
             
             // badgeFilter.Text = badgeFilterNum.ToString();
         }
@@ -354,34 +208,41 @@ namespace Notes.Views.Budget
             {
                 double opacity;
                 Easing easing;
+                uint delay = 0;
 
                 if (inAnimation)
                 {
                     opacity = 1;
-                    easing = Easing.SinIn;
+                    easing = Easing.Linear;
+                    delay = 0;
                 }
                 else
                 {
                     opacity = 0;
-                    easing = Easing.SinOut;
+                    easing = Easing.Linear;
+                    delay = 150;
                 }
 
-                MyListView0.FadeTo(opacity, 500, easing);
-                MyListView1.FadeTo(opacity, 500, easing);
-                MyListView2.FadeTo(opacity, 500, easing);
-                BalanceAmountLbl0.FadeTo(opacity, 500, easing);
-                BalanceAmountLbl1.FadeTo(opacity, 500, easing);
-                BalanceAmountLbl2.FadeTo(opacity, 500, easing);
-                CardIn0.FadeTo(opacity, 500, easing);
-                CardOut0.FadeTo(opacity, 500, easing);
-                CardIn1.FadeTo(opacity, 500, easing);
-                CardOut1.FadeTo(opacity, 500, easing);
-                CardIn2.FadeTo(opacity, 500, easing);
-                CardOut2.FadeTo(opacity, 500, easing);
-                MomoImage.FadeTo(opacity, 500, easing);
-                CashImage.FadeTo(opacity, 500, easing);
+                MyListView0.FadeTo(opacity, delay, easing);
+                MyListView1.FadeTo(opacity, delay, easing);
+                MyListView2.FadeTo(opacity, delay, easing);
+                BalanceAmountLbl0.FadeTo(opacity, delay, easing);
+                BalanceAmountLbl1.FadeTo(opacity, delay, easing);
+                BalanceAmountLbl2.FadeTo(opacity, delay, easing);
+                CardIn0.FadeTo(opacity, delay, easing);
+                CardOut0.FadeTo(opacity, delay, easing);
+                CardIn1.FadeTo(opacity, delay, easing);
+                CardOut1.FadeTo(opacity, delay, easing);
+                CardIn2.FadeTo(opacity, delay, easing);
+                CardOut2.FadeTo(opacity, delay, easing);
+                MomoImage.FadeTo(opacity, delay, easing);
+                CashImage.FadeTo(opacity, delay, easing);
 
             });
+
+            ListLoading0.IsVisible = !inAnimation;
+            ListLoading1.IsVisible = !inAnimation;
+            ListLoading2.IsVisible = !inAnimation;
         }
 
         public void GetAndSetAllPeriods(bool setTypeOfPeriod = true)
@@ -685,6 +546,11 @@ namespace Notes.Views.Budget
 
         async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e, int buttonName, List<CashFlowOperations> list)
         {
+            if (list == null)
+            {
+                return;
+            }
+
             buttonsVisible.TryGetValue($"List{buttonName}Up", out Button buttonUp);
             buttonsVisible.TryGetValue($"List{buttonName}Down", out Button buttonDown);
 

@@ -320,6 +320,7 @@
                     <Label Grid.Column="1" Margin="0,0,23,0" x:Name="BalanceAmountLbl0" Text="-" HorizontalTextAlignment="End" VerticalOptions="Center" TextColor="Wheat"></Label>
                 </Grid>
             </Frame>
+            <ActivityIndicator x:Name="ListLoading0" IsVisible="false" IsRunning="True" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5,0.5,AutoSize,AutoSize"/>
 
         </AbsoluteLayout>
         
@@ -518,6 +519,7 @@
                     <Label  Grid.Column="1" Margin="0,0,10,0" x:Name="BalanceAmountLbl1" Text="-" HorizontalTextAlignment="End" VerticalOptions="Center" TextColor="Wheat"></Label>
                 </Grid>
             </Frame>
+            <ActivityIndicator x:Name="ListLoading1" IsVisible="false" IsRunning="True" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5,0.5,AutoSize,AutoSize"/>
 
         </AbsoluteLayout>
     </ContentPage>
@@ -717,6 +719,7 @@
                     <Label  Grid.Column="1" Margin="0,0,10,0" x:Name="BalanceAmountLbl2" Text="-" HorizontalTextAlignment="End" VerticalOptions="Center" TextColor="Wheat"></Label>
                 </Grid>
             </Frame>
+            <ActivityIndicator x:Name="ListLoading2" IsVisible="false" IsRunning="True" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5,0.5,AutoSize,AutoSize"/>
         </AbsoluteLayout>
     </ContentPage>
     <ContentPage Title="" IconImageSource="statistic.png">
