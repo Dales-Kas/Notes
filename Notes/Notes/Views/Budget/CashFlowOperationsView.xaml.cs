@@ -9,13 +9,14 @@ using Xamarin.Forms.Xaml;
 using Notes.Models.Budget;
 using System.Globalization;
 using Xamarin.CommunityToolkit.Extensions;
+using Newtonsoft.Json;
 
 namespace Notes.Views.Budget
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CashFlowOperationsView : TabbedPage
     {
-        public List<CashFlowOperations> Items { get; set; }
+        //public List<CashFlowOperations> Items { get; set; }
 
         public CashFlowDetailedType detailedTypeFilter = null;
 
@@ -65,6 +66,8 @@ namespace Notes.Views.Budget
         public double inAmount2 = 0;
         public double outAmount2 = 0;
 
+        private List<CashFlowOperationsToShow> filteredItems;
+
         public List<PeriodsOfOperations> PeriodsOfOperations { get; set; } = new List<PeriodsOfOperations>();
         public List<PeriodsOfOperations> YearsOfOperations { get; set; } = new List<PeriodsOfOperations>();
 
@@ -101,6 +104,13 @@ namespace Notes.Views.Budget
             OnPageLoad();
         }
 
+        protected async override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            //await OnPageLoad();
+        }
+
         async Task OnPageLoad()
         {
             await LoadAllData(true);
@@ -120,58 +130,72 @@ namespace Notes.Views.Budget
         #region GetDataFromBase
 
         public async Task LoadAllData(bool getAllPeriods = false, bool setTypeOfPeriod = true)
-        {            
+        {
             AninateList(false);
-            
+
             int badgeFilterNum = 0;
 
-            Items = await App.NotesDB.SelectAllAsyncFrom<CashFlowOperations,Guid>();//App.NotesDB.GetCashFlowOperationsAsync();
+            filteredItems = await App.NotesDB.GetAllCashOperations(periodStart, periodEnd, detailedTypeFilter, clientFilter, dateFilter, inOperationFilter, outOperationFilter);
 
-            List<CashFlowOperations> filteredItems = await App.NotesDB.GetAllCashOperations(periodStart, periodEnd, detailedTypeFilter, clientFilter, dateFilter, inOperationFilter, outOperationFilter);
-
-            var balances = await App.NotesDB.GetBalance(periodEnd);
+            var balances = await App.NotesDB.GetBalance(periodStart, periodEnd, foreignCurrency);
 
             AninateList(true);
-            
+
             //Визначаю залишки...
             double BalanceAmount0 = 0;
             double BalanceAmount1 = 0;
             double BalanceAmount2 = 0;
+            inAmount0 = 0;
+            outAmount0 = 0;
+            inAmount1 = 0;
+            outAmount1 = 0;
+            inAmount2 = 0;
+            outAmount2 = 0;
 
-            if (balances.Count>0)
+            if (balances.Count > 0)
             {
                 BalanceAmount0 = balances[0].Balance0;
                 BalanceAmount1 = balances[0].Balance1;
                 BalanceAmount2 = balances[0].Balance2;
+                //Final values on top of Lists:
+                inAmount0 = balances[0].InValue0;
+                outAmount0 = balances[0].OutValue0;
+                inAmount1 = balances[0].InValue1;
+                outAmount1 = balances[0].OutValue1;
+                inAmount2 = balances[0].InValue2;
+                outAmount2 = balances[0].OutValue2;
             }
 
-            //Get all mounth from Items:
+            //Get all month from Items:
             if (getAllPeriods)
             {
-                GetAndSetAllPeriods(setTypeOfPeriod);
+                await GetAndSetAllPeriods(setTypeOfPeriod);
             }
 
-            if (detailedTypeFilter != null)            
-                badgeFilterNum++;            
+            if (detailedTypeFilter != null)
+                badgeFilterNum++;
 
             if (clientFilter != null)
                 badgeFilterNum++;
-            
+
 
             if (dateFilter > DateTime.MinValue)
                 badgeFilterNum++;
-            
+
             if (inOperationFilter)
                 badgeFilterNum++;
-            
+
             if (outOperationFilter)
                 badgeFilterNum++;
-            
+
             //Final values on top of Lists:
 
-            GetInOutValues(ref inAmount0, ref outAmount0, 0, filteredItems);
-            GetInOutValues(ref inAmount1, ref outAmount1, 1, filteredItems);
-            GetInOutValues(ref inAmount2, ref outAmount2, 2, filteredItems);            
+            if (badgeFilterNum > 0)
+            {
+                GetInOutValues(ref inAmount0, ref outAmount0, 0, filteredItems);
+                GetInOutValues(ref inAmount1, ref outAmount1, 1, filteredItems);
+                GetInOutValues(ref inAmount2, ref outAmount2, 2, filteredItems);
+            }
 
             MyListView0.ItemsSource = filteredItems.Where(x => x.TypeID == 0).ToList();
             MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).ToList();
@@ -181,30 +205,34 @@ namespace Notes.Views.Budget
 
             MyListView1.ScrollTo(LastItem1, animate: false);
 
-            string amountFormat = "#,#.00";
-            string amountFormat0 = "-";
-
-            CardIn0.Text = inAmount0 != 0 ? inAmount0.ToString(amountFormat) : amountFormat0;
-            CardOut0.Text = outAmount0 != 0 ? outAmount0.ToString(amountFormat) : amountFormat0;
-            CardIn1.Text = inAmount1 != 0 ? inAmount1.ToString(amountFormat) : amountFormat0;
-            CardOut1.Text = outAmount1 != 0 ? outAmount1.ToString(amountFormat) : amountFormat0;
-            CardIn2.Text = inAmount2 != 0 ? inAmount2.ToString(amountFormat) : amountFormat0;
-            CardOut2.Text = outAmount2 != 0 ? outAmount2.ToString(amountFormat) : amountFormat0;
-
-            BalanceAmountLbl0.Text = BalanceAmount0 != 0 ? BalanceAmount0.ToString(amountFormat) : amountFormat0;
-            BalanceAmountLbl1.Text = BalanceAmount1 != 0 ? BalanceAmount1.ToString(amountFormat) : amountFormat0;
-            BalanceAmountLbl2.Text = BalanceAmount2 != 0 ? BalanceAmount2.ToString(amountFormat) : amountFormat0;            
+            CardIn0.Text = SetAmountTextOnForm(inAmount0);
+            CardOut0.Text = SetAmountTextOnForm(outAmount0);
+            CardIn1.Text = SetAmountTextOnForm(inAmount1);
+            CardOut1.Text = SetAmountTextOnForm(outAmount1);
+            CardIn2.Text = SetAmountTextOnForm(inAmount2);
+            CardOut2.Text = SetAmountTextOnForm(outAmount2);
+            BalanceAmountLbl0.Text = SetAmountTextOnForm(BalanceAmount0);
+            BalanceAmountLbl1.Text = SetAmountTextOnForm(BalanceAmount1);
+            BalanceAmountLbl2.Text = SetAmountTextOnForm(BalanceAmount2);
 
             SetTitleText(currentPeriodOfUserChoice);
 
             //AninateList(true);
-            
+
             // badgeFilter.Text = badgeFilterNum.ToString();
+        }
+
+        private string SetAmountTextOnForm(double amount)
+        {
+            string amountFormat = "#,#.00";
+            string amountFormat0 = "-";
+
+            return amount != 0 ? amount.ToString(amountFormat) : amountFormat0;
         }
 
         private async Task AninateList(bool inAnimation)
         {
-            await Task.Run(()=>
+            await Task.Run(() =>
             {
                 double opacity;
                 Easing easing;
@@ -220,7 +248,7 @@ namespace Notes.Views.Budget
                 {
                     opacity = 0;
                     easing = Easing.Linear;
-                    delay = 150;
+                    delay = 0;
                 }
 
                 MyListView0.FadeTo(opacity, delay, easing);
@@ -245,9 +273,10 @@ namespace Notes.Views.Budget
             ListLoading2.IsVisible = !inAnimation;
         }
 
-        public void GetAndSetAllPeriods(bool setTypeOfPeriod = true)
+        public async Task GetAndSetAllPeriods(bool setTypeOfPeriod = true)
         {
             //Get all periods:
+            List<CashFlowOperations> Items = await App.NotesDB.SelectAllAsyncFrom<CashFlowOperations, Guid>();
 
             if (setTypeOfPeriod)
             {
@@ -332,7 +361,7 @@ namespace Notes.Views.Budget
             }
         }
 
-        private void GetInOutValues(ref double inValue, ref double outValue, int typeID, List<CashFlowOperations> filteredItems)
+        private void GetInOutValues(ref double inValue, ref double outValue, int typeID, List<CashFlowOperationsToShow> filteredItems)
         {
             inValue = 0;
             outValue = 0;
@@ -381,7 +410,7 @@ namespace Notes.Views.Budget
 
         #region FormItemsVisability
 
-        public async void SetPeriodOfView(PeriodsOfOperations period)
+        public async Task SetPeriodOfView(PeriodsOfOperations period)
         {
             if (period != null)
             {
@@ -544,7 +573,7 @@ namespace Notes.Views.Budget
             }
         }
 
-        async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e, int buttonName, List<CashFlowOperations> list)
+        async Task SetVisabilityOfListPositionButtons(ItemsViewScrolledEventArgs e, int buttonName, List<CashFlowOperationsToShow> list)
         {
             if (list == null)
             {
@@ -612,7 +641,7 @@ namespace Notes.Views.Budget
             else
             {
                 Guid guid = (Guid)(e as TappedEventArgs).Parameter;
-                detailedTypeFilter = await App.NotesDB.SelectAsyncFrom<CashFlowDetailedType,Guid>(guid);
+                detailedTypeFilter = await App.NotesDB.SelectAsyncFrom<CashFlowDetailedType, Guid>(guid);
             }
 
             SetFilterViewOnForm(!IsFilterFilled());
@@ -630,7 +659,7 @@ namespace Notes.Views.Budget
             else
             {
                 Guid guid = (Guid)(e as TappedEventArgs).Parameter;
-                clientFilter = await App.NotesDB.SelectAsyncFrom<Clients,Guid>(guid);
+                clientFilter = await App.NotesDB.SelectAsyncFrom<Clients, Guid>(guid);
             }
 
             SetFilterViewOnForm(!IsFilterFilled());
@@ -781,7 +810,7 @@ namespace Notes.Views.Budget
             (sender as RefreshView).IsRefreshing = false;
         }
 
-        public void allPeriods_PositionChanged(object sender, PositionChangedEventArgs e)
+        public async void allPeriods_PositionChanged(object sender, PositionChangedEventArgs e)
         {
             PeriodsOfOperations period = (PeriodsOfOperations)(sender as CarouselView).CurrentItem;
 
@@ -791,7 +820,7 @@ namespace Notes.Views.Budget
                 return;
             }
 
-            SetPeriodOfView(period);
+            await SetPeriodOfView(period);
         }
 
         private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
@@ -819,9 +848,9 @@ namespace Notes.Views.Budget
             {
                 if (data.TryGetValue(resault, out PeriodsOfOperations resultChoise))
                 {
-                    var index = (allPeriods.ItemsSource as List<PeriodsOfOperations>).FirstOrDefault(x=>x.PeriodName == resault);
+                    var index = (allPeriods.ItemsSource as List<PeriodsOfOperations>).FirstOrDefault(x => x.PeriodName == resault);
 
-                    allPeriods.ScrollTo(index, animate:false);
+                    allPeriods.ScrollTo(index, animate: false);
                     //allPeriods.CurrentItem = resultChoise;
                     SetPeriodOfView(resultChoise);
                     //((Label)sender).Text = resultChoise.PeriodName;
@@ -889,16 +918,6 @@ namespace Notes.Views.Budget
             //SetTitleText(period);
         }
 
-        private void lblClientFilter_BindingContextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblClientFilter_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
-        }
-
         private async void TapGestureRecognizer_Tapped_2(object sender, EventArgs e)
         {
             SetFilterViewOnForm(true);
@@ -908,7 +927,7 @@ namespace Notes.Views.Budget
 
         private async void TapGestureRecognizer_Tapped_3(object sender, EventArgs e)
         {
-            CashFlowOperations operation = (CashFlowOperations)(e as TappedEventArgs).Parameter;
+            var operation = (CashFlowOperationsToShow)(e as TappedEventArgs).Parameter;
 
             if (operation != null)
             {
@@ -930,7 +949,7 @@ namespace Notes.Views.Budget
         {
             await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, 0);
 
-            List<CashFlowOperations> list = (MyListView0.ItemsSource as List<CashFlowOperations>);
+            var list = (MyListView0.ItemsSource as List<CashFlowOperationsToShow>);
 
             await SetVisabilityOfListPositionButtons(e, 0, list);
         }
@@ -939,7 +958,7 @@ namespace Notes.Views.Budget
         {
             await SetVisabilityOfAddButton(e.FirstVisibleItemIndex, 1);
 
-            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+            var list = (MyListView1.ItemsSource as List<CashFlowOperationsToShow>);
 
             await SetVisabilityOfListPositionButtons(e, 1, list);
         }
@@ -951,7 +970,7 @@ namespace Notes.Views.Budget
 
         private void List1Down_Clicked(object sender, EventArgs e)
         {
-            List<CashFlowOperations> list = (MyListView1.ItemsSource as List<CashFlowOperations>);
+            var list = (MyListView1.ItemsSource as List<CashFlowOperationsToShow>);
 
             var count = list[list.Count - 1];
             MyListView1.ScrollTo(count, animate: false);
@@ -964,7 +983,7 @@ namespace Notes.Views.Budget
 
         private void List0Down_Clicked(object sender, EventArgs e)
         {
-            List<CashFlowOperations> list = (MyListView0.ItemsSource as List<CashFlowOperations>);
+            var list = (MyListView0.ItemsSource as List<CashFlowOperationsToShow>);
 
             var count = list[list.Count - 1];
             MyListView0.ScrollTo(count, animate: false);
@@ -993,7 +1012,6 @@ namespace Notes.Views.Budget
             await this.DisplayToastAsync(App.GetToastOptions($"Кількість нових стрічок імпортовано: {i}"));
 
             MomoImage.IsVisible = true;
-            MonoIsLoading.IsVisible = false;
 
             await LoadAllData();
         }
@@ -1003,7 +1021,7 @@ namespace Notes.Views.Budget
         private async void toDelete_Clicked(object sender, EventArgs e)
         {
             //await App.NotesDB.DeleteCashFlowOperationAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
-            await App.NotesDB.DeleteAsync((CashFlowOperations)(sender as SwipeItem).CommandParameter);
+            await App.NotesDB.DeleteAsync(await App.NotesDB.SelectAsyncFrom<CashFlowOperations,Guid>((Guid)(sender as SwipeItem).CommandParameter));
             await LoadAllData();
         }
 
@@ -1014,7 +1032,18 @@ namespace Notes.Views.Budget
 
         private async void ToolbarItem_Clicked_2(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(PrintForm),true);
+            var IDsToPrint = filteredItems.Select(x => x.ID).ToList();
+
+            string listInJson = JsonConvert.SerializeObject(IDsToPrint);
+
+            string notePath = @""+nameof(PrintForm)+"?"+nameof(PrintForm.ListInJson)+"="+listInJson+"&"+nameof(PrintForm.ForeignCurrency)+"="+foreignCurrency+"&"+ nameof(PrintForm.OperationsDate) +"="+ periodEnd.ToString("MMMM yyyy");
+            await Shell.Current.GoToAsync(notePath, true);
+        }
+        
+        private async void MyListView0_BindingContextChanged(object sender, EventArgs e)
+        {
+            //await AninateList(false);
+            //await AninateList(true);
         }
     }
 

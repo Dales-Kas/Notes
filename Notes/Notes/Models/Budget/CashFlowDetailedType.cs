@@ -25,6 +25,11 @@ namespace Notes.Models.Budget
         public string OperationTextColor { get; set; }
 
         public string MCC { get; set; }
-        public int MCC_Count { get; set; }        
+        public int MCC_Count { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

@@ -25,7 +25,8 @@
             <local:GetUnusedOperationColor x:Key="unusedOperColor"/>
             
             <Style x:Key="FrameDetailedTypeStyle" TargetType="Frame">
-                <Setter Property="BackgroundColor" Value="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>
+                <!--<Setter Property="BackgroundColor" Value="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>-->
+                <Setter Property="BackgroundColor" Value="{Binding OperationColor}"/>
                 <Setter Property="HeightRequest" Value="5"/>
                 <Setter Property="WidthRequest" Value="5"/>
                 <Setter Property="Margin" Value="7,7,7,0"/>
@@ -109,11 +110,11 @@
             <!--<Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>-->
 
             <RefreshView x:Name="refreshMyListView0" IsRefreshing="false" Refreshing="refreshMyListView0_Refreshing" Margin="0">
-                <CollectionView x:Name="MyListView0" ItemsSource="{Binding Items0}" 
-                                                     Margin="10,0" 
-                                                     SelectedItem="{Binding ID}"
-                                                     SelectionChanged="MyListView0_SelectionChanged" 
-                                                     SelectionMode="Single" Scrolled="MyListView0_Scrolled">
+                <CollectionView x:Name="MyListView0" 
+                                Margin="10,0" 
+                                SelectedItem="{Binding ID}"
+                                SelectionChanged="MyListView0_SelectionChanged" 
+                                SelectionMode="Single" Scrolled="MyListView0_Scrolled" VerticalScrollBarVisibility="Always" BindingContextChanged="MyListView0_BindingContextChanged">
                     <CollectionView.EmptyView>
                         <StackLayout>
                             <Label x:Name="MonoEmptyText" Text="Триває завантаження даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
@@ -137,7 +138,7 @@
                                 </SwipeView.LeftItems>
                                 <SwipeView.RightItems>
                                     <SwipeItems>
-                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" CommandParameter="{Binding .}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}" Clicked="toDelete_Clicked"></SwipeItem>
+                                        <SwipeItem x:Name="toDelete" Text="Видалити" BackgroundColor="Red" CommandParameter="{Binding ID}" IsVisible="{Binding Source={x:Reference thisPage}, Path=IsEditable}" Clicked="toDelete_Clicked"></SwipeItem>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
                                     <Grid BackgroundColor="{Binding DontUseInCashFlow,Converter={StaticResource unusedOperColor}}">
@@ -163,7 +164,8 @@
                                             </TapGestureRecognizer>
                                         </Frame.GestureRecognizers>
                                     </Frame>
-                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" Style="{StaticResource ClientLblStyle}">
+                                        <!--<Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" Style="{StaticResource ClientLblStyle}">-->
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding ClientName}" Style="{StaticResource ClientLblStyle}">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
                                             </TapGestureRecognizer>
@@ -172,7 +174,8 @@
 
                                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" Style="{StaticResource DescriptionLblStyle}"/>
 
-                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" Style="{StaticResource StorageLblStyle}" HorizontalTextAlignment="Start"/>
+                                    <!--<Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" Style="{StaticResource StorageLblStyle}" HorizontalTextAlignment="Start"/>-->
+                                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageName}" Style="{StaticResource StorageLblStyle}" HorizontalTextAlignment="Start"/>
 
                                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" 
                                                                         TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"                                                                        
@@ -190,7 +193,8 @@
                                                                         HorizontalTextAlignment="End"
                                                                         IsVisible="{Binding Source={x:Reference thisPage}, Path=foreignCurrency}"/>
 
-                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" 
+                                    <!--<Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}"-->
+                                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeName}" 
                                                                         Style="{StaticResource DetailedTypeLblStyle}"
                                                                         HorizontalTextAlignment="End" 
                                                                         LineBreakMode="WordWrap"/>
@@ -221,7 +225,7 @@
                     </Image>
                     <!--<Frame x:Name="lblClientFilterF" BackgroundColor="LightBlue" Margin="0" Padding="0" CornerRadius="10">-->
                     
-                    <Label x:Name="lblClientFilter" Text="{Binding Source={x:Reference thisPage}, Path=ClientFilterName}" BindingContextChanged="lblClientFilter_BindingContextChanged" PropertyChanged="lblClientFilter_PropertyChanged" TextColor="#483D8B" VerticalOptions="Center">
+                    <Label x:Name="lblClientFilter" Text="{Binding Source={x:Reference thisPage}, Path=ClientFilterName}" TextColor="#483D8B" VerticalOptions="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="TapGestureRecognizer_ClientFilter"/>
                         </Label.GestureRecognizers>
@@ -353,7 +357,7 @@
                 </Grid>
                 <RefreshView Refreshing="refreshMyListView0_Refreshing" Margin="0">
                     <CollectionView x:Name="MyListView1"
-            ItemsSource="{Binding Items1}" Margin="10,0" ScrollToRequested="MyListView1_ScrollToRequested" Scrolled="MyListView1_Scrolled">
+            ItemsSource="{Binding Items1}" Margin="10,0" ScrollToRequested="MyListView1_ScrollToRequested" Scrolled="MyListView1_Scrolled" VerticalScrollBarVisibility="Always">
                         
                         <CollectionView.EmptyView>
                             <StackLayout>
@@ -381,8 +385,8 @@
                                             </TapGestureRecognizer>
                                         </Frame.GestureRecognizers>
                                     </Frame>
-                                    <Label Grid.Row="0" Grid.Column="1" 
-                                   Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" 
+                                    <!--<Label Grid.Row="0" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}"-->
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding ClientName}" 
                                    TextColor="#483D8B" 
                                    FontSize="Medium" 
                                    FontAttributes="Bold">
@@ -392,9 +396,11 @@
                                         </Label.GestureRecognizers>
                                     </Label>
                                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
-                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>
+                                    <!--<Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>-->
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding StorageName}" TextColor="#4169E1" HorizontalTextAlignment="Start"/>
                                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>
+                                    <!--<Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>-->
+                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DetailedTypeName}" TextColor="Brown" HorizontalTextAlignment="End"/>
                                     <Label Grid.Row="2" Grid.Column="2" 
                                    Text="{Binding Date}" 
                                    TextColor="Gray" 
@@ -547,7 +553,7 @@
                 <Ellipse HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
                 <RefreshView Refreshing="refreshMyListView0_Refreshing">
                     <CollectionView x:Name="MyListView2"
-            ItemsSource="{Binding Items2}" Margin="10,0">
+            ItemsSource="{Binding Items2}" Margin="10,0" VerticalScrollBarVisibility="Always">
                         <CollectionView.EmptyView>
                             <StackLayout>
                                 <Label Text="Не знайдено даних..." Margin="10,25,10,10" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalOptions="CenterAndExpand" />
@@ -575,15 +581,16 @@
                                         </Frame.GestureRecognizers>
                                     </Frame>
                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
-                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold">
+                                    <!--<Label Grid.Row="1" Grid.Column="1" Text="{Binding Client, Converter={StaticResource clientGuid}, Mode=OneWay}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold">-->
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding ClientName}" TextColor="#483D8B" FontSize="Medium" FontAttributes="Bold">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="ClientTap_Tapped" CommandParameter="{Binding Client}">
                                             </TapGestureRecognizer>
                                         </Label.GestureRecognizers>
                                     </Label>
                                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding Description}" TextColor="#008B8B"/>
-                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" VerticalOptions="Center"/>
-                                    <!--<Label Grid.Row="1" Grid.Column="2" Text="{Binding StorageID, Converter={StaticResource typeGuid}}" TextColor="Brown" HorizontalTextAlignment="End"/>-->
+                                    <!--<Label Grid.Row="0" Grid.Column="2" Text="{Binding CurrencyID, Converter={StaticResource currencyID}}" VerticalOptions="Center"/>-->
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding CurrencyName}" VerticalOptions="Center"/>
                                     <Label Grid.Row="0" Grid.Column="3" Text="{Binding Amount,StringFormat='{0:#,0.00}'}" TextColor="{Binding OperationType,Converter={StaticResource operationColor}}" FontSize="Medium" FontAttributes="Bold" HorizontalTextAlignment="End"/>
                                     <Label Grid.Row="1" Grid.Column="3" Text="{Binding Date}" TextColor="Gray" HorizontalTextAlignment="End">
                                         <Label.GestureRecognizers>
@@ -591,7 +598,8 @@
                                             </TapGestureRecognizer>
                                         </Label.GestureRecognizers>
                                     </Label>
-                                    <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>
+                                    <!--<Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageID, Converter={StaticResource storageGuid}}" TextColor="#4169E1" HorizontalTextAlignment="End"/>-->
+                                    <Label Grid.Row="2" Grid.Column="3" Text="{Binding StorageName}" TextColor="#4169E1" HorizontalTextAlignment="End"/>
                                     <Ellipse Grid.Row="3" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#FFDCDCDC"></Ellipse>
                                 </Grid>
                             </DataTemplate>

@@ -17,8 +17,7 @@ namespace Notes.Models.Budget
         public string Comment { get; set; }
         public Guid DefaultCashFlowDetailedType { get; set; }
 
-        public double PercentageCommission { get; set; }
-
+        public double PercentageCommission { get; set; }        
     }
 
     public class ClientsToShow : Clients

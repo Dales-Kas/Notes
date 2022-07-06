@@ -60,6 +60,17 @@ namespace Notes.Models.Budget
         
         public string MCC { get; set; }
 
+    }
 
+    public class CashFlowOperationsToShow : CashFlowOperations
+    {
+        public string ClientName { get; set; }
+        public string StorageName { get; set; }
+
+        public string DetailedTypeName { get; set; }
+
+        public string CurrencyName { get; set; }
+
+        public string OperationColor { get; set; }
     }
 }

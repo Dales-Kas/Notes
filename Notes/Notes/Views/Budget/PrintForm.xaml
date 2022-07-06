@@ -1,32 +1,97 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Notes.Views.Budget.PrintForm">
-  <ListView x:Name="MyListView"
-            ItemsSource="{Binding Items}"
-            ItemTapped="Handle_ItemTapped"
-            CachingStrategy="RecycleElement">
-    <!--Built in Cells-->
-    <ListView.ItemTemplate>
-        <DataTemplate>
-            <TextCell Text="{Binding .}" />
-        </DataTemplate>
-    </ListView.ItemTemplate>
-    
-    <!--Custom View Cells-->
-    <!--
-    <ListView.ItemTemplate>
-      <DataTemplate>
-        <ViewCell>
-          <StackLayout>
-            <Label Text="{Binding Text}" 
-                   Style="{DynamicResource ListItemTextStyle}" />
-            <Label Text="{Binding Detail}" 
-                   Style="{DynamicResource ListItemDetailTextStyle}"/>
-          </StackLayout>
-        </ViewCell>
-      </DataTemplate>
-    </ListView.ItemTemplate>
-    -->
-  </ListView>
+             xmlns:local="clr-namespace:Notes"
+             x:Class="Notes.Views.Budget.PrintForm" Title="Вибрані операції:"
+             x:Name="thisPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="BtnClient" Text="По контрагентах" Order="Secondary" Clicked="BtnClient_Clicked"/>
+        <ToolbarItem x:Name="BtnDescr" Text="По опису" Order="Secondary" Clicked="BtnDescr_Clicked"/>
+        <ToolbarItem x:Name="BtnDetail" Text="По статті" Order="Secondary" Clicked="BtnDetail_Clicked"/>
+        <ToolbarItem x:Name="BtnInOut" Text="Прихід/розхід" Order="Secondary" Clicked="BtnInOut_Clicked"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:GetRefNameFromGuid x:Key="clientGuid" TypeOfObject="Clients"/>
+            <local:GetRefNameFromGuid x:Key="typeGuid" TypeOfObject="CashFlowDetailedType"/>
+            <local:GetRefNameFromGuid x:Key="storageGuid" TypeOfObject ="MoneyStorages"/>
+            <local:GetOperationTypeColor x:Key="operationColor" />
+            <local:GetDetailedOperationTypeColor x:Key="det_operationColor" />
+            <local:GetUnbool x:Key="boolValue" />
+            <local:GetUnusedOperationColor x:Key="unusedOperColor"/>
+
+            <Style x:Key="FrameDetailedTypeStyle" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{Binding DetailedTypeID, Converter={StaticResource det_operationColor}}"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout Margin="12">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="*період:" VerticalOptions="Center" FontSize="Medium" TextColor="#708090" HorizontalTextAlignment="Start"></Label>
+                <Label Grid.Column="0" Grid.Row="1" Margin="10,0,0,0" x:Name="OperationsPeriod" Text="..." TextColor="#708090" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Start" HorizontalTextAlignment="Start"></Label>
+
+                <Label Grid.Column="1" Grid.RowSpan="2" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand" x:Name="OperationsTypes" Text="..." FontSize="Large" TextColor="#708090" FontAttributes="Bold" HorizontalTextAlignment="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <Ellipse HeightRequest="2" BackgroundColor="Black" />
+            <CollectionView x:Name="MyListView"
+            ItemsSource="{Binding Items}" VerticalScrollBarVisibility="Always">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid HorizontalOptions="FillAndExpand">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Label Text="{Binding Description}" Style="{DynamicResource ListItemTextStyle}" VerticalOptions="Center" FontSize="Large" TextColor="Black"/>
+                            <Label Grid.Column="1" 
+                                       Text="{Binding Amount,StringFormat='{0:#,0.00}'}"  
+                                       Style="{DynamicResource ListItemDetailTextStyle}" 
+                                       HorizontalTextAlignment="End"
+                                       FontSize="Large"
+                                       FontAttributes="Bold"
+                                       IsVisible="{Binding Source={x:Reference thisPage}, Path=ForeignCurrency, Converter={StaticResource boolValue}}"
+                                       TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
+                                       VerticalOptions="Center"/>
+                            <Label Grid.Column="1" 
+                                       Text="{Binding AmountСurrency,StringFormat='{0:#,0.00}'}"  
+                                       Style="{DynamicResource ListItemDetailTextStyle}" 
+                                       HorizontalTextAlignment="End" 
+                                       FontSize="Large"
+                                       FontAttributes="Bold"
+                                       IsVisible="{Binding Source={x:Reference thisPage}, Path=ForeignCurrency}"
+                                       TextColor="{Binding OperationType,Converter={StaticResource operationColor}}"
+                                       VerticalOptions="Center"/>
+                            <Ellipse Grid.Row="1" Grid.ColumnSpan="2" BackgroundColor="Gray" HeightRequest="1" HorizontalOptions="FillAndExpand"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+            <Ellipse HeightRequest="2" BackgroundColor="Black" />
+            <Grid HorizontalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Text="Всього:" FontSize="Large" FontAttributes="Bold" TextColor="Black"></Label>
+                <Label Grid.Column="1" x:Name="TotalAmount" Text="110.59" FontSize="Large" FontAttributes="Bold" HorizontalOptions="End" TextColor="Black"></Label>
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
 </ContentPage>
