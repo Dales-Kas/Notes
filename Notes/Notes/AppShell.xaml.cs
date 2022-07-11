@@ -33,6 +33,8 @@ namespace Notes
             Routing.RegisterRoute(nameof(CashFlowDetailedTypeForm), typeof(CashFlowDetailedTypeForm));
             Routing.RegisterRoute(nameof(CashAddForm), typeof(CashAddForm));
             Routing.RegisterRoute(nameof(PrintForm), typeof(PrintForm));
+            Routing.RegisterRoute(nameof(Charts), typeof(Charts));
+            
         }
         private void btnAbout_Clicked(object sender, EventArgs e)
         {

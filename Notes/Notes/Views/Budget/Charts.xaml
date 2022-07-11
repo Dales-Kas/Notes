@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Notes.Models"
+             xmlns:local1="clr-namespace:Notes.Views.Budget"
+             x:Class="Notes.Views.Budget.Charts"
+             xmlns:dxc="http://schemas.devexpress.com/xamarin/2014/forms/charts"
+             x:Name="ThisPage">
+    <ContentPage.BindingContext>
+        <local:ViewModel/>
+    </ContentPage.BindingContext>
+
+    <!--<StackLayout Orientation="Vertical">-->
+    
+    <!--<dxc:ChartView>
+        <dxc:ChartView.SeriesDataTemplate>
+            <dxc:SeriesTemplateAdapter DataSource="{Binding SeriesData}"
+                                       SeriesDataMember="Description"
+                                       ArgumentDataMember="Amount">
+                <dxc:SeriesTemplateAdapter.ValueDataMembers>
+                    <dxc:ValueDataMember Type="Value" Member="Gdp"/>
+                </dxc:SeriesTemplateAdapter.ValueDataMembers>
+                <dxc:SeriesTemplateAdapter.SeriesTemplate>
+                    <DataTemplate>
+                        <dxc:BarSeries DisplayName="{Binding Path=SeriesDataMemberValue}"/>
+                    </DataTemplate>
+                </dxc:SeriesTemplateAdapter.SeriesTemplate>
+            </dxc:SeriesTemplateAdapter>
+        </dxc:ChartView.SeriesDataTemplate>
+        <dxc:ChartView.AxisY>
+            <dxc:NumericAxisY AlwaysShowZeroLevel="False">
+                <dxc:NumericAxisY.Style>
+                    <dxc:AxisStyle MajorTickmarksVisible="True"
+                                   MinorTickmarksVisible="True"/>
+                </dxc:NumericAxisY.Style>
+                <dxc:NumericAxisY.Title>
+                    <dxc:AxisTitle Text="ГРН."/>
+                </dxc:NumericAxisY.Title>
+            </dxc:NumericAxisY>
+        </dxc:ChartView.AxisY>
+        <dxc:ChartView.AxisX>
+            <dxc:NumericAxisX GridAlignment="1"/>
+        </dxc:ChartView.AxisX>
+        <dxc:ChartView.Legend>
+            <dxc:Legend/>
+        </dxc:ChartView.Legend>
+    </dxc:ChartView>-->
+
+    <dxc:PieChartView>
+
+        <dxc:PieChartView.Hint>
+            <dxc:PieHint Enabled="True"/>
+        </dxc:PieChartView.Hint>
+
+        <dxc:PieChartView.Series>
+
+            <dxc:DonutSeries>
+                <dxc:DonutSeries.Data>
+                    <dxc:PieSeriesDataAdapter DataSource="{Binding Operations}" 
+                                              LabelDataMember="Description"
+                                              ValueDataMember="Amount"/>
+                </dxc:DonutSeries.Data>
+
+                <dxc:DonutSeries.Label>
+                    <dxc:PieSeriesLabel Position="TwoColumns" TextPattern="{}{VP}%" Indent="20"/>
+                </dxc:DonutSeries.Label>
+
+                <dxc:DonutSeries.HintOptions>
+                    <dxc:PieSeriesHintOptions PointTextPattern="{}{L}: {V} грн."/>
+                </dxc:DonutSeries.HintOptions>
+
+            </dxc:DonutSeries>
+
+        </dxc:PieChartView.Series>
+
+        <!--<dxc:PieChartView.Legend>
+            <dxc:Legend Orientation="TopToBottom"
+                        HorizontalPosition="RightOutside"
+                        VerticalPosition="Center"/>
+        </dxc:PieChartView.Legend>-->
+
+    </dxc:PieChartView>
+
+    <!--</StackLayout>-->
+
+</ContentPage>

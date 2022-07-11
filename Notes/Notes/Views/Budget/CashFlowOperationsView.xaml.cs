@@ -10,6 +10,8 @@ using Notes.Models.Budget;
 using System.Globalization;
 using Xamarin.CommunityToolkit.Extensions;
 using Newtonsoft.Json;
+using System.Windows.Input;
+using Expandable;
 
 namespace Notes.Views.Budget
 {
@@ -19,6 +21,12 @@ namespace Notes.Views.Budget
         //public List<CashFlowOperations> Items { get; set; }
 
         public CashFlowDetailedType detailedTypeFilter = null;
+
+        private ICommand _tapCommand;
+        public ICommand TapCommand => _tapCommand ?? (_tapCommand = new Command(p =>
+        {
+            //DisplayAlert("Tapped", p.ToString(), "Ok");
+        }));
 
         public string DetailedTypeFilterName
         {
@@ -201,6 +209,8 @@ namespace Notes.Views.Budget
             MyListView1.ItemsSource = filteredItems.Where(x => x.TypeID == 1).ToList();
             MyListView2.ItemsSource = filteredItems.Where(x => x.TypeID == 2).ToList();
 
+            //MyChars.DataSource = filteredItems.ToList();
+
             //Set current items:
 
             MyListView1.ScrollTo(LastItem1, animate: false);
@@ -293,8 +303,8 @@ namespace Notes.Views.Budget
                         }
                         ).OrderBy(x => x.PeriodStart).ToList();
 
-                DateTime lastdate = PeriodsOfOperations[^1].PeriodStart;
                 DateTime curdate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime lastdate = PeriodsOfOperations.Count > 0 ? PeriodsOfOperations[^1].PeriodStart : new DateTime(curdate.Year, curdate.Month - 1, 1);
                 if (lastdate < curdate)
                 {
                     lastdate = lastdate.AddMonths(1);
@@ -1044,6 +1054,32 @@ namespace Notes.Views.Budget
         {
             //await AninateList(false);
             //await AninateList(true);
+        }
+
+        private void LifecycleEffect_Loaded(object sender, EventArgs e)
+        {
+
+        }
+
+        private void LifeCycleEffect_Unloaded(object sender, EventArgs e)
+        {
+
+        }
+        private async void OnStatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            //var rotation = 0;
+            //switch (e.Status)
+            //{
+            //    case ExpandStatus.Collapsing:
+            //        break;
+            //    case ExpandStatus.Expanding:
+            //        rotation = 180;
+            //        break;
+            //    default:
+            //        return;
+            //}
+
+            //await arrow.RotateTo(rotation, 200, Easing.CubicInOut);
         }
     }
 

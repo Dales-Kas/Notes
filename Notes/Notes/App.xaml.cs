@@ -37,6 +37,7 @@ namespace Notes
         public App()
         {
             //Device.SetFlags(new string[] { "SwipeView_Experimental", "AppTheme_Experimental" });
+            DevExpress.XamarinForms.Charts.Initializer.Init();
 
             InitializeComponent();
 

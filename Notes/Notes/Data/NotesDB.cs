@@ -200,6 +200,31 @@ namespace Notes.Data
             return resault.Count > 0 ? resault[0] : default(T);
         }
 
+        public List<T> SelectAllFrom<T, F>(F id = default, string name = "ID", bool idIsArray = false) where T : new()
+        {
+            var mapping = db_add.GetMapping<T>();
+
+            string query = String.Format("select * from {0}", mapping.TableName);
+
+            if (idIsArray == true)
+            {
+                //var dbRep = await db.ExecuteScalarAsync<string>($"select ID from {mapping.TableName} LIMIT 1");
+
+                //query = string.Format("Select * from [TableName] where ImageId in (x'{0}')", );                
+                //query += $" where {name} = '000341c3-65e2-2104-1237-f3a943bebea7'";
+                query += $" where {name} IN ('{id}')";
+                return db_add.Query<T>(query);
+            }
+            else if (!id.Equals(default(F)))
+            {
+                query += $" where {name} {(idIsArray ? "IN" : "=")} ?";
+
+                return db_add.Query<T>(query, id);
+            }
+
+            return db_add.Query<T>(query);
+        }
+
         public T SelectFrom<T, F>(F id = default, string name = "ID") where T : new()
         {
             var mapping = db_add.GetMapping<T>();
@@ -505,6 +530,74 @@ namespace Notes.Data
             return await db.QueryAsync<CashFlowOperationsToShow>(query, periodStart, periodEnd, dateFilter > DateTime.MinValue, dateFilterMin, dateFilterMax, detailedTypeFilter != null, typeID, clientFilter != null, clientID, inOperationFilter, Models.OperationType.InOperation, outOperationFilter, Models.OperationType.OutOperation);
         }
 
+        public List<CashFlowOperationsToShow> GetAllCashOperationsSync(DateTime periodStart, DateTime periodEnd, CashFlowDetailedType detailedTypeFilter, Clients clientFilter, DateTime dateFilter, bool inOperationFilter, bool outOperationFilter)
+        {
+            DateTime dateFilterMin = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day);
+            DateTime dateFilterMax = new DateTime(dateFilter.Date.Year, dateFilter.Date.Month, dateFilter.Date.Day, 23, 59, 59);
+
+            Guid typeID = Guid.NewGuid();
+
+            if (detailedTypeFilter != null)
+                typeID = detailedTypeFilter.ID;
+
+            Guid clientID = Guid.NewGuid();
+
+            if (clientFilter != null)
+                clientID = clientFilter.ID;
+
+            var mapping = db_add.GetMapping<CashFlowOperations>();
+            string query =
+            $@"SELECT                 
+                item.ID,
+                item.MonoId,
+                item.ID_Parent,
+                item.Date,
+                item.OperationType,
+                item.TypeID,
+                item.Client,
+                item.StorageID,
+                item.DetailedTypeID,
+                item.CurrencyID, 
+                item.Amount,
+                item.Description,
+                item.AmountСurrency,
+                item.ExchangeRate,
+                item.CurrencyExchangeRate,
+                item.IsIncludeCommission,
+                item.IsСurrencyOperartion,
+                item.IsFixedOperartion,
+                item.IsPlan,
+                item.AmountCommission,
+                item.AmountDelayCommission,
+                item.AmountBalanceAfterOperation,
+                item.DontUseInCashFlow,
+                item.AmountInSMS,      
+                item.TextToIdentifyClient,
+                item.MCC,
+                clients.Name as ClientName,
+                storages.Name as StorageName,
+                detail.Name as DetailedTypeName,
+                currencies.Descripton as CurrencyName,
+                ifnull(detail.OperationColor,""#FFFFFFFF"") as OperationColor
+            FROM 
+                {mapping.TableName} as item
+                LEFT JOIN Clients as clients ON(item.Client = clients.ID)
+                LEFT JOIN MoneyStorages as storages ON(item.StorageID = storages.ID)
+                LEFT JOIN CashFlowDetailedType as detail ON (item.DetailedTypeID = detail.ID)
+                LEFT JOIN Currencies as currencies ON (item.CurrencyID = currencies.Code)
+
+            WHERE Date >= ? and Date <= ?
+                AND case when ? then Date >= ? and Date <= ? else true end            
+                AND case when ? then DetailedTypeID = ? else true end
+                AND case when ? then Client = ? else true end
+                AND case when ? then OperationType = ? else true end
+                AND case when ? then OperationType = ? else true end
+            ORDER BY Date desc";
+
+            return db_add.Query<CashFlowOperationsToShow>(query, periodStart, periodEnd, dateFilter > DateTime.MinValue, dateFilterMin, dateFilterMax, detailedTypeFilter != null, typeID, clientFilter != null, clientID, inOperationFilter, Models.OperationType.InOperation, outOperationFilter, Models.OperationType.OutOperation);
+        }
+
+
         public async Task<List<Balance>> GetBalance(DateTime dateStart, DateTime dateEnd, bool foreignCurrency)
         {
             var mapping = await db.GetMappingAsync<CashFlowOperations>();
@@ -547,7 +640,6 @@ namespace Notes.Data
                 WHERE 
                     item.Date <= ?2";
 
-            //return await db.QueryAsync<Balance>(query, dateStart, dateEnd, dateStart, dateEnd, dateEnd);            
             return await db.QueryAsync<Balance>(query, dateStart, dateEnd);
         }
 
@@ -600,6 +692,59 @@ namespace Notes.Data
                 ORDER BY item.Amount desc";
             return await db.QueryAsync<CashFlowOperations>(query);
         }
+
+        public List<CashFlowOperations> GetAllCashOperationsToPrintSync(List<Guid> guids, string groupField)
+        {
+            string ids = GuidsToString(guids);
+
+            var mapping = db_add.GetMapping<CashFlowOperations>();
+
+            string groupFieldinQuery = "";
+            string JoinFieldinQuery = "";
+
+            if (groupField == "Client")
+            {
+                //groupField = @"IFNULL(Clients.Name,"""")";
+                groupField = "Clients.Name";
+                groupFieldinQuery = groupField + " as Description,";
+                JoinFieldinQuery = "LEFT JOIN Clients as Clients ON (item.Client = Clients.ID)";
+                //groupField += ",";
+            }
+            else if (groupField == "Description")
+            {
+                groupField = @"ifnull(item.Description,"""")";
+                groupFieldinQuery = groupField + " as Description,";
+                //groupField += ",";
+            }
+            else if (groupField == "DetailedTypeID")
+            {
+                groupField = @"IFNULL(detail.Name,""Не вказано статтю"")";
+                //groupField = "detail.Name";
+                groupFieldinQuery = groupField + " as Description,";
+                JoinFieldinQuery = "LEFT JOIN CashFlowDetailedType as detail ON (item.DetailedTypeID = detail.ID)";
+                //groupField += ",";
+            }
+            else
+            {
+                groupField = "item.OperationType";
+                groupFieldinQuery = groupField + " as Description,";
+            }
+
+            string query =
+            $@"SELECT                    
+                    {groupFieldinQuery}
+                    SUM(item.AmountСurrency) as AmountСurrency,
+                    SUM(item.Amount) as Amount
+                FROM {mapping.TableName} as item
+                    {JoinFieldinQuery}
+                WHERE 
+                    item.ID IN ('{ids}')
+                GROUP BY
+                    {groupField}
+                ORDER BY item.Amount desc";
+            return db_add.Query<CashFlowOperations>(query);
+        }
+
 
         public string GuidsToString(List<Guid> guids)
         {
